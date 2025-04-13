@@ -30,13 +30,13 @@ curl http://localhost:8080/.well-known/openid-configuration
 curl http://localhost:8080/.well-known/jwks.json
 ```
 
-1. Open a browser and log in using the Test UI
+5. Open a browser and log in using the Test UI
  - Enter the following URL into your browser.
 > http://localhost:8080/authorize?client_id=default&response_type=id_token&scope=openid%20email&redirect_uri=http://localhost&nonce=12345
  - Follow the instructions on your browser to log in.
  - **Note that the LocalHostedService demo skips checking the redirest_uri.**
 
-1. Extract the id_token from the address bar and decode it with [jwt.io](https://jwt.io/)
+6. Extract the id_token from the address bar and decode it with [jwt.io](https://jwt.io/)
  - You should get a result similar to the following.
  - See the source of [pkg/testui](../../pkg/testui) for claims on id_token
 ```json
