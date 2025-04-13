@@ -1,0 +1,62 @@
+// MIT License
+//
+// Copyright (c) 2025 Eigen
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+package oppb.v1;
+
+option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
+
+message Jwks {
+  repeated Jwk keys = 1 [json_name = "keys"];
+}
+
+message Jwk {
+  string kty = 1 [json_name = "kty"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.1 and https://www.rfc-editor.org/rfc/rfc7518#section-6.1 and https://www.rfc-editor.org/rfc/rfc8037.html#section-2
+  string use = 2 [json_name = "use"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.2
+  repeated string key_ops = 3 [json_name = "key_ops"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.3
+  string alg = 4 [json_name = "alg"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.4 and https://www.rfc-editor.org/rfc/rfc7518#section-4.1
+  string kid = 5 [json_name = "kid"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.5
+  string x5u = 6 [json_name = "x5u"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.6
+  repeated string x5c = 7 [json_name = "x5c"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.7
+  string x5t = 8 [json_name = "x5t"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.8
+  string x5t_s256 = 9 [json_name = "x5t#256"]; // https://www.rfc-editor.org/rfc/rfc7517#section-4.9
+  string crv = 10 [json_name = "crv"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.2.1.1 and https://www.rfc-editor.org/rfc/rfc8037.html#section-2
+  string x = 11 [json_name = "x"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.2.1.2 and https://www.rfc-editor.org/rfc/rfc8037.html#section-2
+  string y = 12 [json_name = "y"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.2.1.3
+  string d = 13 [json_name = "d"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.2.2.1 and https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.1 and https://www.rfc-editor.org/rfc/rfc8037.html#section-2
+  string n = 14 [json_name = "n"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.1.1
+  string e = 15 [json_name = "e"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.1.2
+  string p = 16 [json_name = "p"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.2
+  string q = 17 [json_name = "q"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.3
+  string dp = 18 [json_name = "dp"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.4
+  string dq = 19 [json_name = "dq"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.5
+  string qi = 20 [json_name = "qi"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.6
+  repeated JwkOtherPrime oth = 21 [json_name = "oth"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.7
+  string k = 22 [json_name = "k"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.4.1
+}
+
+message JwkOtherPrime {
+  string r = 1 [json_name = "r"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.7.1
+  string d = 2 [json_name = "d"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.7.2
+  string t = 3 [json_name = "t"]; // https://www.rfc-editor.org/rfc/rfc7518#section-6.3.2.7.3
+}
