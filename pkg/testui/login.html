@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Test</title>
+  </head>
+
+  <body>
+    <h1>Welcome</h1>
+    {{if .IsShowMessage}}
+    <div>{{.Message}}</div>
+    {{end}}
+
+    <form class="form" action="/login" method="post">
+      <div><input type="text" name="username" placeholder="Username" /></div>
+      <div><input type="password" name="password" placeholder="Password" /></div>
+      <div><input type="hidden" name="request_id" value="{{.Param.RequestId}}" /></div>
+
+      <p>Please login if you agree to grant the application({{.Param.Client.ClientName}}) the following scopes.</p>
+      <ul>
+        {{range .Param.AuthParams.Scopes}}
+        <li>{{.}}</li>
+        {{end}}  
+      </ul>
+
+      <button type="submit" id="login-button">Login</button>
+    </form>
+    <form class="form" action="/cancel" method="post">
+      <input type="hidden" name="request_id" value="{{.Param.RequestId}}" />
+      <button type="submit" id="cancel-button">Cancel</button>
+    </form>
+    
+    <hr/>
+    
+    <table>
+      <tbody>
+        <tr>
+          <th>Username</th><td>user</td>
+        </tr>
+        <tr>
+          <th>Password</th><td>pass</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
