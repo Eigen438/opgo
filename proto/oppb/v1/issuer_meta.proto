@@ -1,0 +1,115 @@
+// MIT License
+//
+// Copyright (c) 2025 Eigen
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+package oppb.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
+
+// The order of the descriptions should follow the RFC they were cited from.
+message IssuerMeta {
+  // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+  string issuer = 1 [
+    json_name = "issuer",
+    (buf.validate.field).string.uri = true
+  ];
+  string authorization_endpoint = 2 [
+    json_name = "authorization_endpoint",
+    (buf.validate.field).string.uri = true
+  ];
+  string token_endpoint = 3 [
+    json_name = "token_endpoint",
+    (buf.validate.field).string.uri = true
+  ];
+  string userinfo_endpoint = 4 [
+    json_name = "userinfo_endpoint",
+    (buf.validate.field).string.uri = true
+  ];
+  string jwks_uri = 5 [
+    json_name = "jwks_uri",
+    (buf.validate.field).string.uri = true
+  ];
+  string registration_endpoint = 6 [json_name = "registration_endpoint"];
+  repeated string scopes_supported = 7 [
+    json_name = "scopes_supported",
+    (buf.validate.field).repeated.min_items = 1
+  ];
+  repeated string response_types_supported = 8 [
+    json_name = "response_types_supported",
+    (buf.validate.field).repeated.min_items = 1
+  ];
+  repeated string response_modes_supported = 9 [json_name = "response_modes_supported"];
+  repeated string grant_types_supported = 10 [json_name = "grant_types_supported"];
+  repeated string acr_values_supported = 11 [json_name = "acr_values_supported"];
+  repeated string subject_types_supported = 12 [
+    json_name = "subject_types_supported",
+    (buf.validate.field).repeated.min_items = 1
+  ];
+  repeated string id_token_signing_alg_values_supported = 13 [
+    json_name = "id_token_signing_alg_values_supported",
+    (buf.validate.field).repeated.min_items = 1
+  ];
+  repeated string id_token_encryption_alg_values_supported = 14 [json_name = "id_token_encryption_alg_values_supported"];
+  repeated string id_token_encryption_enc_values_supported = 15 [json_name = "id_token_encryption_enc_values_supported"];
+  repeated string userinfo_signing_alg_values_supported = 16 [json_name = "userinfo_signing_alg_values_supported"];
+  repeated string userinfo_encryption_alg_values_supported = 17 [json_name = "userinfo_encryption_alg_values_supported"];
+  repeated string userinfo_encryption_enc_values_supported = 18 [json_name = "userinfo_encryption_enc_values_supported"];
+  repeated string request_object_signing_alg_values_supported = 19 [json_name = "request_object_signing_alg_values_supported"];
+  repeated string request_object_encryption_alg_values_supported = 20 [json_name = "request_object_encryption_alg_values_supported"];
+  repeated string request_object_encryption_enc_values_supported = 21 [json_name = "request_object_encryption_enc_values_supported"];
+  repeated string token_endpoint_auth_methods_supported = 22 [json_name = "token_endpoint_auth_methods_supported"];
+  repeated string token_endpoint_auth_signing_alg_values_supported = 23 [json_name = "token_endpoint_auth_signing_alg_values_supported"];
+  repeated string display_values_supported = 24 [json_name = "display_values_supported"];
+  repeated string claim_types_supported = 25 [json_name = "claim_types_supported"];
+  repeated string claims_supported = 26 [json_name = "claims_supported"];
+  string service_documentation = 27 [json_name = "service_documentation"];
+  repeated string claims_locales_supported = 28 [json_name = "claims_locales_supported"];
+  repeated string ui_locales_supported = 29 [json_name = "ui_locales_supported"];
+  bool claims_parameter_supported = 30 [json_name = "claims_parameter_supported"];
+  bool request_parameter_supported = 31 [json_name = "request_parameter_supported"];
+  bool request_uri_parameter_supported = 32 [json_name = "request_uri_parameter_supported"];
+  bool require_request_uri_registration = 33 [json_name = "require_request_uri_registration"];
+  string op_policy_uri = 34 [json_name = "op_policy_uri"];
+  string op_tos_uri = 35 [json_name = "op_tos_uri"];
+  // https://openid.net/specs/openid-connect-rpinitiated-1_0.html#OPMetadata
+  string end_session_endpoint = 36 [json_name = "end_session_endpoint"];
+  // https://www.rfc-editor.org/rfc/rfc9126.html#section-5
+  string pushed_authorization_request_endpoint = 37 [json_name = "pushed_authorization_request_endpoint"];
+  bool require_pushed_authorization_requests = 38 [json_name = "require_pushed_authorization_requests"];
+  // https://openid.net/specs/openid-financial-api-jarm.html#authorization-server-metadata
+  repeated string authorization_signing_alg_values_supported = 39 [json_name = "authorization_signing_alg_values_supported"];
+  repeated string authorization_encryption_alg_values_supported = 40 [json_name = "authorization_encryption_alg_values_supported"];
+  repeated string authorization_encryption_enc_values_supported = 41 [json_name = "authorization_encryption_enc_values_supported"];
+  // https://datatracker.ietf.org/doc/html/rfc9207#name-authorization-server-metada
+  bool authorization_response_iss_parameter_supported = 42 [json_name = "authorization_response_iss_parameter_supported"];
+  // https://openid.net/specs/openid-connect-backchannel-1_0.html#BCSupport
+  bool backchannel_logout_supported = 43 [json_name = "backchannel_logout_supported"];
+  bool backchannel_logout_session_supported = 44 [json_name = "backchannel_logout_session_supported"];
+  // https://openid.net/specs/openid-connect-frontchannel-1_0.html#OPLogout
+  bool frontchannel_logout_supported = 45 [json_name = "frontchannel_logout_supported"];
+  bool frontchannel_logout_session_supported = 46 [json_name = "frontchannel_logout_session_supported"];
+  // https://datatracker.ietf.org/doc/html/rfc8705#section-3.3
+  bool tls_client_certificate_bound_access_tokens = 47 [json_name = "tls_client_certificate_bound_access_tokens"];
+}

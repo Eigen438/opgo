@@ -1,0 +1,109 @@
+// MIT License
+//
+// Copyright (c) 2025 Eigen
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+package oppb.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "oppb/v1/client.proto";
+import "oppb/v1/client_meta.proto";
+import "oppb/v1/common.proto";
+import "oppb/v1/issuer.proto";
+import "oppb/v1/issuer_meta.proto";
+import "oppb/v1/session_group.proto";
+
+option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
+
+service RestService {
+  rpc IssuerCreate(IssuerCreateRequest) returns (IssuerCreateResponse) {
+    option (google.api.http) = {
+      post: "/issuer/new"
+      body: "*"
+    };
+  }
+  rpc IssuerGet(IssuerGetRequest) returns (IssuerGetResponse) {
+    option (google.api.http) = {get: "/issuer"};
+  }
+  rpc IssuerUpdate(IssuerUpdateRequest) returns (IssuerUpdateResponse) {
+    option (google.api.http) = {
+      post: "/issuer"
+      body: "*"
+    };
+  }
+  rpc ClientCreate(ClientCreateRequest) returns (ClientCreateResponse);
+  rpc SessionGroupCreate(SessionGroupCreateRequest) returns (SessionGroupCreateResponse);
+}
+
+message IssuerCreateRequest {
+  IssuerMeta meta = 1 [
+    json_name = "meta",
+    (buf.validate.field).required = true
+  ];
+  IssuerAttribute attribute = 2 [json_name = "attribute"];
+}
+
+message IssuerCreateResponse {
+  CommonKey key = 1 [json_name = "key"];
+  IssuerMeta meta = 2 [json_name = "meta"];
+  IssuerSecret secret = 3 [json_name = "secret"];
+  IssuerAttribute attribute = 4 [json_name = "attribute"];
+}
+
+message IssuerGetRequest {}
+
+message IssuerGetResponse {
+  IssuerMeta meta = 1 [json_name = "meta"];
+  IssuerAttribute attribute = 2 [json_name = "attribute"];
+}
+
+message IssuerUpdateRequest {
+  IssuerMeta meta = 1 [json_name = "meta"];
+  IssuerAttribute attribute = 2 [json_name = "attribute"];
+}
+
+message IssuerUpdateResponse {
+  IssuerMeta meta = 1 [json_name = "meta"];
+  IssuerAttribute attribute = 2 [json_name = "attribute"];
+}
+
+message ClientCreateRequest {
+  ClientIdentity identity = 1 [json_name = "identity"];
+  ClientMeta meta = 2 [json_name = "mata"];
+  ClientAttribute attribute = 3 [json_name = "attribute"];
+}
+
+message ClientCreateResponse {
+  ClientIdentity identity = 1 [json_name = "identity"];
+  ClientMeta meta = 2 [json_name = "mata"];
+  ClientAttribute attribute = 3 [json_name = "attribute"];
+}
+
+message SessionGroupCreateRequest {
+  CommonKey key = 1 [json_name = "key"];
+  SessionGroupAttribute attribute = 2 [json_name = "attribute"];
+}
+
+message SessionGroupCreateResponse {
+  SessionGroupAttribute attribute = 1 [json_name = "attribute"];
+}

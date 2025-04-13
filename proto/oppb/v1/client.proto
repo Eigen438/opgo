@@ -1,0 +1,54 @@
+// MIT License
+//
+// Copyright (c) 2025 Eigen
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+package oppb.v1;
+
+import "oppb/v1/client_meta.proto";
+import "oppb/v1/common.proto";
+
+option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
+
+enum EnumClientProfile {
+  ENUM_CLIENT_PROFILE_UNSPECIFIED = 0;
+  ENUM_CLIENT_PROFILE_FAPI_1_0 = 1;
+  ENUM_CLIENT_PROFILE_FAPI_2_0 = 2;
+}
+
+message ClientAttribute {
+  int64 access_token_lifetime_seconds = 1 [json_name = "access_token_lifetime_seconds"];
+  int64 authorization_code_lifetime_seconds = 2 [json_name = "authorization_code_lifetime_seconds"];
+  int64 id_token_lifetime_seconds = 3 [json_name = "id_token_lifetime_seconds"];
+  int64 refresh_token_lifetime_seconds = 4 [json_name = "refresh_token_lifetime_seconds"];
+  int64 request_lifetime_seconds = 5 [json_name = "request_lifetime_seconds"];
+  string session_group_id = 6 [json_name = "session_group_id"];
+  EnumClientProfile profile = 11 [json_name = "profile"];
+  repeated string tls_client_certificates = 12 [json_name = "tls_client_certificates"];
+}
+
+message Client {
+  ClientIdentity identity = 1 [json_name = "identity"];
+  CommonKey issuer = 2 [json_name = "issuer"];
+  ClientMeta meta = 3 [json_name = "meta"];
+  ClientAttribute attribute = 4 [json_name = "attribute"];
+}
