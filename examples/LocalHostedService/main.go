@@ -101,6 +101,8 @@ func main() {
 	mux.HandleFunc("/login", testui.LoginHandler(s))
 	mux.HandleFunc("/cancel", testui.CancelHandler(s))
 
+	log.Printf("start server")
+
 	server := http.Server{
 		Addr: ":" + port,
 		Handler: cors.New(cors.Options{

@@ -8,7 +8,7 @@ LocalHostedService is a test provider that allows simple login and returns a sin
 
 ```sh
 git clone https://github.com/Eigen438/opgo.git
-cd examples/LocalHostedService
+cd opgo/examples/LocalHostedService
 ```
 
 2. Run the following command to start the provider
