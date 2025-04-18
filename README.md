@@ -24,7 +24,7 @@ Additionally, opgo can also function as an OP simulator using the provided sampl
 ### Installation
 
 ```bash
-go get [github.com/Eigen438/opgo](https://github.com/Eigen438/opgo)
+go get https://github.com/Eigen438/opgo
 ```
 
 ## Basic Usage
