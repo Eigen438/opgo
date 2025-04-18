@@ -1,18 +1,19 @@
 # opgo
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **opgo** is an SDK for building OpenID Connect Providers (OPs) in Go.
-By implementing configurations that determine the provider's behavior, user interfaces, user information for authentication, and storage for session states, users can create their own OPs.
-Alternatively, it can be run as an OP simulator using the sample code for developing Relying Parties (RPs).
+Users can create their own OPs by implementing configurations that determine the provider's behavior, user interfaces, user information for authentication, and storage for session states.
+Alternatively, opgo can be run as an OP simulator using the sample code for developing Relying Parties (RPs).
 
 ## Features
-By utilizing opgo, you can flexibly implement the following elements to build your own OpenID Connect Provider:
+By utilizing opgo, users can flexibly implement the following elements to build their own OpenID Connect Provider:
 
-* **Configuration**: Various settings to determine the provider's behavior.
-* **UI**: User interfaces such as authentication and consent screens.
-* **User Information**: Management of user information for authentication.
-* **Storage**: Persistence of session states and other data.
+* **Configuration**: You can implement various settings to determine the provider's behavior.
+* **UI**: You can implement user interfaces such as authentication and consent screens.
+* **User Information**: You can implement the management of user information for authentication.
+* **Storage**: You can implement the persistence of session states and other data.
 
-Additionally, it can also function as an OP simulator using the provided sample code for developing Relying Parties (RPs).
+Additionally, opgo can also function as an OP simulator using the provided sample code for developing Relying Parties (RPs).
 
 ## Getting Started
 
@@ -197,26 +198,26 @@ func (t *TokenIdentifierLink) DeleteTokens(ctx context.Context) {
 ```
 
 ### The code above performs the following actions:
-- **Configuration**: Defines the OP metadata in the oppb.IssuerMeta struct.
-- **Storage**: Initializes an in-memory storage using inmemstore.New and sets it to dataprovider.
-- **SDK Initialization**: Creates an SDK instance using the opgo.NewHostedSdk function.
-- **Client Registration**: Registers an initial client using the s.ClientCreate function.
-- **Routing**: Obtains an http.ServeMux to handle requests to the OP's endpoints using s.ServeMux, and adds custom handlers (/login, /cancel).
-- **Server Startup**: Starts an HTTP server using the net/http package to handle incoming requests.
+- **Configuration**: Defines the OP metadata in the `oppb.IssuerMeta` struct.
+- **Storage**: Initializes an in-memory storage using `inmemstore.New` and sets it to `dataprovider`.
+- **SDK Initialization**: Creates an SDK instance using the `opgo.NewHostedSdk` function.
+- **Client Registration**: Registers an initial client using the `s.ClientCreate` function.
+- **Routing**: Obtains an `http.ServeMux` to handle requests to the OP's endpoints using `s.ServeMux`, and adds custom handlers (`/login`, `/cancel`).
+- **Server Startup**: Starts an HTTP server using the `net/http` package to handle incoming requests.
 
 ### Customization
-When using opgo, you can build your own unique OpenID Connect Provider by implementing and configuring the following aspects:
+When using opgo, users can build their own unique OpenID Connect Provider by implementing and configuring the following aspects:
 
-- **Storage**: Besides inmemstore, you can implement persistent storage using databases or other methods.
-- **UI**: Instead of the testui package, you can implement your own authentication and consent screens.
-- **Callbacks**: You can implement callback functions to perform custom logic before and after authentication processes.
-- **Configuration**: By modifying structs like oppb.IssuerMeta and opgo.ClientParam, you can precisely control the behavior of your OP.
+- **Storage**: Besides `inmemstore`, users can implement persistent storage using databases or other methods.
+- **UI**: Instead of the `testui` package, users can implement their own authentication and consent screens.
+- **Callbacks**: Users can implement callback functions to perform custom logic before and after authentication processes.
+- **Configuration**: By modifying structs like `oppb.IssuerMeta` and `opgo.ClientParam`, users can precisely control the behavior of their OP.
 
 # Contributing
 Feel free to submit bug reports and feature requests through GitHub Issues. Pull requests are also welcome.
 
 # Acknowledgment
-The development of opgo was inspired by Authlete. We extend our sincere gratitude to them.
+The development of opgo was inspired by [Authlete](https://www.authlete.com/). We extend our sincere gratitude to them.
 
 # License
 MIT License
