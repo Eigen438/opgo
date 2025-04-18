@@ -1,11 +1,8 @@
 # opgo
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 **opgo** is an SDK for building OpenID Connect Providers (OPs) in Go.
 By implementing configurations that determine the provider's behavior, user interfaces, user information for authentication, and storage for session states, users can create their own OPs.
 Alternatively, it can be run as an OP simulator using the sample code for developing Relying Parties (RPs).
-
-The `NewHostedSdk` function is part of the `opgo` SDK, which facilitates the creation of OpenID Connect Providers (OPs) in Go. This function initializes a hosted instance of the `opgo` SDK.
-
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 By utilizing opgo, you can flexibly implement the following elements to build your own OpenID Connect Provider:
@@ -21,7 +18,7 @@ Additionally, it can also function as an OP simulator using the provided sample 
 
 ### Prerequisites
 
-* Go 1.18 or higher
+* Go 1.23.4 or higher
 
 ### Installation
 
@@ -30,7 +27,7 @@ go get [github.com/Eigen438/opgo](https://github.com/Eigen438/opgo)
 ```
 
 ## Basic Usage
-```
+```GO
 func main() {
 	ctx := context.Background()
 	port := os.Getenv("PORT")
