@@ -27,7 +27,7 @@ Additionally, opgo can also function as an OP simulator using the provided sampl
 go get [github.com/Eigen438/opgo](https://github.com/Eigen438/opgo)
 ```
 
-## Basic Usage
+### Basic Usage
 ```GO
 func main() {
 	ctx := context.Background()
@@ -205,13 +205,16 @@ func (t *TokenIdentifierLink) DeleteTokens(ctx context.Context) {
 - **Routing**: Obtains an `http.ServeMux` to handle requests to the OP's endpoints using `s.ServeMux`, and adds custom handlers (`/login`, `/cancel`).
 - **Server Startup**: Starts an HTTP server using the `net/http` package to handle incoming requests.
 
-### Customization
+# Customization
 When using opgo, users can build their own unique OpenID Connect Provider by implementing and configuring the following aspects:
 
 - **Storage**: Besides `inmemstore`, users can implement persistent storage using databases or other methods.
 - **UI**: Instead of the `testui` package, users can implement their own authentication and consent screens.
 - **Callbacks**: Users can implement callback functions to perform custom logic before and after authentication processes.
 - **Configuration**: By modifying structs like `oppb.IssuerMeta` and `opgo.ClientParam`, users can precisely control the behavior of their OP.
+
+# Examples
+For a practical example of how to use **opgo**, check out the [LocalHostedService example](examples/LocalHostedService). This example demonstrates how to set up a locally hosted OpenID Connect Provider using the opgo SDK.
 
 # Contributing
 Feel free to submit bug reports and feature requests through GitHub Issues. Pull requests are also welcome.
