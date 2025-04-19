@@ -1,5 +1,6 @@
 # opgo
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![license](https://badgen.net/github/license/eigen438/opgo/)](https://github.com/eigen438/opgo/blob/master/LICENSE)
+[![release](https://badgen.net/github/release/eigen438/opgo/stable)](https://github.com/zitadel/oidc/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/eigen438/opgo)](https://goreportcard.com/report/github.com/eigen438/opgo)
 
 **opgo** is an SDK for building OpenID Connect Providers (OPs) in Go.
