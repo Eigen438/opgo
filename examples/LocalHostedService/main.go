@@ -43,7 +43,13 @@ import (
 func main() {
 	ctx := context.Background()
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	issuer := os.Getenv("ISSUER")
+	if issuer == "" {
+		issuer = "http://localhost:" + port
+	}
 
 	// use storage on memory
 	memstore := inmemstore.New(1 * time.Minute)
@@ -101,7 +107,7 @@ func main() {
 	mux.HandleFunc("/login", testui.LoginHandler(s))
 	mux.HandleFunc("/cancel", testui.CancelHandler(s))
 
-	log.Printf("start server")
+	log.Printf("start server(port:%s)", port)
 
 	server := http.Server{
 		Addr: ":" + port,
