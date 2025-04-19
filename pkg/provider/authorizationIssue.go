@@ -184,12 +184,12 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 
 		builder, fail := NewRedirectBuilder(iss, r.Details.Client, r.Details.AuthParams, vals)
 		if fail != nil {
-			log.Printf("[BACKEND_ERROR] redirect build errror")
+			log.Printf("[BACKEND_ERROR] redirect build error")
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("redirect build errror1"))
 		}
 		out, err := builder.Build(ctx, time.Now())
 		if err != nil {
-			log.Printf("[BACKEND_ERROR] redirect build errror")
+			log.Printf("[BACKEND_ERROR] redirect build error: %v", err)
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("redirect build errror2"))
 		}
 		if builder.IsFormPost() {

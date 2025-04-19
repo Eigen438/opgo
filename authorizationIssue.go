@@ -49,5 +49,8 @@ func (i *innerSdk) AuthorizationIssue(ctx context.Context, param *IssueRequest) 
 	})
 	auth.SetAuth(req, i)
 	res, err := i.provider.AuthorizationIssue(ctx, req)
-	return res.Msg, err
+	if err != nil {
+		return nil, err
+	}
+	return res.Msg, nil
 }
