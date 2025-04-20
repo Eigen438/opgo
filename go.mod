@@ -1,6 +1,8 @@
 module github.com/Eigen438/opgo
 
-go 1.24.2
+go 1.23.8
+
+toolchain go1.24.1
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250307204501-0409229c3780.1
@@ -8,7 +10,7 @@ require (
 	connectrpc.com/connect v1.18.1
 	connectrpc.com/otelconnect v0.7.2
 	github.com/Eigen438/dataprovider v1.2.0
-	github.com/Eigen438/inmemstore v0.0.1
+	github.com/Eigen438/inmemstore v0.0.2
 	github.com/MicahParks/jwkset v0.9.5
 	github.com/MicahParks/keyfunc/v3 v3.3.10
 	github.com/aidarkhanov/nanoid/v2 v2.0.5
