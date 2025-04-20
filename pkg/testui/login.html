@@ -1,45 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Test</title>
+    <title>Login Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      .form {
+        margin-bottom: 15px;
+      }
+
+      .form div {
+        margin-bottom: 10px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .cancel-button {
+        background-color: #dc3545;
+      }
+
+      .cancel-button:hover {
+        background-color: #a71d2a;
+      }
+
+      ul {
+        padding-left: 20px;
+        color: #555;
+      }
+
+      table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f4f4f9;
+        color: #333;
+      }
+    </style>
   </head>
 
   <body>
-    <h1>Welcome</h1>
-    {{if .IsShowMessage}}
-    <div>{{.Message}}</div>
-    {{end}}
-
-    <form class="form" action="/login" method="post">
-      <div><input type="text" name="username" placeholder="Username" /></div>
-      <div><input type="password" name="password" placeholder="Password" /></div>
-      <div><input type="hidden" name="request_id" value="{{.Param.RequestId}}" /></div>
-
-      <p>Please login if you agree to grant the application({{.Param.Client.ClientName}}) the following scopes.</p>
-      <ul>
-        {{range .Param.AuthParams.Scopes}}
-        <li>{{.}}</li>
-        {{end}}  
-      </ul>
-
-      <button type="submit" id="login-button">Login</button>
-    </form>
-    <form class="form" action="/cancel" method="post">
-      <input type="hidden" name="request_id" value="{{.Param.RequestId}}" />
-      <button type="submit" id="cancel-button">Cancel</button>
-    </form>
-    
-    <hr/>
-    
-    <table>
-      <tbody>
-        <tr>
-          <th>Username</th><td>user</td>
-        </tr>
-        <tr>
-          <th>Password</th><td>pass</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="container">
+      <h1>Welcome</h1>
+      {{if .IsShowMessage}}
+      <div>{{.Message}}</div>
+      {{end}}
+  
+      <form class="form" action="/login" method="post">
+        <label for="username">Username</label>
+        <div><input type="text" name="username" placeholder="Username" /></div>
+        <label for="password">Password</label>
+        <div><input type="password" name="password" placeholder="Password" /></div>
+        <div><input type="hidden" name="request_id" value="{{.Param.RequestId}}" /></div>
+  
+        <p>Please login if you agree to grant the application({{.Param.Client.ClientName}}) the following scopes.</p>
+        <ul>
+          {{range .Param.AuthParams.Scopes}}
+          <li>{{.}}</li>
+          {{end}}  
+        </ul>
+  
+        <button type="submit" id="login-button">Login</button>
+      </form>
+      <form class="form" action="/cancel" method="post">
+        <input type="hidden" name="request_id" value="{{.Param.RequestId}}" />
+        <button type="submit" id="cancel-button">Cancel</button>
+      </form>
+      
+      <hr/>
+      
+      <p>Use the following credentials to log in:</p>
+      <table>
+        <caption>Demo Login Credentials</caption>
+        <tbody>
+          <tr>
+            <th>Username</th><td>user</td>
+          </tr>
+          <tr>
+            <th>Password</th><td>pass</td>
+          </tr>
+        </tbody>
+      </table>  
+    </div>
   </body>
 </html>
