@@ -10,6 +10,8 @@ connectrpc.com/otelconnect v0.7.2 h1:WlnwFzaW64dN06JXU+hREPUGeEzpz3Acz2ACOmN8cMI
 connectrpc.com/otelconnect v0.7.2/go.mod h1:JS7XUKfuJs2adhCnXhNHPHLz6oAaZniCJdSF00OZSew=
 github.com/Eigen438/dataprovider v1.2.0 h1:u40W0gydEdccjRpSlcuy/J7i2bau2wiOJS5uexjJ8eE=
 github.com/Eigen438/dataprovider v1.2.0/go.mod h1:GYSJmFApfVq3FcwXC12dtQOYvEqtiorsz3jLK3PPm+8=
+github.com/Eigen438/inmemstore v0.0.1 h1:vT6W5FJMy1knN6VmPVwIGFW8rIkaKB/XvMYz7GFRkl8=
+github.com/Eigen438/inmemstore v0.0.1/go.mod h1:+Md84oUMot11UIZxvfIQPB4omuzPeTdjb6CjBAuQE1Y=
 github.com/MicahParks/jwkset v0.9.5 h1:/baA2n7RhO7nRIe1rx4ZX1Opeq+mwDuuWi2myDZwqnA=
 github.com/MicahParks/jwkset v0.9.5/go.mod h1:U2oRhRaLgDCLjtpGL2GseNKGmZtLs/3O7p+OZaL5vo0=
 github.com/MicahParks/keyfunc/v3 v3.3.10 h1:JtEGE8OcNeI297AMrR4gVXivV8fyAawFUMkbwNreJRk=

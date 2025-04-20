@@ -24,183 +24,120 @@ package inmemstore
 
 import (
 	"context"
-	"encoding/json"
-	"reflect"
-	"sync"
+	"fmt"
 	"time"
 
-	"go.opentelemetry.io/contrib/bridges/otelslog"
-	"go.opentelemetry.io/otel"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/Eigen438/dataprovider"
+	origin "github.com/Eigen438/inmemstore"
+	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"github.com/Eigen438/opgo/pkg/model"
+	"github.com/Eigen438/opgo/pkg/provider"
 )
 
-const serviceName = "inmemstore"
-
-var (
-	tracer = otel.Tracer(serviceName)
-	logger = otelslog.NewLogger(serviceName)
-)
-
-type storeItem struct {
-	lowItem  []byte
-	expireAt int64
-}
-
-type inner struct {
-	mutex          sync.Mutex
-	items          map[string]*storeItem
-	cleaningWindow time.Duration
+type InmemStore interface {
+	origin.InmemStore
+	provider.ProviderCallbacks
 }
 
 func New(cleaningWindow time.Duration) InmemStore {
-	initMap := map[string]*storeItem{}
 	m := inner{
-		mutex:          sync.Mutex{},
-		items:          initMap,
-		cleaningWindow: cleaningWindow,
+		InmemStore: origin.New(cleaningWindow),
 	}
-	go m.cleaner()
 	return &m
 }
 
-func (i *inner) cleaning(now time.Time) {
-	_, span := tracer.Start(context.Background(), "cleaning")
-	defer span.End()
+type inner struct {
+	origin.InmemStore
+}
 
-	unix := now.Unix()
-	list := []string{}
-	for k, v := range i.items {
-		if v.expireAt != -1 && v.expireAt < unix {
-			list = append(list, k)
-			logger.Debug("*:" + k)
-		} else {
-			logger.Debug(" :" + k)
+func (inner) DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error {
+	// request_id base link
+	link := &tokenIdentifierLink{
+		IssuerId: issuerId,
+		Key:      requestId,
+		Kind:     "request",
+		List:     []string{},
+	}
+	if err := dataprovider.Get(ctx, link); err == nil {
+		link.DeleteTokens(ctx)
+	}
+	return nil
+}
+
+func (inner) DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error {
+	// request_id base link
+	link := &tokenIdentifierLink{
+		IssuerId: issuerId,
+		Key:      sessionId,
+		Kind:     "session",
+		List:     []string{},
+	}
+	if err := dataprovider.Get(ctx, link); err == nil {
+		link.DeleteTokens(ctx)
+	}
+	return nil
+}
+
+func TokenWriteInterceptor(ctx context.Context, data any) {
+	if p, ok := data.(*model.TokenIdentifier); ok {
+		// request_id base link
+		requestLink := &tokenIdentifierLink{
+			IssuerId: p.Details.Authorized.Request.Client.Issuer.Id,
+			Key:      p.Details.Authorized.Request.Key.Id,
+			Kind:     "request",
+			List:     []string{},
 		}
-	}
-	for _, k := range list {
-		delete(i.items, k)
-	}
-}
+		_ = dataprovider.Get(ctx, requestLink)
+		requestLink.List = append(requestLink.List, p.Details.Identifier)
+		requestLink.ExpireAt = time.Now().Add(24 * time.Hour)
+		_ = dataprovider.Set(ctx, requestLink)
 
-func (i *inner) syncCreate(key string, value *storeItem) error {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-	if _, ok := i.items[key]; ok {
-		return status.Error(codes.AlreadyExists, "already exist")
-	} else {
-		i.items[key] = value
-		return nil
-	}
-}
-
-func (i *inner) syncSet(key string, value *storeItem) {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-	i.items[key] = value
-}
-
-func (i *inner) syncGet(key string) (*storeItem, error) {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-	if v, ok := i.items[key]; !ok {
-		return nil, status.Error(codes.NotFound, "not found")
-	} else {
-		return v, nil
-	}
-}
-
-func (i *inner) syncDelete(key string) {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-	delete(i.items, key)
-}
-
-func (i *inner) cleaner() {
-	for {
-		time.Sleep(i.cleaningWindow)
-		i.cleaning(time.Now())
-	}
-}
-
-// Create Pathable data
-func (i *inner) Create(_ctx context.Context, data any) error {
-	ctx, span := tracer.Start(_ctx, "Create")
-	defer span.End()
-
-	rv := reflect.ValueOf(data)
-	if p, ok := rv.Interface().(Pathable); !ok {
-		return status.Error(codes.Unavailable, "not implement Pathable")
-	} else {
-		var expireAt int64 = -1
-		if e, ok := rv.Interface().(Expirable); ok {
-			expireAt = e.ExpireAtUnix(ctx)
+		// session_id base link
+		sessionLink := &tokenIdentifierLink{
+			IssuerId: p.Details.Authorized.Request.Client.Issuer.Id,
+			Key:      p.Details.Authorized.SessionId,
+			Kind:     "session",
+			List:     []string{},
 		}
-
-		if b, err := json.Marshal(data); err != nil {
-			return err
-		} else {
-			return i.syncCreate(p.Path(ctx), &storeItem{
-				lowItem:  b,
-				expireAt: expireAt,
-			})
-		}
+		_ = dataprovider.Get(ctx, sessionLink)
+		sessionLink.List = append(sessionLink.List, p.Details.Identifier)
+		sessionLink.ExpireAt = time.Now().Add(24 * time.Hour)
+		_ = dataprovider.Set(ctx, sessionLink)
 	}
 }
 
-// Write/Set Pathable data
-func (i *inner) Set(_ctx context.Context, data any) error {
-	ctx, span := tracer.Start(_ctx, "Set")
-	defer span.End()
-
-	rv := reflect.ValueOf(data)
-	if p, ok := rv.Interface().(Pathable); !ok {
-		return status.Error(codes.Unavailable, "not implement Pathable")
-	} else {
-		var expireAt int64 = -1
-		if e, ok := rv.Interface().(Expirable); ok {
-			expireAt = e.ExpireAtUnix(ctx)
-		}
-
-		if b, err := json.Marshal(data); err != nil {
-			return err
-		} else {
-			i.syncSet(p.Path(ctx), &storeItem{
-				lowItem:  b,
-				expireAt: expireAt,
-			})
-			return nil
-		}
-	}
+type tokenIdentifierLink struct {
+	IssuerId string
+	Key      string
+	Kind     string
+	List     []string
+	ExpireAt time.Time
 }
 
-// Read/Get Pathable data
-func (i *inner) Get(_ctx context.Context, data any) error {
-	ctx, span := tracer.Start(_ctx, "Get")
-	defer span.End()
-
-	rv := reflect.ValueOf(data)
-	if p, ok := rv.Interface().(Pathable); !ok {
-		return status.Error(codes.Unavailable, "not implement Pathable")
-	} else {
-		if v, err := i.syncGet(p.Path(ctx)); err != nil {
-			return err
-		} else {
-			return json.Unmarshal(v.lowItem, data)
-		}
-	}
+func (t *tokenIdentifierLink) Path(_ context.Context) string {
+	return fmt.Sprintf("opgo/v1/issuers/%s/tokensList/%s/kind/%s", t.IssuerId, t.Key, t.Kind)
 }
 
-// Delete Pathable data
-func (i *inner) Delete(_ctx context.Context, data any) error {
-	ctx, span := tracer.Start(_ctx, "Delete")
-	defer span.End()
+func (t *tokenIdentifierLink) ExpireAtUnix(_ context.Context) int64 {
+	return t.ExpireAt.Unix()
+}
 
-	rv := reflect.ValueOf(data)
-	if p, ok := rv.Interface().(Pathable); !ok {
-		return status.Error(codes.Unavailable, "not implement Pathable")
-	} else {
-		i.syncDelete(p.Path(ctx))
-		return nil
+func (t *tokenIdentifierLink) DeleteTokens(ctx context.Context) {
+	for _, tokenIdentifierId := range t.List {
+		tokenIdentifier := &model.TokenIdentifier{
+			Details: model.TokenIdentifierDetails{
+				Identifier: tokenIdentifierId,
+				Authorized: model.Authorized{
+					Request: model.RequestDetails{
+						Client: &model.Client{
+							Issuer: &oppb.CommonKey{
+								Id: t.IssuerId,
+							},
+						},
+					},
+				},
+			},
+		}
+		_ = dataprovider.Delete(ctx, tokenIdentifier)
 	}
 }

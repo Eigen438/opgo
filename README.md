@@ -34,12 +34,18 @@ go get https://github.com/Eigen438/opgo
 func main() {
 	ctx := context.Background()
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	issuer := os.Getenv("ISSUER")
+	if issuer == "" {
+		issuer = "http://localhost:" + port
+	}
 
 	// use storage on memory
 	memstore := inmemstore.New(1 * time.Minute)
 	dataprovider.Initialize(memstore)
-	dataprovider.AddWriteOpInterceptor(&model.TokenIdentifier{}, tokenWriteInterceptor)
+	dataprovider.AddWriteOpInterceptor(&model.TokenIdentifier{}, inmemstore.TokenWriteInterceptor)
 
 	meta := &oppb.IssuerMeta{
 		Issuer:                            issuer,
@@ -59,7 +65,7 @@ func main() {
 		RequestParameterSupported:         true,
 		RequestUriParameterSupported:      true,
 	}
-	s, err := opgo.NewHostedSdk(ctx, meta, testui.Callbacks{}, &callbacks{})
+	s, err := opgo.NewHostedSdk(ctx, meta, testui.Callbacks{}, memstore)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,7 +75,7 @@ func main() {
 		ClientSecret: "secret",
 		Meta: &oppb.ClientMeta{
 			// If you do not set the RedirectUris parameter, the check will be skipped.
-			// RedirectUris: []string{"[https://exsample.com/cb](https://exsample.com/cb)"},
+			// RedirectUris: []string{"https://exsample.com/cb"},
 			GrantTypes:               []string{"authorization_code"},
 			TokenEndpointAuthMethod:  "client_secret_basic",
 			ResponseTypes:            []string{"code"},
@@ -92,7 +98,7 @@ func main() {
 	mux.HandleFunc("/login", testui.LoginHandler(s))
 	mux.HandleFunc("/cancel", testui.CancelHandler(s))
 
-	log.Printf("start server")
+	log.Printf("start server(port:%s)", port)
 
 	server := http.Server{
 		Addr: ":" + port,
@@ -102,101 +108,6 @@ func main() {
 	}
 	log.Fatal(server.ListenAndServe())
 }
-
-func tokenWriteInterceptor(ctx context.Context, data any) {
-	if p, ok := data.(*model.TokenIdentifier); ok {
-		// request_id base link
-		requestLink := &TokenIdentifierLink{
-			IssuerId: p.Details.Authorized.Request.Client.Issuer.Id,
-			Key:      p.Details.Authorized.Request.Key.Id,
-			Kind:     "request",
-			List:     []string{},
-		}
-		_ = dataprovider.Get(ctx, requestLink)
-		requestLink.List = append(requestLink.List, p.Details.Identifier)
-		requestLink.ExpireAt = time.Now().Add(24 * time.Hour)
-		_ = dataprovider.Set(ctx, requestLink)
-
-		// session_id base link
-		sessionLink := &TokenIdentifierLink{
-			IssuerId: p.Details.Authorized.Request.Client.Issuer.Id,
-			Key:      p.Details.Authorized.SessionId,
-			Kind:     "session",
-			List:     []string{},
-		}
-		_ = dataprovider.Get(ctx, sessionLink)
-		sessionLink.List = append(sessionLink.List, p.Details.Identifier)
-		sessionLink.ExpireAt = time.Now().Add(24 * time.Hour)
-		_ = dataprovider.Set(ctx, sessionLink)
-	}
-}
-
-type callbacks struct {
-}
-
-func (callbacks) DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error {
-	// request_id base link
-	link := &TokenIdentifierLink{
-		IssuerId: issuerId,
-		Key:      requestId,
-		Kind:     "request",
-		List:     []string{},
-	}
-	if err := dataprovider.Get(ctx, link); err == nil {
-		link.DeleteTokens(ctx)
-	}
-	return nil
-}
-
-func (callbacks) DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error {
-	// request_id base link
-	link := &TokenIdentifierLink{
-		IssuerId: issuerId,
-		Key:      sessionId,
-		Kind:     "session",
-		List:     []string{},
-	}
-	if err := dataprovider.Get(ctx, link); err == nil {
-		link.DeleteTokens(ctx)
-	}
-	return nil
-}
-
-type TokenIdentifierLink struct {
-	IssuerId string
-	Key      string
-	Kind     string
-	List     []string
-	ExpireAt time.Time
-}
-
-func (t *TokenIdentifierLink) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/v1/issuers/%s/tokensList/%s/kind/%s", t.IssuerId, t.Key, t.Kind)
-}
-
-func (t *TokenIdentifierLink) ExpireAtUnix(_ context.Context) int64 {
-	return t.ExpireAt.Unix()
-}
-
-func (t *TokenIdentifierLink) DeleteTokens(ctx context.Context) {
-	for _, tokenIdentifierId := range t.List {
-		tokenIdentifier := &model.TokenIdentifier{
-			Details: model.TokenIdentifierDetails{
-				Identifier: tokenIdentifierId,
-				Authorized: model.Authorized{
-					Request: model.RequestDetails{
-						Client: &model.Client{
-							Issuer: &oppb.CommonKey{
-								Id: t.IssuerId,
-							},
-						},
-					},
-				},
-			},
-		}
-		_ = dataprovider.Delete(ctx, tokenIdentifier)
-	}
-}
 ```
 
 ### The code above performs the following actions:
@@ -205,7 +116,7 @@ func (t *TokenIdentifierLink) DeleteTokens(ctx context.Context) {
 - **SDK Initialization**: Creates an SDK instance using the `opgo.NewHostedSdk` function.
 - **Client Registration**: Registers an initial client using the `s.ClientCreate` function.
 - **Routing**: Obtains an `http.ServeMux` to handle requests to the OP's endpoints using `s.ServeMux`, and adds custom handlers (`/login`, `/cancel`).
-- **Server Startup**: Starts an HTTP server using the `net/http` package to handle incoming requests.
+- **Server Startup**: Starts an HTTP server using the `net/http` package to handle incoming requests. The server is configured with CORS settings using the `cors` package to allow all headers.
 
 # Customization
 When using opgo, users can build their own unique OpenID Connect Provider by implementing and configuring the following aspects:
