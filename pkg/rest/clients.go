@@ -24,6 +24,8 @@ package rest
 
 import (
 	"context"
+	"fmt"
+	"slices"
 
 	"connectrpc.com/authn"
 	"connectrpc.com/connect"
@@ -38,6 +40,48 @@ func (rest *Rest) ClientCreate(ctx context.Context,
 	if iss := auth.CheckIssuer(ctx, req); iss == nil {
 		return nil, authn.Errorf("invalid authorization(ClientCreate)")
 	} else {
+		// Check
+		for _, v := range req.Msg.Meta.ResponseTypes {
+			if !slices.Contains(iss.Meta.ResponseTypesSupported, v) {
+				return nil, fmt.Errorf("response_type:%s not supported", v)
+			}
+		}
+		for _, v := range req.Msg.Meta.GrantTypes {
+			if !slices.Contains(iss.Meta.GrantTypesSupported, v) {
+				return nil, fmt.Errorf("grant_types:%s not supported", v)
+			}
+		}
+		if v := req.Msg.Meta.IdTokenSignedResponseAlg; len(v) > 0 {
+			if !slices.Contains(iss.Meta.IdTokenSigningAlgValuesSupported, v) {
+				return nil, fmt.Errorf("id_token_signed_response_alg:%s not supported", v)
+			}
+		}
+		if v := req.Msg.Meta.UserinfoSignedResponseAlg; len(v) > 0 {
+			if !slices.Contains(iss.Meta.UserinfoSigningAlgValuesSupported, v) {
+				return nil, fmt.Errorf("userinfo_signed_response_alg:%s not supported", v)
+			}
+		}
+		if v := req.Msg.Meta.RequestObjectSigningAlg; len(v) > 0 {
+			if !slices.Contains(iss.Meta.RequestObjectSigningAlgValuesSupported, v) {
+				return nil, fmt.Errorf("request_object_signed_response_alg:%s not supported", v)
+			}
+		}
+		if v := req.Msg.Meta.TokenEndpointAuthMethod; len(v) > 0 {
+			if !slices.Contains(iss.Meta.TokenEndpointAuthMethodsSupported, v) {
+				return nil, fmt.Errorf("token_endpoint_auth_method:%s not supported", v)
+			}
+		}
+		if v := req.Msg.Meta.TokenEndpointAuthSigningAlg; len(v) > 0 {
+			if !slices.Contains(iss.Meta.TokenEndpointAuthSigningAlgValuesSupported, v) {
+				return nil, fmt.Errorf("token_endpoint_auth_signing_alg:%s not supported", v)
+			}
+		}
+		if v := req.Msg.Meta.AuthorizationSignedResponseAlg; len(v) > 0 {
+			if !slices.Contains(iss.Meta.AuthorizationSigningAlgValuesSupported, v) {
+				return nil, fmt.Errorf("authorization_signed_response_alg:%s not supported", v)
+			}
+		}
+
 		client := &model.Client{
 			Identity:  req.Msg.Identity,
 			Issuer:    iss.Key,
