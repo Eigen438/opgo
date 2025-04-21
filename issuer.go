@@ -49,7 +49,7 @@ func issuerCreate(ctx context.Context, authInfo auth.AuthInfo, param issuerCreat
 		Attribute: param.Attribute,
 	})
 	auth.SetAuth(req, authInfo)
-	server := rest.NewRest(authInfo.Username(), authInfo.Password())
+	server := rest.NewRest(authInfo.Username(), authInfo.Password(), true)
 	res, err := server.IssuerCreate(ctx, req)
 	if err != nil {
 		return nil, err

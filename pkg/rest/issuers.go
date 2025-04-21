@@ -33,6 +33,7 @@ import (
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/keyutil"
 	"github.com/Eigen438/opgo/internal/oauth"
+	"github.com/Eigen438/opgo/internal/randutil"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/bufbuild/protovalidate-go"
@@ -70,13 +71,29 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 		}
 	}
 
+	issuerId := "default-issuer"
+	issuerPassword := "default-password"
+
+	if !rest.isSingleTenant {
+		id, err := randutil.UniqueId()
+		if err != nil {
+			return nil, err
+		}
+		pass, err := randutil.UuidV4()
+		if err != nil {
+			return nil, err
+		}
+		issuerId = id
+		issuerPassword = pass
+	}
+
 	iss := &model.Issuer{
 		Key: &oppb.CommonKey{
-			Id: "default-issuer",
+			Id: issuerId,
 		},
 		Meta: &oppb.IssuerMeta{},
 		Secret: &oppb.IssuerSecret{
-			Password: "default-password",
+			Password: issuerPassword,
 		},
 		Attribute: &oppb.IssuerAttribute{},
 		Resources: &oppb.IssuerResources{
