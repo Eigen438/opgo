@@ -597,12 +597,18 @@ func checkClientAuthentication(ctx context.Context, params *clientAuthentication
 		clientAssertionType := params.Values.Get("client_assertion_type")
 		if (len(clientAssertion) > 0) && (len(clientAssertionType) > 0) {
 			rc := &jwt.RegisteredClaims{}
+			// invalid_grant
+			// The provided authorization grant (e.g., authorization
+			// code, resource owner credentials) or refresh token is
+			// invalid, expired, revoked, does not match the redirection
+			// URI used in the authorization request, or was issued to
+			// another client.
 			token, err := parseJwt(ctx, params.Client.Meta, clientAssertion, rc)
 			if err != nil {
 				return &oppb.TokenFailResponse{
 					StatusCode: http.StatusBadRequest,
 					Error: &oppb.OauthError{
-						Error:            oauth.TokenErrorInvalidRequest,
+						Error:            oauth.TokenErrorInvalidGrant,
 						ErrorDescription: "private_jwt parse error:" + err.Error(),
 					},
 				}
@@ -612,7 +618,7 @@ func checkClientAuthentication(ctx context.Context, params *clientAuthentication
 				return &oppb.TokenFailResponse{
 					StatusCode: http.StatusBadRequest,
 					Error: &oppb.OauthError{
-						Error:            oauth.TokenErrorInvalidRequest,
+						Error:            oauth.TokenErrorInvalidGrant,
 						ErrorDescription: "private_jwt no exp:" + err.Error(),
 					},
 				}
@@ -621,7 +627,7 @@ func checkClientAuthentication(ctx context.Context, params *clientAuthentication
 				return &oppb.TokenFailResponse{
 					StatusCode: http.StatusBadRequest,
 					Error: &oppb.OauthError{
-						Error:            oauth.TokenErrorInvalidRequest,
+						Error:            oauth.TokenErrorInvalidGrant,
 						ErrorDescription: "private_jwt expired",
 					},
 				}
