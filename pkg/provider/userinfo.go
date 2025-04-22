@@ -113,7 +113,7 @@ func (p *Provider) Userinfo(ctx context.Context,
 		if access.Details.Authorized.Request.Client.Meta.UserinfoSignedResponseAlg == "" {
 			return responseJson(u)
 		} else {
-			u["iss"] = iss.Key.Id
+			u["iss"] = iss.Meta.Issuer
 			u["aud"] = access.Details.Authorized.Request.Client.Identity.ClientId
 			jwt, err := makeJwt(ctx, iss, u, access.Details.Authorized.Request.Client.Meta.UserinfoSignedResponseAlg)
 			if err != nil {

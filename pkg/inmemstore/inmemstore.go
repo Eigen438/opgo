@@ -28,26 +28,26 @@ import (
 	"time"
 
 	"github.com/Eigen438/dataprovider"
-	origin "github.com/Eigen438/inmemstore"
+	"github.com/Eigen438/inmemstore"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/Eigen438/opgo/pkg/provider"
 )
 
 type InmemStore interface {
-	origin.InmemStore
+	inmemstore.InmemStore
 	provider.ProviderCallbacks
 }
 
 func New(cleaningWindow time.Duration) InmemStore {
 	m := inner{
-		InmemStore: origin.New(cleaningWindow),
+		InmemStore: inmemstore.New(cleaningWindow),
 	}
 	return &m
 }
 
 type inner struct {
-	origin.InmemStore
+	inmemstore.InmemStore
 }
 
 func (inner) DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error {

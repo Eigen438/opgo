@@ -250,7 +250,7 @@ func parseParams(parseTarget string) *oppb.AuthorizationParameters {
 		params.Scopes = strings.Split(vals.Get("scope"), " ")
 	}
 	if len(vals.Get("prompt")) > 0 {
-		params.Scopes = strings.Split(vals.Get("prompt"), " ")
+		params.Prompts = strings.Split(vals.Get("prompt"), " ")
 	}
 	if len(vals.Get("ui_locales")) > 0 {
 		params.UiLocales = strings.Split(vals.Get("ui_locales"), " ")

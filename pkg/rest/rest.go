@@ -23,13 +23,15 @@
 package rest
 
 type Rest struct {
-	username string
-	password string
+	username       string
+	password       string
+	isSingleTenant bool
 }
 
-func NewRest(username, password string) *Rest {
+func NewRest(username, password string, isSingleTenant bool) *Rest {
 	return &Rest{
-		username: username,
-		password: password,
+		username:       username,
+		password:       password,
+		isSingleTenant: isSingleTenant,
 	}
 }

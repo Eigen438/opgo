@@ -32,6 +32,8 @@ import (
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/keyutil"
+	"github.com/Eigen438/opgo/internal/oauth"
+	"github.com/Eigen438/opgo/internal/randutil"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/bufbuild/protovalidate-go"
@@ -50,14 +52,48 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 		return nil, authn.Errorf("invalid authorization(IssuerCreate)")
 	}
 
-	// default value
+	// Complete default values
+	if len(req.Msg.Meta.ResponseModesSupported) == 0 {
+		req.Msg.Meta.ResponseModesSupported = []string{
+			oauth.ResponseModeQuery,
+			oauth.ResponseModeFragment,
+		}
+	}
+	if len(req.Msg.Meta.GrantTypesSupported) == 0 {
+		req.Msg.Meta.GrantTypesSupported = []string{
+			oauth.GrantTypeAuthorizationCode,
+			oauth.GrantTypeImplicit,
+		}
+	}
+	if len(req.Msg.Meta.TokenEndpointAuthMethodsSupported) == 0 {
+		req.Msg.Meta.TokenEndpointAuthMethodsSupported = []string{
+			oauth.TokenEndpointAuthMethodClientSecretBasic,
+		}
+	}
+
+	issuerId := "default-issuer"
+	issuerPassword := "default-password"
+
+	if !rest.isSingleTenant {
+		id, err := randutil.UniqueId()
+		if err != nil {
+			return nil, err
+		}
+		pass, err := randutil.UuidV4()
+		if err != nil {
+			return nil, err
+		}
+		issuerId = id
+		issuerPassword = pass
+	}
+
 	iss := &model.Issuer{
 		Key: &oppb.CommonKey{
-			Id: "test",
+			Id: issuerId,
 		},
 		Meta: &oppb.IssuerMeta{},
 		Secret: &oppb.IssuerSecret{
-			Password: "password",
+			Password: issuerPassword,
 		},
 		Attribute: &oppb.IssuerAttribute{},
 		Resources: &oppb.IssuerResources{
@@ -76,8 +112,19 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 		return nil, err
 	}
 
+	// Generate signing keys for the Issuer to use
 	keyTypes := map[string]bool{}
 	for _, alg := range iss.Meta.IdTokenSigningAlgValuesSupported {
+		if keyType, ok := keyutil.KeyType(alg); ok {
+			keyTypes[keyType] = true
+		}
+	}
+	for _, alg := range iss.Meta.AuthorizationSigningAlgValuesSupported {
+		if keyType, ok := keyutil.KeyType(alg); ok {
+			keyTypes[keyType] = true
+		}
+	}
+	for _, alg := range iss.Meta.UserinfoSigningAlgValuesSupported {
 		if keyType, ok := keyutil.KeyType(alg); ok {
 			keyTypes[keyType] = true
 		}

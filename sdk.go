@@ -127,8 +127,8 @@ func NewHostedSdk(
 		return nil, fmt.Errorf("parameter providerCallbacks is required")
 	}
 
-	localSdkUser := "local_sdk_user"
-	localSdkPass := "local_sdk_pass"
+	localSdkUser := "local_sdk_user" // dummy user
+	localSdkPass := "local_sdk_pass" // dummy pass
 	tempAuth := auth.NewAuthInfo(localSdkUser, localSdkPass)
 	res, err := issuerCreate(ctx, tempAuth, issuerCreateParam{
 		Meta:      issuerMeta,
@@ -145,7 +145,7 @@ func NewHostedSdk(
 			Callbacks:      sdkCallbacks,
 		},
 		provider: provider.NewProvider(providerCallbacks),
-		rest:     rest.NewRest(res.Key.Id, res.Secret.Password),
+		rest:     rest.NewRest(res.Key.Id, res.Secret.Password, true),
 	}
 	return i, nil
 }

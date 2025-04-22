@@ -20,39 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package opgo
+package cloudfirestore
 
 import (
 	"context"
-	"fmt"
 
-	"connectrpc.com/connect"
-	"github.com/Eigen438/opgo/pkg/auth"
-	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
-	"github.com/Eigen438/opgo/pkg/rest"
+	"github.com/Eigen438/cloudfirestore"
+	"github.com/Eigen438/opgo/pkg/provider"
+	"google.golang.org/api/option"
 )
 
-type issuerCreateParam struct {
-	Meta      *oppb.IssuerMeta
-	Attribute *oppb.IssuerAttribute
+type CloudFirestore interface {
+	cloudfirestore.CloudFirestore
+	provider.ProviderCallbacks
 }
 
-func issuerCreate(ctx context.Context, authInfo auth.AuthInfo, param issuerCreateParam) (*oppb.IssuerCreateResponse, error) {
-	if param.Meta == nil {
-		return nil, fmt.Errorf("param.Meta is required")
-	}
-	if param.Attribute == nil {
-		return nil, fmt.Errorf("param.Attribute is required")
-	}
-	req := connect.NewRequest(&oppb.IssuerCreateRequest{
-		Meta:      param.Meta,
-		Attribute: param.Attribute,
-	})
-	auth.SetAuth(req, authInfo)
-	server := rest.NewRest(authInfo.Username(), authInfo.Password(), true)
-	res, err := server.IssuerCreate(ctx, req)
+func NewWithDatabase(ctx context.Context, databaseID string, opts ...option.ClientOption) (CloudFirestore, error) {
+	c, err := cloudfirestore.NewWithDatabase(ctx, databaseID, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return res.Msg, nil
+	m := inner{
+		CloudFirestore: c,
+	}
+	return &m, nil
+}
+
+type inner struct {
+	cloudfirestore.CloudFirestore
+}
+
+func (inner) DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error {
+	q := cloudfirestore.Collection("peridot/v1/issuers/"+issuerId+"/tokens").Where("RequestId", "==", requestId)
+	_, err := cloudfirestore.DeleteWithQuery(ctx, q, 10)
+	return err
+}
+
+func (inner) DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error {
+	q := cloudfirestore.Collection("peridot/v1/issuers/"+issuerId+"/tokens").Where("SessionId", "==", sessionId)
+	_, err := cloudfirestore.DeleteWithQuery(ctx, q, 10)
+	return err
 }
