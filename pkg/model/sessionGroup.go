@@ -36,5 +36,8 @@ type SessionGroup struct {
 }
 
 func (s *SessionGroup) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/v1/issuers/%s/sessionGroups/%s", s.Issuer.Id, s.Key.Id)
+	return fmt.Sprintf("opgo/%s/issuers/%s/sessionGroups/%s",
+		version,
+		s.Issuer.Id,
+		s.Key.Id)
 }

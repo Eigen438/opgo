@@ -39,5 +39,9 @@ type Key struct {
 }
 
 func (k *Key) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/v1/issuers/%s/keys/%s/versions/%s", k.Issuer.Id, k.KeyType, k.Key.Id)
+	return fmt.Sprintf("opgo/%s/issuers/%s/keys/%s/versions/%s",
+		version,
+		k.Issuer.Id,
+		k.KeyType,
+		k.Key.Id)
 }

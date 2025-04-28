@@ -46,8 +46,10 @@ type Request struct {
 }
 
 func (r Request) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/v1/issuers/%s/requests/%s",
-		r.Details.Client.Issuer.Id, r.Details.Key.Id)
+	return fmt.Sprintf("opgo/%s/issuers/%s/requests/%s",
+		version,
+		r.Details.Client.Issuer.Id,
+		r.Details.Key.Id)
 }
 
 func (r Request) ExpireAtUnix(_ context.Context) int64 {
