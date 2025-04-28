@@ -44,8 +44,14 @@ func (rest *Rest) SessionGroupCreate(ctx context.Context,
 			Attribute: req.Msg.Attribute,
 		}
 
-		if err := dataprovider.Create(ctx, sg); err != nil {
-			return nil, err
+		if rest.isSingleTenant {
+			if err := dataprovider.Set(ctx, sg); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := dataprovider.Create(ctx, sg); err != nil {
+				return nil, err
+			}
 		}
 
 		return connect.NewResponse(&oppb.SessionGroupCreateResponse{

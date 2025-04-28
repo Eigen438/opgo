@@ -53,6 +53,7 @@ service RestService {
   }
   rpc ClientCreate(ClientCreateRequest) returns (ClientCreateResponse);
   rpc SessionGroupCreate(SessionGroupCreateRequest) returns (SessionGroupCreateResponse);
+  rpc KeyRotate(KeyRotateRequest) returns (KeyRotateResponse);
 }
 
 message IssuerCreateRequest {
@@ -107,3 +108,9 @@ message SessionGroupCreateRequest {
 message SessionGroupCreateResponse {
   SessionGroupAttribute attribute = 1 [json_name = "attribute"];
 }
+
+message KeyRotateRequest {
+  string key_type = 1 [json_name = "key_type"];
+}
+
+message KeyRotateResponse {}

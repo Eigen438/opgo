@@ -97,9 +97,14 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 		},
 		Attribute: &oppb.IssuerAttribute{},
 		Resources: &oppb.IssuerResources{
-			KeyMap: map[string]string{},
+			KeyMap: map[string]*oppb.KeyRing{},
 		},
 	}
+
+	if rest.isSingleTenant {
+		_ = dataprovider.Get(ctx, iss)
+	}
+
 	if req.Msg.Meta != nil {
 		iss.Meta = req.Msg.Meta
 	}
@@ -131,6 +136,10 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 	}
 	for keyType, ok := range keyTypes {
 		if ok {
+			if _, ok := iss.Resources.KeyMap[keyType]; ok {
+				continue
+			}
+			// Generate a new key
 			key, err := keyutil.GeneratePrivateKey(iss.Key, keyType, time.Now())
 			if err != nil {
 				return nil, err
@@ -138,13 +147,21 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 			if err := dataprovider.Create(ctx, key); err != nil {
 				return nil, err
 			}
-			iss.Resources.KeyMap[keyType] = key.Key.Id
+			kr := &oppb.KeyRing{
+				CurrentKeyId: key.Key.Id,
+			}
+			iss.Resources.KeyMap[keyType] = kr
 		}
 	}
 
-	if err := dataprovider.Create(ctx, iss); err != nil {
-		log.Printf("IssuerCreate err:%v", err)
-		return nil, err
+	if rest.isSingleTenant {
+		if err := dataprovider.Set(ctx, iss); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := dataprovider.Create(ctx, iss); err != nil {
+			return nil, err
+		}
 	}
 
 	return connect.NewResponse(&oppb.IssuerCreateResponse{

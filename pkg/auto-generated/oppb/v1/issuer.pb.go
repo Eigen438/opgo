@@ -157,7 +157,7 @@ func (x *IssuerSecret) GetPassword() string {
 
 type IssuerResources struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	KeyMap        map[string]string      `protobuf:"bytes,1,rep,name=key_map,proto3" json:"key_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	KeyMap        map[string]*KeyRing    `protobuf:"bytes,1,rep,name=key_map,proto3" json:"key_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -192,9 +192,61 @@ func (*IssuerResources) Descriptor() ([]byte, []int) {
 	return file_oppb_v1_issuer_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *IssuerResources) GetKeyMap() map[string]string {
+func (x *IssuerResources) GetKeyMap() map[string]*KeyRing {
 	if x != nil {
 		return x.KeyMap
+	}
+	return nil
+}
+
+type KeyRing struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	CurrentKeyId   string                 `protobuf:"bytes,1,opt,name=current_key_id,proto3" json:"current_key_id,omitempty"`
+	ReservedKeyIds []string               `protobuf:"bytes,2,rep,name=reserved_key_ids,proto3" json:"reserved_key_ids,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *KeyRing) Reset() {
+	*x = KeyRing{}
+	mi := &file_oppb_v1_issuer_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeyRing) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeyRing) ProtoMessage() {}
+
+func (x *KeyRing) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_issuer_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeyRing.ProtoReflect.Descriptor instead.
+func (*KeyRing) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_issuer_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *KeyRing) GetCurrentKeyId() string {
+	if x != nil {
+		return x.CurrentKeyId
+	}
+	return ""
+}
+
+func (x *KeyRing) GetReservedKeyIds() []string {
+	if x != nil {
+		return x.ReservedKeyIds
 	}
 	return nil
 }
@@ -209,7 +261,7 @@ type IssuerAttribute struct {
 
 func (x *IssuerAttribute) Reset() {
 	*x = IssuerAttribute{}
-	mi := &file_oppb_v1_issuer_proto_msgTypes[3]
+	mi := &file_oppb_v1_issuer_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -221,7 +273,7 @@ func (x *IssuerAttribute) String() string {
 func (*IssuerAttribute) ProtoMessage() {}
 
 func (x *IssuerAttribute) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_issuer_proto_msgTypes[3]
+	mi := &file_oppb_v1_issuer_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -234,7 +286,7 @@ func (x *IssuerAttribute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IssuerAttribute.ProtoReflect.Descriptor instead.
 func (*IssuerAttribute) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_issuer_proto_rawDescGZIP(), []int{3}
+	return file_oppb_v1_issuer_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *IssuerAttribute) GetMemo() string {
@@ -262,12 +314,15 @@ const file_oppb_v1_issuer_proto_rawDesc = "" +
 	"\x06secret\x18\x03 \x01(\v2\x15.oppb.v1.IssuerSecretR\x06secret\x126\n" +
 	"\tattribute\x18\x04 \x01(\v2\x18.oppb.v1.IssuerAttributeR\tattribute\"*\n" +
 	"\fIssuerSecret\x12\x1a\n" +
-	"\bpassword\x18\x01 \x01(\tR\bpassword\"\x8c\x01\n" +
+	"\bpassword\x18\x01 \x01(\tR\bpassword\"\x9e\x01\n" +
 	"\x0fIssuerResources\x12>\n" +
-	"\akey_map\x18\x01 \x03(\v2$.oppb.v1.IssuerResources.KeyMapEntryR\akey_map\x1a9\n" +
+	"\akey_map\x18\x01 \x03(\v2$.oppb.v1.IssuerResources.KeyMapEntryR\akey_map\x1aK\n" +
 	"\vKeyMapEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\";\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12&\n" +
+	"\x05value\x18\x02 \x01(\v2\x10.oppb.v1.KeyRingR\x05value:\x028\x01\"]\n" +
+	"\aKeyRing\x12&\n" +
+	"\x0ecurrent_key_id\x18\x01 \x01(\tR\x0ecurrent_key_id\x12*\n" +
+	"\x10reserved_key_ids\x18\x02 \x03(\tR\x10reserved_key_ids\";\n" +
 	"\x0fIssuerAttribute\x12\x12\n" +
 	"\x04memo\x18\x01 \x01(\tR\x04memo\x12\x14\n" +
 	"\x05owner\x18\x02 \x01(\tR\x05ownerB\x91\x01\n" +
@@ -285,27 +340,29 @@ func file_oppb_v1_issuer_proto_rawDescGZIP() []byte {
 	return file_oppb_v1_issuer_proto_rawDescData
 }
 
-var file_oppb_v1_issuer_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_oppb_v1_issuer_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_oppb_v1_issuer_proto_goTypes = []any{
 	(*Issuer)(nil),          // 0: oppb.v1.Issuer
 	(*IssuerSecret)(nil),    // 1: oppb.v1.IssuerSecret
 	(*IssuerResources)(nil), // 2: oppb.v1.IssuerResources
-	(*IssuerAttribute)(nil), // 3: oppb.v1.IssuerAttribute
-	nil,                     // 4: oppb.v1.IssuerResources.KeyMapEntry
-	(*CommonKey)(nil),       // 5: oppb.v1.CommonKey
-	(*IssuerMeta)(nil),      // 6: oppb.v1.IssuerMeta
+	(*KeyRing)(nil),         // 3: oppb.v1.KeyRing
+	(*IssuerAttribute)(nil), // 4: oppb.v1.IssuerAttribute
+	nil,                     // 5: oppb.v1.IssuerResources.KeyMapEntry
+	(*CommonKey)(nil),       // 6: oppb.v1.CommonKey
+	(*IssuerMeta)(nil),      // 7: oppb.v1.IssuerMeta
 }
 var file_oppb_v1_issuer_proto_depIdxs = []int32{
-	5, // 0: oppb.v1.Issuer.key:type_name -> oppb.v1.CommonKey
-	6, // 1: oppb.v1.Issuer.meta:type_name -> oppb.v1.IssuerMeta
+	6, // 0: oppb.v1.Issuer.key:type_name -> oppb.v1.CommonKey
+	7, // 1: oppb.v1.Issuer.meta:type_name -> oppb.v1.IssuerMeta
 	1, // 2: oppb.v1.Issuer.secret:type_name -> oppb.v1.IssuerSecret
-	3, // 3: oppb.v1.Issuer.attribute:type_name -> oppb.v1.IssuerAttribute
-	4, // 4: oppb.v1.IssuerResources.key_map:type_name -> oppb.v1.IssuerResources.KeyMapEntry
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 3: oppb.v1.Issuer.attribute:type_name -> oppb.v1.IssuerAttribute
+	5, // 4: oppb.v1.IssuerResources.key_map:type_name -> oppb.v1.IssuerResources.KeyMapEntry
+	3, // 5: oppb.v1.IssuerResources.KeyMapEntry.value:type_name -> oppb.v1.KeyRing
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_issuer_proto_init() }
@@ -321,7 +378,7 @@ func file_oppb_v1_issuer_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_oppb_v1_issuer_proto_rawDesc), len(file_oppb_v1_issuer_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

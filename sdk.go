@@ -57,6 +57,7 @@ type Sdk interface {
 	//
 	ClientCreate(context.Context, ClientParam) error
 	SessionGroupCreate(context.Context, *oppb.SessionGroupCreateRequest) error
+	KeyRotate(context.Context, string) error
 }
 
 type innerSdk struct {

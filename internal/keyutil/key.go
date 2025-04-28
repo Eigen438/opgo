@@ -98,13 +98,9 @@ func GetPublicKey(k *model.Key) (any, error) {
 	return nil, fmt.Errorf("unsupported keyType:" + k.KeyType)
 }
 
-func GetPrivateKey(ctx context.Context, iss *model.Issuer, keyType string) (any, error) {
-	kid, ok := iss.Resources.KeyMap[keyType]
-	if !ok {
-		return nil, fmt.Errorf("key not found")
-	}
+func GetPrivateKey(ctx context.Context, iss *model.Issuer, keyType string, keyId string) (any, error) {
 	key := &model.Key{
-		Key:     &oppb.CommonKey{Id: kid},
+		Key:     &oppb.CommonKey{Id: keyId},
 		Issuer:  iss.Key,
 		KeyType: keyType,
 	}
@@ -188,12 +184,12 @@ func GetKeyInfo(ctx context.Context, iss *model.Issuer, algorithm string) (*KeyI
 		return nil, fmt.Errorf("unknown algorithm:" + algorithm)
 	}
 
-	kid, ok := iss.Resources.KeyMap[keyType]
+	kr, ok := iss.Resources.KeyMap[keyType]
 	if !ok {
 		return nil, fmt.Errorf("key not found")
 	}
 
-	pk, err := GetPrivateKey(ctx, iss, keyType)
+	pk, err := GetPrivateKey(ctx, iss, keyType, kr.CurrentKeyId)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +197,7 @@ func GetKeyInfo(ctx context.Context, iss *model.Issuer, algorithm string) (*KeyI
 	return &KeyInfo{
 		Method: method,
 		Key:    pk,
-		Kid:    kid,
+		Kid:    kr.CurrentKeyId,
 	}, nil
 }
 

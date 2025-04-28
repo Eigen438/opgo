@@ -42,29 +42,35 @@ func (p *Provider) Jwks(ctx context.Context,
 		return nil, authn.Errorf("invalid authorization(Jwks)")
 	} else {
 		jwkSet := jwkset.NewMemoryStorage()
-		for keyType, kid := range iss.Resources.KeyMap {
-			key, err := keyutil.GetPrivateKey(ctx, iss, keyType)
-			if err != nil {
-				log.Printf("[BACKEND_ERROR] GetKeyInfo:%v", err)
-				continue
+		for keyType, kr := range iss.Resources.KeyMap {
+			addToJwkSet := func(keyId string) {
+				key, err := keyutil.GetPrivateKey(ctx, iss, keyType, keyId)
+				if err != nil {
+					log.Printf("[BACKEND_ERROR] GetKeyInfo:%v", err)
+					return
+				}
+				options := jwkset.JWKOptions{
+					Marshal: jwkset.JWKMarshalOptions{
+						Private: false,
+					},
+					Metadata: jwkset.JWKMetadataOptions{
+						KID: keyId,
+					},
+				}
+				jwk, err := jwkset.NewJWKFromKey(key, options)
+				if err != nil {
+					log.Printf("[BACKEND_ERROR] NewJWKFromKey:%v", err)
+					return
+				}
+				if err := jwkSet.KeyWrite(ctx, jwk); err != nil {
+					log.Printf("[BACKEND_ERROR] KeyWrite:%v", err)
+					return
+				}
 			}
 
-			options := jwkset.JWKOptions{
-				Marshal: jwkset.JWKMarshalOptions{
-					Private: false,
-				},
-				Metadata: jwkset.JWKMetadataOptions{
-					KID: kid,
-				},
-			}
-			jwk, err := jwkset.NewJWKFromKey(key, options)
-			if err != nil {
-				log.Printf("[BACKEND_ERROR] NewJWKFromKey:%v", err)
-				continue
-			}
-			if err := jwkSet.KeyWrite(ctx, jwk); err != nil {
-				log.Printf("[BACKEND_ERROR] KeyWrite:%v", err)
-				continue
+			addToJwkSet(kr.CurrentKeyId)
+			for _, keyId := range kr.ReservedKeyIds {
+				addToJwkSet(keyId)
 			}
 		}
 		m, err := jwkSet.Marshal(ctx)
