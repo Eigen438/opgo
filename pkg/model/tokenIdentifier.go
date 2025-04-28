@@ -52,7 +52,7 @@ type TokenIdentifier struct {
 }
 
 func (t TokenIdentifier) Path(_ context.Context) string {
-	return fmt.Sprintf("opgp/v1/issuers/%s/tokens/%s",
+	return fmt.Sprintf("opgo/v1/issuers/%s/tokens/%s",
 		t.Details.Authorized.Request.Client.Issuer.Id,
 		t.Details.Identifier)
 }

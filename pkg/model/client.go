@@ -44,7 +44,7 @@ type Client struct {
 }
 
 func (c *Client) Path(_ context.Context) string {
-	return fmt.Sprintf("opgp/v1/issuers/%s/clients/%s", c.Issuer.Id, c.Identity.ClientId)
+	return fmt.Sprintf("opgo/v1/issuers/%s/clients/%s", c.Issuer.Id, c.Identity.ClientId)
 }
 
 // get key for parsing jwt
