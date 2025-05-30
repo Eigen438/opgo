@@ -69,7 +69,7 @@ func NewRedirectBuilder(iss *model.Issuer, client *model.Client, params *oppb.Au
 	}
 	mode, ok := table[params.ResponseMode]
 	if !ok {
-		return nil, fmt.Errorf("unknown reponse_mode(%s)", params.ResponseMode)
+		return nil, fmt.Errorf("unknown response_mode(%s)", params.ResponseMode)
 	}
 	if mode == oauth.ResponseModeError {
 		return nil, fmt.Errorf("wrong combination response_type(%s) and response_mode(%s)", params.ResponseType, params.ResponseMode)
