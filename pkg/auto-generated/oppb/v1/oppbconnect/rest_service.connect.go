@@ -69,6 +69,8 @@ const (
 	// RestServiceSessionGroupCreateProcedure is the fully-qualified name of the RestService's
 	// SessionGroupCreate RPC.
 	RestServiceSessionGroupCreateProcedure = "/oppb.v1.RestService/SessionGroupCreate"
+	// RestServiceKeyRotateProcedure is the fully-qualified name of the RestService's KeyRotate RPC.
+	RestServiceKeyRotateProcedure = "/oppb.v1.RestService/KeyRotate"
 )
 
 // RestServiceClient is a client for the oppb.v1.RestService service.
@@ -78,6 +80,7 @@ type RestServiceClient interface {
 	IssuerUpdate(context.Context, *connect.Request[v1.IssuerUpdateRequest]) (*connect.Response[v1.IssuerUpdateResponse], error)
 	ClientCreate(context.Context, *connect.Request[v1.ClientCreateRequest]) (*connect.Response[v1.ClientCreateResponse], error)
 	SessionGroupCreate(context.Context, *connect.Request[v1.SessionGroupCreateRequest]) (*connect.Response[v1.SessionGroupCreateResponse], error)
+	KeyRotate(context.Context, *connect.Request[v1.KeyRotateRequest]) (*connect.Response[v1.KeyRotateResponse], error)
 }
 
 // NewRestServiceClient constructs a client for the oppb.v1.RestService service. By default, it uses
@@ -121,6 +124,12 @@ func NewRestServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(restServiceMethods.ByName("SessionGroupCreate")),
 			connect.WithClientOptions(opts...),
 		),
+		keyRotate: connect.NewClient[v1.KeyRotateRequest, v1.KeyRotateResponse](
+			httpClient,
+			baseURL+RestServiceKeyRotateProcedure,
+			connect.WithSchema(restServiceMethods.ByName("KeyRotate")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -131,6 +140,7 @@ type restServiceClient struct {
 	issuerUpdate       *connect.Client[v1.IssuerUpdateRequest, v1.IssuerUpdateResponse]
 	clientCreate       *connect.Client[v1.ClientCreateRequest, v1.ClientCreateResponse]
 	sessionGroupCreate *connect.Client[v1.SessionGroupCreateRequest, v1.SessionGroupCreateResponse]
+	keyRotate          *connect.Client[v1.KeyRotateRequest, v1.KeyRotateResponse]
 }
 
 // IssuerCreate calls oppb.v1.RestService.IssuerCreate.
@@ -158,6 +168,11 @@ func (c *restServiceClient) SessionGroupCreate(ctx context.Context, req *connect
 	return c.sessionGroupCreate.CallUnary(ctx, req)
 }
 
+// KeyRotate calls oppb.v1.RestService.KeyRotate.
+func (c *restServiceClient) KeyRotate(ctx context.Context, req *connect.Request[v1.KeyRotateRequest]) (*connect.Response[v1.KeyRotateResponse], error) {
+	return c.keyRotate.CallUnary(ctx, req)
+}
+
 // RestServiceHandler is an implementation of the oppb.v1.RestService service.
 type RestServiceHandler interface {
 	IssuerCreate(context.Context, *connect.Request[v1.IssuerCreateRequest]) (*connect.Response[v1.IssuerCreateResponse], error)
@@ -165,6 +180,7 @@ type RestServiceHandler interface {
 	IssuerUpdate(context.Context, *connect.Request[v1.IssuerUpdateRequest]) (*connect.Response[v1.IssuerUpdateResponse], error)
 	ClientCreate(context.Context, *connect.Request[v1.ClientCreateRequest]) (*connect.Response[v1.ClientCreateResponse], error)
 	SessionGroupCreate(context.Context, *connect.Request[v1.SessionGroupCreateRequest]) (*connect.Response[v1.SessionGroupCreateResponse], error)
+	KeyRotate(context.Context, *connect.Request[v1.KeyRotateRequest]) (*connect.Response[v1.KeyRotateResponse], error)
 }
 
 // NewRestServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -204,6 +220,12 @@ func NewRestServiceHandler(svc RestServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(restServiceMethods.ByName("SessionGroupCreate")),
 		connect.WithHandlerOptions(opts...),
 	)
+	restServiceKeyRotateHandler := connect.NewUnaryHandler(
+		RestServiceKeyRotateProcedure,
+		svc.KeyRotate,
+		connect.WithSchema(restServiceMethods.ByName("KeyRotate")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/oppb.v1.RestService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RestServiceIssuerCreateProcedure:
@@ -216,6 +238,8 @@ func NewRestServiceHandler(svc RestServiceHandler, opts ...connect.HandlerOption
 			restServiceClientCreateHandler.ServeHTTP(w, r)
 		case RestServiceSessionGroupCreateProcedure:
 			restServiceSessionGroupCreateHandler.ServeHTTP(w, r)
+		case RestServiceKeyRotateProcedure:
+			restServiceKeyRotateHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -243,4 +267,8 @@ func (UnimplementedRestServiceHandler) ClientCreate(context.Context, *connect.Re
 
 func (UnimplementedRestServiceHandler) SessionGroupCreate(context.Context, *connect.Request[v1.SessionGroupCreateRequest]) (*connect.Response[v1.SessionGroupCreateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("oppb.v1.RestService.SessionGroupCreate is not implemented"))
+}
+
+func (UnimplementedRestServiceHandler) KeyRotate(context.Context, *connect.Request[v1.KeyRotateRequest]) (*connect.Response[v1.KeyRotateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("oppb.v1.RestService.KeyRotate is not implemented"))
 }

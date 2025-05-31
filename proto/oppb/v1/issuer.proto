@@ -41,7 +41,12 @@ message IssuerSecret {
 }
 
 message IssuerResources {
-  map<string, string> key_map = 1 [json_name = "key_map"];
+  map<string, KeyRing> key_map = 1 [json_name = "key_map"];
+}
+
+message KeyRing {
+  string current_key_id = 1 [json_name = "current_key_id"];
+  repeated string reserved_key_ids = 2 [json_name = "reserved_key_ids"];
 }
 
 message IssuerAttribute {

@@ -89,8 +89,14 @@ func (rest *Rest) ClientCreate(ctx context.Context,
 			Attribute: req.Msg.Attribute,
 		}
 
-		if err := dataprovider.Create(ctx, client); err != nil {
-			return nil, err
+		if rest.isSingleTenant {
+			if err := dataprovider.Set(ctx, client); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := dataprovider.Create(ctx, client); err != nil {
+				return nil, err
+			}
 		}
 
 		return connect.NewResponse(&oppb.ClientCreateResponse{

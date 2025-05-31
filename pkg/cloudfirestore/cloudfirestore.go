@@ -24,7 +24,11 @@ package cloudfirestore
 
 import (
 	"context"
+	"fmt"
+	"log"
 
+	apiv1 "cloud.google.com/go/firestore/apiv1/admin"
+	"cloud.google.com/go/firestore/apiv1/admin/adminpb"
 	"github.com/Eigen438/cloudfirestore"
 	"github.com/Eigen438/opgo/pkg/provider"
 	"google.golang.org/api/option"
@@ -35,7 +39,7 @@ type CloudFirestore interface {
 	provider.ProviderCallbacks
 }
 
-func NewWithDatabase(ctx context.Context, databaseID string, opts ...option.ClientOption) (CloudFirestore, error) {
+func NewWithDatabase(ctx context.Context, projectID, databaseID string, opts ...option.ClientOption) (CloudFirestore, error) {
 	c, err := cloudfirestore.NewWithDatabase(ctx, databaseID, opts...)
 	if err != nil {
 		return nil, err
@@ -43,6 +47,8 @@ func NewWithDatabase(ctx context.Context, databaseID string, opts ...option.Clie
 	m := inner{
 		CloudFirestore: c,
 	}
+	// setup ttl
+	go construction(ctx, projectID, databaseID)
 	return &m, nil
 }
 
@@ -60,4 +66,45 @@ func (inner) DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId 
 	q := cloudfirestore.Collection("peridot/v1/issuers/"+issuerId+"/tokens").Where("SessionId", "==", sessionId)
 	_, err := cloudfirestore.DeleteWithQuery(ctx, q, 10)
 	return err
+}
+
+func construction(ctx context.Context, projectID, databaseID string) {
+	admin, err := apiv1.NewFirestoreAdminClient(ctx)
+	if err != nil {
+		log.Printf("[BACKEND_ERROR] NewFirestoreAdminClient:%v", err)
+		return
+	}
+
+	// SetupTTL
+	setupTTL(ctx, admin, projectID, databaseID, "authorizationCodes", "ExpireAt")
+	setupTTL(ctx, admin, projectID, databaseID, "requests", "ExpireAt")
+	setupTTL(ctx, admin, projectID, databaseID, "sessions", "ExpireAt")
+	setupTTL(ctx, admin, projectID, databaseID, "tokens", "ExpireAt")
+	setupTTL(ctx, admin, projectID, databaseID, "pars", "ExpireAt")
+}
+
+func setupTTL(ctx context.Context, admin *apiv1.FirestoreAdminClient, projectID, databaseID, collectionId, fieldName string) {
+	name := fmt.Sprintf("projects/%s/databases/%s/collectionGroups/%s/fields/%s", projectID, databaseID, collectionId, fieldName)
+	// Create a new TTL with the specified field
+	req := &adminpb.GetFieldRequest{
+		Name: name,
+	}
+	field, _ := admin.GetField(ctx, req)
+	if field == nil {
+		// Create a new TTL
+		field = &adminpb.Field{
+			Name: name,
+			TtlConfig: &adminpb.Field_TtlConfig{
+				State: adminpb.Field_TtlConfig_ACTIVE,
+			},
+		}
+	} else {
+		// Update the existing TTL to expire
+		field.TtlConfig = &adminpb.Field_TtlConfig{
+			State: adminpb.Field_TtlConfig_ACTIVE,
+		}
+	}
+	admin.UpdateField(ctx, &adminpb.UpdateFieldRequest{
+		Field: field,
+	})
 }

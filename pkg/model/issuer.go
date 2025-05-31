@@ -38,5 +38,7 @@ type Issuer struct {
 }
 
 func (i *Issuer) Path(_ context.Context) string {
-	return fmt.Sprintf("opgp/v1/issuers/%s", i.Key.Id)
+	return fmt.Sprintf("opgo/%s/issuers/%s",
+		version,
+		i.Key.Id)
 }

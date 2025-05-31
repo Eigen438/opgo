@@ -37,7 +37,8 @@ type PushedAuthorization struct {
 }
 
 func (i *PushedAuthorization) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/v1/issuers/%s/clients/%s/pars/%s",
+	return fmt.Sprintf("opgo/%s/issuers/%s/clients/%s/pars/%s",
+		version,
 		i.Client.Issuer.Id,
 		i.Client.Identity.ClientId,
 		i.Key.Id)

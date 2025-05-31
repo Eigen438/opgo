@@ -129,6 +129,8 @@ When using opgo, users can build their own unique OpenID Connect Provider by imp
 # Examples
 For a practical example of how to use **opgo**, check out the [LocalHostedService example](examples/LocalHostedService). This example demonstrates how to set up a locally hosted OpenID Connect Provider using the opgo SDK.
 
+Another example, [GoogleCloudHostedService example](examples/GoogleCloudHostedService), demonstrates how to host the OPGO service on Google Cloud Platform using Cloud Firestore, Firebase Authentication, and Cloud Run. See [examples/GoogleCloudHostedService/README.md](examples/GoogleCloudHostedService/README.md) for more information, including required environment variables, available endpoints, and the login process.
+
 # Contributing
 Feel free to submit bug reports and feature requests through GitHub Issues. Pull requests are also welcome.
 

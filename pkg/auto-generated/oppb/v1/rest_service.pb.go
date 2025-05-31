@@ -573,6 +573,86 @@ func (x *SessionGroupCreateResponse) GetAttribute() *SessionGroupAttribute {
 	return nil
 }
 
+type KeyRotateRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	KeyType       string                 `protobuf:"bytes,1,opt,name=key_type,proto3" json:"key_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KeyRotateRequest) Reset() {
+	*x = KeyRotateRequest{}
+	mi := &file_oppb_v1_rest_service_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeyRotateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeyRotateRequest) ProtoMessage() {}
+
+func (x *KeyRotateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_rest_service_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeyRotateRequest.ProtoReflect.Descriptor instead.
+func (*KeyRotateRequest) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_rest_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *KeyRotateRequest) GetKeyType() string {
+	if x != nil {
+		return x.KeyType
+	}
+	return ""
+}
+
+type KeyRotateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KeyRotateResponse) Reset() {
+	*x = KeyRotateResponse{}
+	mi := &file_oppb_v1_rest_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeyRotateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeyRotateResponse) ProtoMessage() {}
+
+func (x *KeyRotateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_rest_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeyRotateResponse.ProtoReflect.Descriptor instead.
+func (*KeyRotateResponse) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_rest_service_proto_rawDescGZIP(), []int{11}
+}
+
 var File_oppb_v1_rest_service_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_rest_service_proto_rawDesc = "" +
@@ -608,13 +688,17 @@ const file_oppb_v1_rest_service_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\v2\x12.oppb.v1.CommonKeyR\x03key\x12<\n" +
 	"\tattribute\x18\x02 \x01(\v2\x1e.oppb.v1.SessionGroupAttributeR\tattribute\"Z\n" +
 	"\x1aSessionGroupCreateResponse\x12<\n" +
-	"\tattribute\x18\x01 \x01(\v2\x1e.oppb.v1.SessionGroupAttributeR\tattribute2\xd4\x03\n" +
+	"\tattribute\x18\x01 \x01(\v2\x1e.oppb.v1.SessionGroupAttributeR\tattribute\".\n" +
+	"\x10KeyRotateRequest\x12\x1a\n" +
+	"\bkey_type\x18\x01 \x01(\tR\bkey_type\"\x13\n" +
+	"\x11KeyRotateResponse2\x98\x04\n" +
 	"\vRestService\x12c\n" +
 	"\fIssuerCreate\x12\x1c.oppb.v1.IssuerCreateRequest\x1a\x1d.oppb.v1.IssuerCreateResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/issuer/new\x12S\n" +
 	"\tIssuerGet\x12\x19.oppb.v1.IssuerGetRequest\x1a\x1a.oppb.v1.IssuerGetResponse\"\x0f\x82\xd3\xe4\x93\x02\t\x12\a/issuer\x12_\n" +
 	"\fIssuerUpdate\x12\x1c.oppb.v1.IssuerUpdateRequest\x1a\x1d.oppb.v1.IssuerUpdateResponse\"\x12\x82\xd3\xe4\x93\x02\f:\x01*\"\a/issuer\x12K\n" +
 	"\fClientCreate\x12\x1c.oppb.v1.ClientCreateRequest\x1a\x1d.oppb.v1.ClientCreateResponse\x12]\n" +
-	"\x12SessionGroupCreate\x12\".oppb.v1.SessionGroupCreateRequest\x1a#.oppb.v1.SessionGroupCreateResponseB\x96\x01\n" +
+	"\x12SessionGroupCreate\x12\".oppb.v1.SessionGroupCreateRequest\x1a#.oppb.v1.SessionGroupCreateResponse\x12B\n" +
+	"\tKeyRotate\x12\x19.oppb.v1.KeyRotateRequest\x1a\x1a.oppb.v1.KeyRotateResponseB\x96\x01\n" +
 	"\vcom.oppb.v1B\x10RestServiceProtoP\x01Z8github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb\xa2\x02\x03OXX\xaa\x02\aOppb.V1\xca\x02\aOppb\\V1\xe2\x02\x13Oppb\\V1\\GPBMetadata\xea\x02\bOppb::V1b\x06proto3"
 
 var (
@@ -629,7 +713,7 @@ func file_oppb_v1_rest_service_proto_rawDescGZIP() []byte {
 	return file_oppb_v1_rest_service_proto_rawDescData
 }
 
-var file_oppb_v1_rest_service_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_oppb_v1_rest_service_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_oppb_v1_rest_service_proto_goTypes = []any{
 	(*IssuerCreateRequest)(nil),        // 0: oppb.v1.IssuerCreateRequest
 	(*IssuerCreateResponse)(nil),       // 1: oppb.v1.IssuerCreateResponse
@@ -641,49 +725,53 @@ var file_oppb_v1_rest_service_proto_goTypes = []any{
 	(*ClientCreateResponse)(nil),       // 7: oppb.v1.ClientCreateResponse
 	(*SessionGroupCreateRequest)(nil),  // 8: oppb.v1.SessionGroupCreateRequest
 	(*SessionGroupCreateResponse)(nil), // 9: oppb.v1.SessionGroupCreateResponse
-	(*IssuerMeta)(nil),                 // 10: oppb.v1.IssuerMeta
-	(*IssuerAttribute)(nil),            // 11: oppb.v1.IssuerAttribute
-	(*CommonKey)(nil),                  // 12: oppb.v1.CommonKey
-	(*IssuerSecret)(nil),               // 13: oppb.v1.IssuerSecret
-	(*ClientIdentity)(nil),             // 14: oppb.v1.ClientIdentity
-	(*ClientMeta)(nil),                 // 15: oppb.v1.ClientMeta
-	(*ClientAttribute)(nil),            // 16: oppb.v1.ClientAttribute
-	(*SessionGroupAttribute)(nil),      // 17: oppb.v1.SessionGroupAttribute
+	(*KeyRotateRequest)(nil),           // 10: oppb.v1.KeyRotateRequest
+	(*KeyRotateResponse)(nil),          // 11: oppb.v1.KeyRotateResponse
+	(*IssuerMeta)(nil),                 // 12: oppb.v1.IssuerMeta
+	(*IssuerAttribute)(nil),            // 13: oppb.v1.IssuerAttribute
+	(*CommonKey)(nil),                  // 14: oppb.v1.CommonKey
+	(*IssuerSecret)(nil),               // 15: oppb.v1.IssuerSecret
+	(*ClientIdentity)(nil),             // 16: oppb.v1.ClientIdentity
+	(*ClientMeta)(nil),                 // 17: oppb.v1.ClientMeta
+	(*ClientAttribute)(nil),            // 18: oppb.v1.ClientAttribute
+	(*SessionGroupAttribute)(nil),      // 19: oppb.v1.SessionGroupAttribute
 }
 var file_oppb_v1_rest_service_proto_depIdxs = []int32{
-	10, // 0: oppb.v1.IssuerCreateRequest.meta:type_name -> oppb.v1.IssuerMeta
-	11, // 1: oppb.v1.IssuerCreateRequest.attribute:type_name -> oppb.v1.IssuerAttribute
-	12, // 2: oppb.v1.IssuerCreateResponse.key:type_name -> oppb.v1.CommonKey
-	10, // 3: oppb.v1.IssuerCreateResponse.meta:type_name -> oppb.v1.IssuerMeta
-	13, // 4: oppb.v1.IssuerCreateResponse.secret:type_name -> oppb.v1.IssuerSecret
-	11, // 5: oppb.v1.IssuerCreateResponse.attribute:type_name -> oppb.v1.IssuerAttribute
-	10, // 6: oppb.v1.IssuerGetResponse.meta:type_name -> oppb.v1.IssuerMeta
-	11, // 7: oppb.v1.IssuerGetResponse.attribute:type_name -> oppb.v1.IssuerAttribute
-	10, // 8: oppb.v1.IssuerUpdateRequest.meta:type_name -> oppb.v1.IssuerMeta
-	11, // 9: oppb.v1.IssuerUpdateRequest.attribute:type_name -> oppb.v1.IssuerAttribute
-	10, // 10: oppb.v1.IssuerUpdateResponse.meta:type_name -> oppb.v1.IssuerMeta
-	11, // 11: oppb.v1.IssuerUpdateResponse.attribute:type_name -> oppb.v1.IssuerAttribute
-	14, // 12: oppb.v1.ClientCreateRequest.identity:type_name -> oppb.v1.ClientIdentity
-	15, // 13: oppb.v1.ClientCreateRequest.meta:type_name -> oppb.v1.ClientMeta
-	16, // 14: oppb.v1.ClientCreateRequest.attribute:type_name -> oppb.v1.ClientAttribute
-	14, // 15: oppb.v1.ClientCreateResponse.identity:type_name -> oppb.v1.ClientIdentity
-	15, // 16: oppb.v1.ClientCreateResponse.meta:type_name -> oppb.v1.ClientMeta
-	16, // 17: oppb.v1.ClientCreateResponse.attribute:type_name -> oppb.v1.ClientAttribute
-	12, // 18: oppb.v1.SessionGroupCreateRequest.key:type_name -> oppb.v1.CommonKey
-	17, // 19: oppb.v1.SessionGroupCreateRequest.attribute:type_name -> oppb.v1.SessionGroupAttribute
-	17, // 20: oppb.v1.SessionGroupCreateResponse.attribute:type_name -> oppb.v1.SessionGroupAttribute
+	12, // 0: oppb.v1.IssuerCreateRequest.meta:type_name -> oppb.v1.IssuerMeta
+	13, // 1: oppb.v1.IssuerCreateRequest.attribute:type_name -> oppb.v1.IssuerAttribute
+	14, // 2: oppb.v1.IssuerCreateResponse.key:type_name -> oppb.v1.CommonKey
+	12, // 3: oppb.v1.IssuerCreateResponse.meta:type_name -> oppb.v1.IssuerMeta
+	15, // 4: oppb.v1.IssuerCreateResponse.secret:type_name -> oppb.v1.IssuerSecret
+	13, // 5: oppb.v1.IssuerCreateResponse.attribute:type_name -> oppb.v1.IssuerAttribute
+	12, // 6: oppb.v1.IssuerGetResponse.meta:type_name -> oppb.v1.IssuerMeta
+	13, // 7: oppb.v1.IssuerGetResponse.attribute:type_name -> oppb.v1.IssuerAttribute
+	12, // 8: oppb.v1.IssuerUpdateRequest.meta:type_name -> oppb.v1.IssuerMeta
+	13, // 9: oppb.v1.IssuerUpdateRequest.attribute:type_name -> oppb.v1.IssuerAttribute
+	12, // 10: oppb.v1.IssuerUpdateResponse.meta:type_name -> oppb.v1.IssuerMeta
+	13, // 11: oppb.v1.IssuerUpdateResponse.attribute:type_name -> oppb.v1.IssuerAttribute
+	16, // 12: oppb.v1.ClientCreateRequest.identity:type_name -> oppb.v1.ClientIdentity
+	17, // 13: oppb.v1.ClientCreateRequest.meta:type_name -> oppb.v1.ClientMeta
+	18, // 14: oppb.v1.ClientCreateRequest.attribute:type_name -> oppb.v1.ClientAttribute
+	16, // 15: oppb.v1.ClientCreateResponse.identity:type_name -> oppb.v1.ClientIdentity
+	17, // 16: oppb.v1.ClientCreateResponse.meta:type_name -> oppb.v1.ClientMeta
+	18, // 17: oppb.v1.ClientCreateResponse.attribute:type_name -> oppb.v1.ClientAttribute
+	14, // 18: oppb.v1.SessionGroupCreateRequest.key:type_name -> oppb.v1.CommonKey
+	19, // 19: oppb.v1.SessionGroupCreateRequest.attribute:type_name -> oppb.v1.SessionGroupAttribute
+	19, // 20: oppb.v1.SessionGroupCreateResponse.attribute:type_name -> oppb.v1.SessionGroupAttribute
 	0,  // 21: oppb.v1.RestService.IssuerCreate:input_type -> oppb.v1.IssuerCreateRequest
 	2,  // 22: oppb.v1.RestService.IssuerGet:input_type -> oppb.v1.IssuerGetRequest
 	4,  // 23: oppb.v1.RestService.IssuerUpdate:input_type -> oppb.v1.IssuerUpdateRequest
 	6,  // 24: oppb.v1.RestService.ClientCreate:input_type -> oppb.v1.ClientCreateRequest
 	8,  // 25: oppb.v1.RestService.SessionGroupCreate:input_type -> oppb.v1.SessionGroupCreateRequest
-	1,  // 26: oppb.v1.RestService.IssuerCreate:output_type -> oppb.v1.IssuerCreateResponse
-	3,  // 27: oppb.v1.RestService.IssuerGet:output_type -> oppb.v1.IssuerGetResponse
-	5,  // 28: oppb.v1.RestService.IssuerUpdate:output_type -> oppb.v1.IssuerUpdateResponse
-	7,  // 29: oppb.v1.RestService.ClientCreate:output_type -> oppb.v1.ClientCreateResponse
-	9,  // 30: oppb.v1.RestService.SessionGroupCreate:output_type -> oppb.v1.SessionGroupCreateResponse
-	26, // [26:31] is the sub-list for method output_type
-	21, // [21:26] is the sub-list for method input_type
+	10, // 26: oppb.v1.RestService.KeyRotate:input_type -> oppb.v1.KeyRotateRequest
+	1,  // 27: oppb.v1.RestService.IssuerCreate:output_type -> oppb.v1.IssuerCreateResponse
+	3,  // 28: oppb.v1.RestService.IssuerGet:output_type -> oppb.v1.IssuerGetResponse
+	5,  // 29: oppb.v1.RestService.IssuerUpdate:output_type -> oppb.v1.IssuerUpdateResponse
+	7,  // 30: oppb.v1.RestService.ClientCreate:output_type -> oppb.v1.ClientCreateResponse
+	9,  // 31: oppb.v1.RestService.SessionGroupCreate:output_type -> oppb.v1.SessionGroupCreateResponse
+	11, // 32: oppb.v1.RestService.KeyRotate:output_type -> oppb.v1.KeyRotateResponse
+	27, // [27:33] is the sub-list for method output_type
+	21, // [21:27] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name
 	21, // [21:21] is the sub-list for extension extendee
 	0,  // [0:21] is the sub-list for field type_name
@@ -706,7 +794,7 @@ func file_oppb_v1_rest_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_oppb_v1_rest_service_proto_rawDesc), len(file_oppb_v1_rest_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
