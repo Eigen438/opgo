@@ -31,7 +31,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo"
-	"github.com/Eigen438/opgo/pkg/authenticationui"
+	"github.com/Eigen438/opgo/examples/GoogleCloudHostedService/authenticationui"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/cloudfirestore"
 	"github.com/rs/cors"
