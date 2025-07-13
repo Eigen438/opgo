@@ -21,7 +21,7 @@ Additionally, opgo can also function as an OP simulator using the provided sampl
 
 ### Prerequisites
 
-* Go 1.23.8 or higher
+* Go 1.23.10 or higher
 
 ### Installation
 
@@ -75,7 +75,7 @@ func main() {
 		ClientSecret: "secret",
 		Meta: &oppb.ClientMeta{
 			// If you do not set the RedirectUris parameter, the check will be skipped.
-			// RedirectUris: []string{"https://exsample.com/cb"},
+			// RedirectUris: []string{"https://example.com/cb"},
 			GrantTypes:               []string{"authorization_code"},
 			TokenEndpointAuthMethod:  "client_secret_basic",
 			ResponseTypes:            []string{"code"},
