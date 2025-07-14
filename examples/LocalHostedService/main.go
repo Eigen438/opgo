@@ -83,7 +83,7 @@ func main() {
 		ClientSecret: "secret",
 		Meta: &oppb.ClientMeta{
 			// If you do not set the RedirectUris parameter, the check will be skipped.
-			// RedirectUris: []string{"https://exsample.com/cb"},
+			// RedirectUris: []string{"https://example.com/cb"},
 			GrantTypes:               []string{"authorization_code"},
 			TokenEndpointAuthMethod:  "client_secret_basic",
 			ResponseTypes:            []string{"code"},
