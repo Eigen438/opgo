@@ -1111,6 +1111,166 @@ func (x *UserinfoResponse) GetBody() string {
 	return ""
 }
 
+type PushedAuthorizationRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	BasicAuth            *BasicAuth             `protobuf:"bytes,1,opt,name=basic_auth,json=basicAuth,proto3" json:"basic_auth,omitempty"`
+	ContentType          string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	Method               string                 `protobuf:"bytes,3,opt,name=method,proto3" json:"method,omitempty"`
+	Form                 string                 `protobuf:"bytes,4,opt,name=form,proto3" json:"form,omitempty"`
+	TlsClientCertificate string                 `protobuf:"bytes,5,opt,name=tls_client_certificate,json=tlsClientCertificate,proto3" json:"tls_client_certificate,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *PushedAuthorizationRequest) Reset() {
+	*x = PushedAuthorizationRequest{}
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PushedAuthorizationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PushedAuthorizationRequest) ProtoMessage() {}
+
+func (x *PushedAuthorizationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PushedAuthorizationRequest.ProtoReflect.Descriptor instead.
+func (*PushedAuthorizationRequest) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *PushedAuthorizationRequest) GetBasicAuth() *BasicAuth {
+	if x != nil {
+		return x.BasicAuth
+	}
+	return nil
+}
+
+func (x *PushedAuthorizationRequest) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *PushedAuthorizationRequest) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *PushedAuthorizationRequest) GetForm() string {
+	if x != nil {
+		return x.Form
+	}
+	return ""
+}
+
+func (x *PushedAuthorizationRequest) GetTlsClientCertificate() string {
+	if x != nil {
+		return x.TlsClientCertificate
+	}
+	return ""
+}
+
+type PushedAuthorizationResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to PushedAuthorizationResponseOneof:
+	//
+	//	*PushedAuthorizationResponse_Success
+	//	*PushedAuthorizationResponse_Fail
+	PushedAuthorizationResponseOneof isPushedAuthorizationResponse_PushedAuthorizationResponseOneof `protobuf_oneof:"pushed_authorization_response_oneof"`
+	unknownFields                    protoimpl.UnknownFields
+	sizeCache                        protoimpl.SizeCache
+}
+
+func (x *PushedAuthorizationResponse) Reset() {
+	*x = PushedAuthorizationResponse{}
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PushedAuthorizationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PushedAuthorizationResponse) ProtoMessage() {}
+
+func (x *PushedAuthorizationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PushedAuthorizationResponse.ProtoReflect.Descriptor instead.
+func (*PushedAuthorizationResponse) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *PushedAuthorizationResponse) GetPushedAuthorizationResponseOneof() isPushedAuthorizationResponse_PushedAuthorizationResponseOneof {
+	if x != nil {
+		return x.PushedAuthorizationResponseOneof
+	}
+	return nil
+}
+
+func (x *PushedAuthorizationResponse) GetSuccess() *PushedAuthorizationSuccessResponse {
+	if x != nil {
+		if x, ok := x.PushedAuthorizationResponseOneof.(*PushedAuthorizationResponse_Success); ok {
+			return x.Success
+		}
+	}
+	return nil
+}
+
+func (x *PushedAuthorizationResponse) GetFail() *PushedAuthorizationFailResponse {
+	if x != nil {
+		if x, ok := x.PushedAuthorizationResponseOneof.(*PushedAuthorizationResponse_Fail); ok {
+			return x.Fail
+		}
+	}
+	return nil
+}
+
+type isPushedAuthorizationResponse_PushedAuthorizationResponseOneof interface {
+	isPushedAuthorizationResponse_PushedAuthorizationResponseOneof()
+}
+
+type PushedAuthorizationResponse_Success struct {
+	Success *PushedAuthorizationSuccessResponse `protobuf:"bytes,1,opt,name=success,proto3,oneof"`
+}
+
+type PushedAuthorizationResponse_Fail struct {
+	Fail *PushedAuthorizationFailResponse `protobuf:"bytes,2,opt,name=fail,proto3,oneof"`
+}
+
+func (*PushedAuthorizationResponse_Success) isPushedAuthorizationResponse_PushedAuthorizationResponseOneof() {
+}
+
+func (*PushedAuthorizationResponse_Fail) isPushedAuthorizationResponse_PushedAuthorizationResponseOneof() {
+}
+
 type RequestRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -1120,7 +1280,7 @@ type RequestRequest struct {
 
 func (x *RequestRequest) Reset() {
 	*x = RequestRequest{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[16]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1132,7 +1292,7 @@ func (x *RequestRequest) String() string {
 func (*RequestRequest) ProtoMessage() {}
 
 func (x *RequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[16]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1145,7 +1305,7 @@ func (x *RequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestRequest.ProtoReflect.Descriptor instead.
 func (*RequestRequest) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{16}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *RequestRequest) GetRequestId() string {
@@ -1165,7 +1325,7 @@ type RequestResponse struct {
 
 func (x *RequestResponse) Reset() {
 	*x = RequestResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[17]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1177,7 +1337,7 @@ func (x *RequestResponse) String() string {
 func (*RequestResponse) ProtoMessage() {}
 
 func (x *RequestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[17]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1190,7 +1350,7 @@ func (x *RequestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestResponse.ProtoReflect.Descriptor instead.
 func (*RequestResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{17}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *RequestResponse) GetClient() *ClientMeta {
@@ -1217,7 +1377,7 @@ type AuthorizationFailResponse struct {
 
 func (x *AuthorizationFailResponse) Reset() {
 	*x = AuthorizationFailResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[18]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1229,7 +1389,7 @@ func (x *AuthorizationFailResponse) String() string {
 func (*AuthorizationFailResponse) ProtoMessage() {}
 
 func (x *AuthorizationFailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[18]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1242,7 +1402,7 @@ func (x *AuthorizationFailResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizationFailResponse.ProtoReflect.Descriptor instead.
 func (*AuthorizationFailResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{18}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *AuthorizationFailResponse) GetStatusCode() int32 {
@@ -1272,7 +1432,7 @@ type AuthorizationErrorResponse struct {
 
 func (x *AuthorizationErrorResponse) Reset() {
 	*x = AuthorizationErrorResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[19]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1284,7 +1444,7 @@ func (x *AuthorizationErrorResponse) String() string {
 func (*AuthorizationErrorResponse) ProtoMessage() {}
 
 func (x *AuthorizationErrorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[19]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1297,7 +1457,7 @@ func (x *AuthorizationErrorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizationErrorResponse.ProtoReflect.Descriptor instead.
 func (*AuthorizationErrorResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{19}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *AuthorizationErrorResponse) GetError() string {
@@ -1339,7 +1499,7 @@ type AuthorizationNextActionLogin struct {
 
 func (x *AuthorizationNextActionLogin) Reset() {
 	*x = AuthorizationNextActionLogin{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[20]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1351,7 +1511,7 @@ func (x *AuthorizationNextActionLogin) String() string {
 func (*AuthorizationNextActionLogin) ProtoMessage() {}
 
 func (x *AuthorizationNextActionLogin) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[20]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1364,7 +1524,7 @@ func (x *AuthorizationNextActionLogin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizationNextActionLogin.ProtoReflect.Descriptor instead.
 func (*AuthorizationNextActionLogin) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{20}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *AuthorizationNextActionLogin) GetRequestId() string {
@@ -1401,7 +1561,7 @@ type AuthorizationNextActionIssue struct {
 
 func (x *AuthorizationNextActionIssue) Reset() {
 	*x = AuthorizationNextActionIssue{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[21]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1413,7 +1573,7 @@ func (x *AuthorizationNextActionIssue) String() string {
 func (*AuthorizationNextActionIssue) ProtoMessage() {}
 
 func (x *AuthorizationNextActionIssue) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[21]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1426,7 +1586,7 @@ func (x *AuthorizationNextActionIssue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizationNextActionIssue.ProtoReflect.Descriptor instead.
 func (*AuthorizationNextActionIssue) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{21}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *AuthorizationNextActionIssue) GetRequestId() string {
@@ -1473,7 +1633,7 @@ type AuthorizationRedirectResponse struct {
 
 func (x *AuthorizationRedirectResponse) Reset() {
 	*x = AuthorizationRedirectResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[22]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1485,7 +1645,7 @@ func (x *AuthorizationRedirectResponse) String() string {
 func (*AuthorizationRedirectResponse) ProtoMessage() {}
 
 func (x *AuthorizationRedirectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[22]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1498,7 +1658,7 @@ func (x *AuthorizationRedirectResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizationRedirectResponse.ProtoReflect.Descriptor instead.
 func (*AuthorizationRedirectResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{22}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *AuthorizationRedirectResponse) GetUrl() string {
@@ -1517,7 +1677,7 @@ type AuthorizationHtmlResponse struct {
 
 func (x *AuthorizationHtmlResponse) Reset() {
 	*x = AuthorizationHtmlResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[23]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1529,7 +1689,7 @@ func (x *AuthorizationHtmlResponse) String() string {
 func (*AuthorizationHtmlResponse) ProtoMessage() {}
 
 func (x *AuthorizationHtmlResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[23]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1542,7 +1702,7 @@ func (x *AuthorizationHtmlResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizationHtmlResponse.ProtoReflect.Descriptor instead.
 func (*AuthorizationHtmlResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{23}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *AuthorizationHtmlResponse) GetContent() string {
@@ -1568,7 +1728,7 @@ type TokenSuccessResponse struct {
 
 func (x *TokenSuccessResponse) Reset() {
 	*x = TokenSuccessResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[24]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1580,7 +1740,7 @@ func (x *TokenSuccessResponse) String() string {
 func (*TokenSuccessResponse) ProtoMessage() {}
 
 func (x *TokenSuccessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[24]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1593,7 +1753,7 @@ func (x *TokenSuccessResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenSuccessResponse.ProtoReflect.Descriptor instead.
 func (*TokenSuccessResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{24}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *TokenSuccessResponse) GetAccessToken() string {
@@ -1648,7 +1808,7 @@ type TokenFailResponse struct {
 
 func (x *TokenFailResponse) Reset() {
 	*x = TokenFailResponse{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[25]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1660,7 +1820,7 @@ func (x *TokenFailResponse) String() string {
 func (*TokenFailResponse) ProtoMessage() {}
 
 func (x *TokenFailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[25]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1673,7 +1833,7 @@ func (x *TokenFailResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenFailResponse.ProtoReflect.Descriptor instead.
 func (*TokenFailResponse) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{25}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *TokenFailResponse) GetStatusCode() int32 {
@@ -1690,6 +1850,126 @@ func (x *TokenFailResponse) GetError() *OauthError {
 	return nil
 }
 
+type PushedAuthorizationSuccessResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StatusCode    int32                  `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	RequestUri    string                 `protobuf:"bytes,2,opt,name=request_uri,json=requestUri,proto3" json:"request_uri,omitempty"`
+	ExpiresIn     int32                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PushedAuthorizationSuccessResponse) Reset() {
+	*x = PushedAuthorizationSuccessResponse{}
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PushedAuthorizationSuccessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PushedAuthorizationSuccessResponse) ProtoMessage() {}
+
+func (x *PushedAuthorizationSuccessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PushedAuthorizationSuccessResponse.ProtoReflect.Descriptor instead.
+func (*PushedAuthorizationSuccessResponse) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *PushedAuthorizationSuccessResponse) GetStatusCode() int32 {
+	if x != nil {
+		return x.StatusCode
+	}
+	return 0
+}
+
+func (x *PushedAuthorizationSuccessResponse) GetRequestUri() string {
+	if x != nil {
+		return x.RequestUri
+	}
+	return ""
+}
+
+func (x *PushedAuthorizationSuccessResponse) GetExpiresIn() int32 {
+	if x != nil {
+		return x.ExpiresIn
+	}
+	return 0
+}
+
+type PushedAuthorizationFailResponse struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	StatusCode       int32                  `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	Error            string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	ErrorDescription string                 `protobuf:"bytes,3,opt,name=error_description,json=errorDescription,proto3" json:"error_description,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *PushedAuthorizationFailResponse) Reset() {
+	*x = PushedAuthorizationFailResponse{}
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PushedAuthorizationFailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PushedAuthorizationFailResponse) ProtoMessage() {}
+
+func (x *PushedAuthorizationFailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PushedAuthorizationFailResponse.ProtoReflect.Descriptor instead.
+func (*PushedAuthorizationFailResponse) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *PushedAuthorizationFailResponse) GetStatusCode() int32 {
+	if x != nil {
+		return x.StatusCode
+	}
+	return 0
+}
+
+func (x *PushedAuthorizationFailResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *PushedAuthorizationFailResponse) GetErrorDescription() string {
+	if x != nil {
+		return x.ErrorDescription
+	}
+	return ""
+}
+
 type OauthError struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// https://www.rfc-editor.org/rfc/rfc6749.html#section-5.2
@@ -1702,7 +1982,7 @@ type OauthError struct {
 
 func (x *OauthError) Reset() {
 	*x = OauthError{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[26]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1714,7 +1994,7 @@ func (x *OauthError) String() string {
 func (*OauthError) ProtoMessage() {}
 
 func (x *OauthError) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[26]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1727,7 +2007,7 @@ func (x *OauthError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OauthError.ProtoReflect.Descriptor instead.
 func (*OauthError) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{26}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *OauthError) GetError() string {
@@ -1761,7 +2041,7 @@ type BasicAuth struct {
 
 func (x *BasicAuth) Reset() {
 	*x = BasicAuth{}
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[27]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1773,7 +2053,7 @@ func (x *BasicAuth) String() string {
 func (*BasicAuth) ProtoMessage() {}
 
 func (x *BasicAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_provider_service_proto_msgTypes[27]
+	mi := &file_oppb_v1_provider_service_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1786,7 +2066,7 @@ func (x *BasicAuth) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BasicAuth.ProtoReflect.Descriptor instead.
 func (*BasicAuth) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{27}
+	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *BasicAuth) GetUsername() string {
@@ -1883,7 +2163,18 @@ const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"\x04body\x18\x03 \x01(\tR\x04body\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"/\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xd4\x01\n" +
+	"\x1aPushedAuthorizationRequest\x121\n" +
+	"\n" +
+	"basic_auth\x18\x01 \x01(\v2\x12.oppb.v1.BasicAuthR\tbasicAuth\x12!\n" +
+	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\x12\x16\n" +
+	"\x06method\x18\x03 \x01(\tR\x06method\x12\x12\n" +
+	"\x04form\x18\x04 \x01(\tR\x04form\x124\n" +
+	"\x16tls_client_certificate\x18\x05 \x01(\tR\x14tlsClientCertificate\"\xcd\x01\n" +
+	"\x1bPushedAuthorizationResponse\x12G\n" +
+	"\asuccess\x18\x01 \x01(\v2+.oppb.v1.PushedAuthorizationSuccessResponseH\x00R\asuccess\x12>\n" +
+	"\x04fail\x18\x02 \x01(\v2(.oppb.v1.PushedAuthorizationFailResponseH\x00R\x04failB%\n" +
+	"#pushed_authorization_response_oneof\"/\n" +
 	"\x0eRequestRequest\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\"\x81\x01\n" +
@@ -1933,7 +2224,19 @@ const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"\x11TokenFailResponse\x12\x1f\n" +
 	"\vstatus_code\x18\x01 \x01(\x05R\n" +
 	"statusCode\x12)\n" +
-	"\x05error\x18\x02 \x01(\v2\x13.oppb.v1.OauthErrorR\x05error\"n\n" +
+	"\x05error\x18\x02 \x01(\v2\x13.oppb.v1.OauthErrorR\x05error\"\x85\x01\n" +
+	"\"PushedAuthorizationSuccessResponse\x12\x1f\n" +
+	"\vstatus_code\x18\x01 \x01(\x05R\n" +
+	"statusCode\x12\x1f\n" +
+	"\vrequest_uri\x18\x02 \x01(\tR\n" +
+	"requestUri\x12\x1d\n" +
+	"\n" +
+	"expires_in\x18\x03 \x01(\x05R\texpiresIn\"\x85\x01\n" +
+	"\x1fPushedAuthorizationFailResponse\x12\x1f\n" +
+	"\vstatus_code\x18\x01 \x01(\x05R\n" +
+	"statusCode\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x12+\n" +
+	"\x11error_description\x18\x03 \x01(\tR\x10errorDescription\"n\n" +
 	"\n" +
 	"OauthError\x12\x14\n" +
 	"\x05error\x18\x01 \x01(\tR\x05error\x12,\n" +
@@ -1941,7 +2244,7 @@ const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"\terror_uri\x18\x03 \x01(\tR\terror_uri\"C\n" +
 	"\tBasicAuth\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword2\xb3\a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword2\x95\b\n" +
 	"\x0fProviderService\x12B\n" +
 	"\tDiscovery\x12\x19.oppb.v1.DiscoveryRequest\x1a\x1a.oppb.v1.DiscoveryResponse\x123\n" +
 	"\x04Jwks\x12\x14.oppb.v1.JwksRequest\x1a\x15.oppb.v1.JwksResponse\x12N\n" +
@@ -1950,7 +2253,8 @@ const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"\x13AuthorizationCancel\x12#.oppb.v1.AuthorizationCancelRequest\x1a$.oppb.v1.AuthorizationCancelResponse\x12K\n" +
 	"\fStartSession\x12\x1c.oppb.v1.StartSessionRequest\x1a\x1d.oppb.v1.StartSessionResponse\x126\n" +
 	"\x05Token\x12\x15.oppb.v1.TokenRequest\x1a\x16.oppb.v1.TokenResponse\x12?\n" +
-	"\bUserinfo\x12\x18.oppb.v1.UserinfoRequest\x1a\x19.oppb.v1.UserinfoResponse\x12<\n" +
+	"\bUserinfo\x12\x18.oppb.v1.UserinfoRequest\x1a\x19.oppb.v1.UserinfoResponse\x12`\n" +
+	"\x13PushedAuthorization\x12#.oppb.v1.PushedAuthorizationRequest\x1a$.oppb.v1.PushedAuthorizationResponse\x12<\n" +
 	"\aRequest\x12\x17.oppb.v1.RequestRequest\x1a\x18.oppb.v1.RequestResponse\x12]\n" +
 	"\x12RegistrationCreate\x12\".oppb.v1.RegistrationCreateRequest\x1a#.oppb.v1.RegistrationCreateResponse\x12]\n" +
 	"\x12RegistrationDelete\x12\".oppb.v1.RegistrationDeleteRequest\x1a#.oppb.v1.RegistrationDeleteResponse\x12T\n" +
@@ -1969,107 +2273,116 @@ func file_oppb_v1_provider_service_proto_rawDescGZIP() []byte {
 	return file_oppb_v1_provider_service_proto_rawDescData
 }
 
-var file_oppb_v1_provider_service_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_oppb_v1_provider_service_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_oppb_v1_provider_service_proto_goTypes = []any{
-	(*DiscoveryRequest)(nil),              // 0: oppb.v1.DiscoveryRequest
-	(*DiscoveryResponse)(nil),             // 1: oppb.v1.DiscoveryResponse
-	(*JwksRequest)(nil),                   // 2: oppb.v1.JwksRequest
-	(*JwksResponse)(nil),                  // 3: oppb.v1.JwksResponse
-	(*AuthorizationRequest)(nil),          // 4: oppb.v1.AuthorizationRequest
-	(*AuthorizationResponse)(nil),         // 5: oppb.v1.AuthorizationResponse
-	(*AuthorizationIssueRequest)(nil),     // 6: oppb.v1.AuthorizationIssueRequest
-	(*AuthorizationIssueResponse)(nil),    // 7: oppb.v1.AuthorizationIssueResponse
-	(*AuthorizationCancelRequest)(nil),    // 8: oppb.v1.AuthorizationCancelRequest
-	(*AuthorizationCancelResponse)(nil),   // 9: oppb.v1.AuthorizationCancelResponse
-	(*StartSessionRequest)(nil),           // 10: oppb.v1.StartSessionRequest
-	(*StartSessionResponse)(nil),          // 11: oppb.v1.StartSessionResponse
-	(*TokenRequest)(nil),                  // 12: oppb.v1.TokenRequest
-	(*TokenResponse)(nil),                 // 13: oppb.v1.TokenResponse
-	(*UserinfoRequest)(nil),               // 14: oppb.v1.UserinfoRequest
-	(*UserinfoResponse)(nil),              // 15: oppb.v1.UserinfoResponse
-	(*RequestRequest)(nil),                // 16: oppb.v1.RequestRequest
-	(*RequestResponse)(nil),               // 17: oppb.v1.RequestResponse
-	(*AuthorizationFailResponse)(nil),     // 18: oppb.v1.AuthorizationFailResponse
-	(*AuthorizationErrorResponse)(nil),    // 19: oppb.v1.AuthorizationErrorResponse
-	(*AuthorizationNextActionLogin)(nil),  // 20: oppb.v1.AuthorizationNextActionLogin
-	(*AuthorizationNextActionIssue)(nil),  // 21: oppb.v1.AuthorizationNextActionIssue
-	(*AuthorizationRedirectResponse)(nil), // 22: oppb.v1.AuthorizationRedirectResponse
-	(*AuthorizationHtmlResponse)(nil),     // 23: oppb.v1.AuthorizationHtmlResponse
-	(*TokenSuccessResponse)(nil),          // 24: oppb.v1.TokenSuccessResponse
-	(*TokenFailResponse)(nil),             // 25: oppb.v1.TokenFailResponse
-	(*OauthError)(nil),                    // 26: oppb.v1.OauthError
-	(*BasicAuth)(nil),                     // 27: oppb.v1.BasicAuth
-	nil,                                   // 28: oppb.v1.AuthorizationRequest.SessionsEntry
-	nil,                                   // 29: oppb.v1.UserinfoResponse.HeadersEntry
-	(*IssuerMeta)(nil),                    // 30: oppb.v1.IssuerMeta
-	(*Jwk)(nil),                           // 31: oppb.v1.Jwk
-	(*AuthorizationParameters)(nil),       // 32: oppb.v1.AuthorizationParameters
-	(*ClientMeta)(nil),                    // 33: oppb.v1.ClientMeta
-	(*ClientAttribute)(nil),               // 34: oppb.v1.ClientAttribute
-	(*RegistrationCreateRequest)(nil),     // 35: oppb.v1.RegistrationCreateRequest
-	(*RegistrationDeleteRequest)(nil),     // 36: oppb.v1.RegistrationDeleteRequest
-	(*RegistrationGetRequest)(nil),        // 37: oppb.v1.RegistrationGetRequest
-	(*RegistrationCreateResponse)(nil),    // 38: oppb.v1.RegistrationCreateResponse
-	(*RegistrationDeleteResponse)(nil),    // 39: oppb.v1.RegistrationDeleteResponse
-	(*RegistrationGetResponse)(nil),       // 40: oppb.v1.RegistrationGetResponse
+	(*DiscoveryRequest)(nil),                   // 0: oppb.v1.DiscoveryRequest
+	(*DiscoveryResponse)(nil),                  // 1: oppb.v1.DiscoveryResponse
+	(*JwksRequest)(nil),                        // 2: oppb.v1.JwksRequest
+	(*JwksResponse)(nil),                       // 3: oppb.v1.JwksResponse
+	(*AuthorizationRequest)(nil),               // 4: oppb.v1.AuthorizationRequest
+	(*AuthorizationResponse)(nil),              // 5: oppb.v1.AuthorizationResponse
+	(*AuthorizationIssueRequest)(nil),          // 6: oppb.v1.AuthorizationIssueRequest
+	(*AuthorizationIssueResponse)(nil),         // 7: oppb.v1.AuthorizationIssueResponse
+	(*AuthorizationCancelRequest)(nil),         // 8: oppb.v1.AuthorizationCancelRequest
+	(*AuthorizationCancelResponse)(nil),        // 9: oppb.v1.AuthorizationCancelResponse
+	(*StartSessionRequest)(nil),                // 10: oppb.v1.StartSessionRequest
+	(*StartSessionResponse)(nil),               // 11: oppb.v1.StartSessionResponse
+	(*TokenRequest)(nil),                       // 12: oppb.v1.TokenRequest
+	(*TokenResponse)(nil),                      // 13: oppb.v1.TokenResponse
+	(*UserinfoRequest)(nil),                    // 14: oppb.v1.UserinfoRequest
+	(*UserinfoResponse)(nil),                   // 15: oppb.v1.UserinfoResponse
+	(*PushedAuthorizationRequest)(nil),         // 16: oppb.v1.PushedAuthorizationRequest
+	(*PushedAuthorizationResponse)(nil),        // 17: oppb.v1.PushedAuthorizationResponse
+	(*RequestRequest)(nil),                     // 18: oppb.v1.RequestRequest
+	(*RequestResponse)(nil),                    // 19: oppb.v1.RequestResponse
+	(*AuthorizationFailResponse)(nil),          // 20: oppb.v1.AuthorizationFailResponse
+	(*AuthorizationErrorResponse)(nil),         // 21: oppb.v1.AuthorizationErrorResponse
+	(*AuthorizationNextActionLogin)(nil),       // 22: oppb.v1.AuthorizationNextActionLogin
+	(*AuthorizationNextActionIssue)(nil),       // 23: oppb.v1.AuthorizationNextActionIssue
+	(*AuthorizationRedirectResponse)(nil),      // 24: oppb.v1.AuthorizationRedirectResponse
+	(*AuthorizationHtmlResponse)(nil),          // 25: oppb.v1.AuthorizationHtmlResponse
+	(*TokenSuccessResponse)(nil),               // 26: oppb.v1.TokenSuccessResponse
+	(*TokenFailResponse)(nil),                  // 27: oppb.v1.TokenFailResponse
+	(*PushedAuthorizationSuccessResponse)(nil), // 28: oppb.v1.PushedAuthorizationSuccessResponse
+	(*PushedAuthorizationFailResponse)(nil),    // 29: oppb.v1.PushedAuthorizationFailResponse
+	(*OauthError)(nil),                         // 30: oppb.v1.OauthError
+	(*BasicAuth)(nil),                          // 31: oppb.v1.BasicAuth
+	nil,                                        // 32: oppb.v1.AuthorizationRequest.SessionsEntry
+	nil,                                        // 33: oppb.v1.UserinfoResponse.HeadersEntry
+	(*IssuerMeta)(nil),                         // 34: oppb.v1.IssuerMeta
+	(*Jwk)(nil),                                // 35: oppb.v1.Jwk
+	(*AuthorizationParameters)(nil),            // 36: oppb.v1.AuthorizationParameters
+	(*ClientMeta)(nil),                         // 37: oppb.v1.ClientMeta
+	(*ClientAttribute)(nil),                    // 38: oppb.v1.ClientAttribute
+	(*RegistrationCreateRequest)(nil),          // 39: oppb.v1.RegistrationCreateRequest
+	(*RegistrationDeleteRequest)(nil),          // 40: oppb.v1.RegistrationDeleteRequest
+	(*RegistrationGetRequest)(nil),             // 41: oppb.v1.RegistrationGetRequest
+	(*RegistrationCreateResponse)(nil),         // 42: oppb.v1.RegistrationCreateResponse
+	(*RegistrationDeleteResponse)(nil),         // 43: oppb.v1.RegistrationDeleteResponse
+	(*RegistrationGetResponse)(nil),            // 44: oppb.v1.RegistrationGetResponse
 }
 var file_oppb_v1_provider_service_proto_depIdxs = []int32{
-	30, // 0: oppb.v1.DiscoveryResponse.meta:type_name -> oppb.v1.IssuerMeta
-	31, // 1: oppb.v1.JwksResponse.keys:type_name -> oppb.v1.Jwk
-	28, // 2: oppb.v1.AuthorizationRequest.sessions:type_name -> oppb.v1.AuthorizationRequest.SessionsEntry
-	18, // 3: oppb.v1.AuthorizationResponse.fail:type_name -> oppb.v1.AuthorizationFailResponse
-	20, // 4: oppb.v1.AuthorizationResponse.login:type_name -> oppb.v1.AuthorizationNextActionLogin
-	21, // 5: oppb.v1.AuthorizationResponse.issue:type_name -> oppb.v1.AuthorizationNextActionIssue
-	22, // 6: oppb.v1.AuthorizationResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
-	23, // 7: oppb.v1.AuthorizationResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
-	32, // 8: oppb.v1.AuthorizationResponse.params:type_name -> oppb.v1.AuthorizationParameters
-	33, // 9: oppb.v1.AuthorizationResponse.client:type_name -> oppb.v1.ClientMeta
-	34, // 10: oppb.v1.AuthorizationResponse.client_attribute:type_name -> oppb.v1.ClientAttribute
-	22, // 11: oppb.v1.AuthorizationIssueResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
-	23, // 12: oppb.v1.AuthorizationIssueResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
-	22, // 13: oppb.v1.AuthorizationCancelResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
-	23, // 14: oppb.v1.AuthorizationCancelResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
-	27, // 15: oppb.v1.TokenRequest.basic_auth:type_name -> oppb.v1.BasicAuth
-	24, // 16: oppb.v1.TokenResponse.success:type_name -> oppb.v1.TokenSuccessResponse
-	25, // 17: oppb.v1.TokenResponse.fail:type_name -> oppb.v1.TokenFailResponse
-	29, // 18: oppb.v1.UserinfoResponse.headers:type_name -> oppb.v1.UserinfoResponse.HeadersEntry
-	33, // 19: oppb.v1.RequestResponse.client:type_name -> oppb.v1.ClientMeta
-	32, // 20: oppb.v1.RequestResponse.auth_params:type_name -> oppb.v1.AuthorizationParameters
-	19, // 21: oppb.v1.AuthorizationFailResponse.error:type_name -> oppb.v1.AuthorizationErrorResponse
-	33, // 22: oppb.v1.AuthorizationNextActionLogin.client:type_name -> oppb.v1.ClientMeta
-	32, // 23: oppb.v1.AuthorizationNextActionLogin.auth_params:type_name -> oppb.v1.AuthorizationParameters
-	33, // 24: oppb.v1.AuthorizationNextActionIssue.client:type_name -> oppb.v1.ClientMeta
-	32, // 25: oppb.v1.AuthorizationNextActionIssue.auth_params:type_name -> oppb.v1.AuthorizationParameters
-	26, // 26: oppb.v1.TokenFailResponse.error:type_name -> oppb.v1.OauthError
-	0,  // 27: oppb.v1.ProviderService.Discovery:input_type -> oppb.v1.DiscoveryRequest
-	2,  // 28: oppb.v1.ProviderService.Jwks:input_type -> oppb.v1.JwksRequest
-	4,  // 29: oppb.v1.ProviderService.Authorization:input_type -> oppb.v1.AuthorizationRequest
-	6,  // 30: oppb.v1.ProviderService.AuthorizationIssue:input_type -> oppb.v1.AuthorizationIssueRequest
-	8,  // 31: oppb.v1.ProviderService.AuthorizationCancel:input_type -> oppb.v1.AuthorizationCancelRequest
-	10, // 32: oppb.v1.ProviderService.StartSession:input_type -> oppb.v1.StartSessionRequest
-	12, // 33: oppb.v1.ProviderService.Token:input_type -> oppb.v1.TokenRequest
-	14, // 34: oppb.v1.ProviderService.Userinfo:input_type -> oppb.v1.UserinfoRequest
-	16, // 35: oppb.v1.ProviderService.Request:input_type -> oppb.v1.RequestRequest
-	35, // 36: oppb.v1.ProviderService.RegistrationCreate:input_type -> oppb.v1.RegistrationCreateRequest
-	36, // 37: oppb.v1.ProviderService.RegistrationDelete:input_type -> oppb.v1.RegistrationDeleteRequest
-	37, // 38: oppb.v1.ProviderService.RegistrationGet:input_type -> oppb.v1.RegistrationGetRequest
-	1,  // 39: oppb.v1.ProviderService.Discovery:output_type -> oppb.v1.DiscoveryResponse
-	3,  // 40: oppb.v1.ProviderService.Jwks:output_type -> oppb.v1.JwksResponse
-	5,  // 41: oppb.v1.ProviderService.Authorization:output_type -> oppb.v1.AuthorizationResponse
-	7,  // 42: oppb.v1.ProviderService.AuthorizationIssue:output_type -> oppb.v1.AuthorizationIssueResponse
-	9,  // 43: oppb.v1.ProviderService.AuthorizationCancel:output_type -> oppb.v1.AuthorizationCancelResponse
-	11, // 44: oppb.v1.ProviderService.StartSession:output_type -> oppb.v1.StartSessionResponse
-	13, // 45: oppb.v1.ProviderService.Token:output_type -> oppb.v1.TokenResponse
-	15, // 46: oppb.v1.ProviderService.Userinfo:output_type -> oppb.v1.UserinfoResponse
-	17, // 47: oppb.v1.ProviderService.Request:output_type -> oppb.v1.RequestResponse
-	38, // 48: oppb.v1.ProviderService.RegistrationCreate:output_type -> oppb.v1.RegistrationCreateResponse
-	39, // 49: oppb.v1.ProviderService.RegistrationDelete:output_type -> oppb.v1.RegistrationDeleteResponse
-	40, // 50: oppb.v1.ProviderService.RegistrationGet:output_type -> oppb.v1.RegistrationGetResponse
-	39, // [39:51] is the sub-list for method output_type
-	27, // [27:39] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	34, // 0: oppb.v1.DiscoveryResponse.meta:type_name -> oppb.v1.IssuerMeta
+	35, // 1: oppb.v1.JwksResponse.keys:type_name -> oppb.v1.Jwk
+	32, // 2: oppb.v1.AuthorizationRequest.sessions:type_name -> oppb.v1.AuthorizationRequest.SessionsEntry
+	20, // 3: oppb.v1.AuthorizationResponse.fail:type_name -> oppb.v1.AuthorizationFailResponse
+	22, // 4: oppb.v1.AuthorizationResponse.login:type_name -> oppb.v1.AuthorizationNextActionLogin
+	23, // 5: oppb.v1.AuthorizationResponse.issue:type_name -> oppb.v1.AuthorizationNextActionIssue
+	24, // 6: oppb.v1.AuthorizationResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
+	25, // 7: oppb.v1.AuthorizationResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
+	36, // 8: oppb.v1.AuthorizationResponse.params:type_name -> oppb.v1.AuthorizationParameters
+	37, // 9: oppb.v1.AuthorizationResponse.client:type_name -> oppb.v1.ClientMeta
+	38, // 10: oppb.v1.AuthorizationResponse.client_attribute:type_name -> oppb.v1.ClientAttribute
+	24, // 11: oppb.v1.AuthorizationIssueResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
+	25, // 12: oppb.v1.AuthorizationIssueResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
+	24, // 13: oppb.v1.AuthorizationCancelResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
+	25, // 14: oppb.v1.AuthorizationCancelResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
+	31, // 15: oppb.v1.TokenRequest.basic_auth:type_name -> oppb.v1.BasicAuth
+	26, // 16: oppb.v1.TokenResponse.success:type_name -> oppb.v1.TokenSuccessResponse
+	27, // 17: oppb.v1.TokenResponse.fail:type_name -> oppb.v1.TokenFailResponse
+	33, // 18: oppb.v1.UserinfoResponse.headers:type_name -> oppb.v1.UserinfoResponse.HeadersEntry
+	31, // 19: oppb.v1.PushedAuthorizationRequest.basic_auth:type_name -> oppb.v1.BasicAuth
+	28, // 20: oppb.v1.PushedAuthorizationResponse.success:type_name -> oppb.v1.PushedAuthorizationSuccessResponse
+	29, // 21: oppb.v1.PushedAuthorizationResponse.fail:type_name -> oppb.v1.PushedAuthorizationFailResponse
+	37, // 22: oppb.v1.RequestResponse.client:type_name -> oppb.v1.ClientMeta
+	36, // 23: oppb.v1.RequestResponse.auth_params:type_name -> oppb.v1.AuthorizationParameters
+	21, // 24: oppb.v1.AuthorizationFailResponse.error:type_name -> oppb.v1.AuthorizationErrorResponse
+	37, // 25: oppb.v1.AuthorizationNextActionLogin.client:type_name -> oppb.v1.ClientMeta
+	36, // 26: oppb.v1.AuthorizationNextActionLogin.auth_params:type_name -> oppb.v1.AuthorizationParameters
+	37, // 27: oppb.v1.AuthorizationNextActionIssue.client:type_name -> oppb.v1.ClientMeta
+	36, // 28: oppb.v1.AuthorizationNextActionIssue.auth_params:type_name -> oppb.v1.AuthorizationParameters
+	30, // 29: oppb.v1.TokenFailResponse.error:type_name -> oppb.v1.OauthError
+	0,  // 30: oppb.v1.ProviderService.Discovery:input_type -> oppb.v1.DiscoveryRequest
+	2,  // 31: oppb.v1.ProviderService.Jwks:input_type -> oppb.v1.JwksRequest
+	4,  // 32: oppb.v1.ProviderService.Authorization:input_type -> oppb.v1.AuthorizationRequest
+	6,  // 33: oppb.v1.ProviderService.AuthorizationIssue:input_type -> oppb.v1.AuthorizationIssueRequest
+	8,  // 34: oppb.v1.ProviderService.AuthorizationCancel:input_type -> oppb.v1.AuthorizationCancelRequest
+	10, // 35: oppb.v1.ProviderService.StartSession:input_type -> oppb.v1.StartSessionRequest
+	12, // 36: oppb.v1.ProviderService.Token:input_type -> oppb.v1.TokenRequest
+	14, // 37: oppb.v1.ProviderService.Userinfo:input_type -> oppb.v1.UserinfoRequest
+	16, // 38: oppb.v1.ProviderService.PushedAuthorization:input_type -> oppb.v1.PushedAuthorizationRequest
+	18, // 39: oppb.v1.ProviderService.Request:input_type -> oppb.v1.RequestRequest
+	39, // 40: oppb.v1.ProviderService.RegistrationCreate:input_type -> oppb.v1.RegistrationCreateRequest
+	40, // 41: oppb.v1.ProviderService.RegistrationDelete:input_type -> oppb.v1.RegistrationDeleteRequest
+	41, // 42: oppb.v1.ProviderService.RegistrationGet:input_type -> oppb.v1.RegistrationGetRequest
+	1,  // 43: oppb.v1.ProviderService.Discovery:output_type -> oppb.v1.DiscoveryResponse
+	3,  // 44: oppb.v1.ProviderService.Jwks:output_type -> oppb.v1.JwksResponse
+	5,  // 45: oppb.v1.ProviderService.Authorization:output_type -> oppb.v1.AuthorizationResponse
+	7,  // 46: oppb.v1.ProviderService.AuthorizationIssue:output_type -> oppb.v1.AuthorizationIssueResponse
+	9,  // 47: oppb.v1.ProviderService.AuthorizationCancel:output_type -> oppb.v1.AuthorizationCancelResponse
+	11, // 48: oppb.v1.ProviderService.StartSession:output_type -> oppb.v1.StartSessionResponse
+	13, // 49: oppb.v1.ProviderService.Token:output_type -> oppb.v1.TokenResponse
+	15, // 50: oppb.v1.ProviderService.Userinfo:output_type -> oppb.v1.UserinfoResponse
+	17, // 51: oppb.v1.ProviderService.PushedAuthorization:output_type -> oppb.v1.PushedAuthorizationResponse
+	19, // 52: oppb.v1.ProviderService.Request:output_type -> oppb.v1.RequestResponse
+	42, // 53: oppb.v1.ProviderService.RegistrationCreate:output_type -> oppb.v1.RegistrationCreateResponse
+	43, // 54: oppb.v1.ProviderService.RegistrationDelete:output_type -> oppb.v1.RegistrationDeleteResponse
+	44, // 55: oppb.v1.ProviderService.RegistrationGet:output_type -> oppb.v1.RegistrationGetResponse
+	43, // [43:56] is the sub-list for method output_type
+	30, // [30:43] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_provider_service_proto_init() }
@@ -2102,13 +2415,17 @@ func file_oppb_v1_provider_service_proto_init() {
 		(*TokenResponse_Success)(nil),
 		(*TokenResponse_Fail)(nil),
 	}
+	file_oppb_v1_provider_service_proto_msgTypes[17].OneofWrappers = []any{
+		(*PushedAuthorizationResponse_Success)(nil),
+		(*PushedAuthorizationResponse_Fail)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_oppb_v1_provider_service_proto_rawDesc), len(file_oppb_v1_provider_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

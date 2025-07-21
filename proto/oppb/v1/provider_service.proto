@@ -42,6 +42,7 @@ service ProviderService {
   rpc StartSession(StartSessionRequest) returns (StartSessionResponse);
   rpc Token(TokenRequest) returns (TokenResponse);
   rpc Userinfo(UserinfoRequest) returns (UserinfoResponse);
+  rpc PushedAuthorization(PushedAuthorizationRequest) returns (PushedAuthorizationResponse);
   rpc Request(RequestRequest) returns (RequestResponse);
   rpc RegistrationCreate(RegistrationCreateRequest) returns (RegistrationCreateResponse);
   rpc RegistrationDelete(RegistrationDeleteRequest) returns (RegistrationDeleteResponse);
@@ -145,6 +146,21 @@ message UserinfoResponse {
   string body = 3;
 }
 
+message PushedAuthorizationRequest {
+  BasicAuth basic_auth = 1;
+  string content_type = 2;
+  string method = 3;
+  string form = 4;
+  string tls_client_certificate = 5;
+}
+
+message PushedAuthorizationResponse {
+  oneof pushed_authorization_response_oneof {
+    PushedAuthorizationSuccessResponse success = 1;
+    PushedAuthorizationFailResponse fail = 2;
+  }
+}
+
 message RequestRequest {
   string request_id = 1;
 }
@@ -203,6 +219,18 @@ message TokenSuccessResponse {
 message TokenFailResponse {
   int32 status_code = 1;
   OauthError error = 2;
+}
+
+message PushedAuthorizationSuccessResponse {
+  int32 status_code = 1;
+  string request_uri = 2;
+  int32 expires_in = 3;
+}
+
+message PushedAuthorizationFailResponse {
+  int32 status_code = 1;
+  string error = 2;
+  string error_description = 3;
 }
 
 message OauthError {

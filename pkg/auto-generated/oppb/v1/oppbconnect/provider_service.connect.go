@@ -77,6 +77,9 @@ const (
 	// ProviderServiceUserinfoProcedure is the fully-qualified name of the ProviderService's Userinfo
 	// RPC.
 	ProviderServiceUserinfoProcedure = "/oppb.v1.ProviderService/Userinfo"
+	// ProviderServicePushedAuthorizationProcedure is the fully-qualified name of the ProviderService's
+	// PushedAuthorization RPC.
+	ProviderServicePushedAuthorizationProcedure = "/oppb.v1.ProviderService/PushedAuthorization"
 	// ProviderServiceRequestProcedure is the fully-qualified name of the ProviderService's Request RPC.
 	ProviderServiceRequestProcedure = "/oppb.v1.ProviderService/Request"
 	// ProviderServiceRegistrationCreateProcedure is the fully-qualified name of the ProviderService's
@@ -100,6 +103,7 @@ type ProviderServiceClient interface {
 	StartSession(context.Context, *connect.Request[v1.StartSessionRequest]) (*connect.Response[v1.StartSessionResponse], error)
 	Token(context.Context, *connect.Request[v1.TokenRequest]) (*connect.Response[v1.TokenResponse], error)
 	Userinfo(context.Context, *connect.Request[v1.UserinfoRequest]) (*connect.Response[v1.UserinfoResponse], error)
+	PushedAuthorization(context.Context, *connect.Request[v1.PushedAuthorizationRequest]) (*connect.Response[v1.PushedAuthorizationResponse], error)
 	Request(context.Context, *connect.Request[v1.RequestRequest]) (*connect.Response[v1.RequestResponse], error)
 	RegistrationCreate(context.Context, *connect.Request[v1.RegistrationCreateRequest]) (*connect.Response[v1.RegistrationCreateResponse], error)
 	RegistrationDelete(context.Context, *connect.Request[v1.RegistrationDeleteRequest]) (*connect.Response[v1.RegistrationDeleteResponse], error)
@@ -165,6 +169,12 @@ func NewProviderServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(providerServiceMethods.ByName("Userinfo")),
 			connect.WithClientOptions(opts...),
 		),
+		pushedAuthorization: connect.NewClient[v1.PushedAuthorizationRequest, v1.PushedAuthorizationResponse](
+			httpClient,
+			baseURL+ProviderServicePushedAuthorizationProcedure,
+			connect.WithSchema(providerServiceMethods.ByName("PushedAuthorization")),
+			connect.WithClientOptions(opts...),
+		),
 		request: connect.NewClient[v1.RequestRequest, v1.RequestResponse](
 			httpClient,
 			baseURL+ProviderServiceRequestProcedure,
@@ -202,6 +212,7 @@ type providerServiceClient struct {
 	startSession        *connect.Client[v1.StartSessionRequest, v1.StartSessionResponse]
 	token               *connect.Client[v1.TokenRequest, v1.TokenResponse]
 	userinfo            *connect.Client[v1.UserinfoRequest, v1.UserinfoResponse]
+	pushedAuthorization *connect.Client[v1.PushedAuthorizationRequest, v1.PushedAuthorizationResponse]
 	request             *connect.Client[v1.RequestRequest, v1.RequestResponse]
 	registrationCreate  *connect.Client[v1.RegistrationCreateRequest, v1.RegistrationCreateResponse]
 	registrationDelete  *connect.Client[v1.RegistrationDeleteRequest, v1.RegistrationDeleteResponse]
@@ -248,6 +259,11 @@ func (c *providerServiceClient) Userinfo(ctx context.Context, req *connect.Reque
 	return c.userinfo.CallUnary(ctx, req)
 }
 
+// PushedAuthorization calls oppb.v1.ProviderService.PushedAuthorization.
+func (c *providerServiceClient) PushedAuthorization(ctx context.Context, req *connect.Request[v1.PushedAuthorizationRequest]) (*connect.Response[v1.PushedAuthorizationResponse], error) {
+	return c.pushedAuthorization.CallUnary(ctx, req)
+}
+
 // Request calls oppb.v1.ProviderService.Request.
 func (c *providerServiceClient) Request(ctx context.Context, req *connect.Request[v1.RequestRequest]) (*connect.Response[v1.RequestResponse], error) {
 	return c.request.CallUnary(ctx, req)
@@ -278,6 +294,7 @@ type ProviderServiceHandler interface {
 	StartSession(context.Context, *connect.Request[v1.StartSessionRequest]) (*connect.Response[v1.StartSessionResponse], error)
 	Token(context.Context, *connect.Request[v1.TokenRequest]) (*connect.Response[v1.TokenResponse], error)
 	Userinfo(context.Context, *connect.Request[v1.UserinfoRequest]) (*connect.Response[v1.UserinfoResponse], error)
+	PushedAuthorization(context.Context, *connect.Request[v1.PushedAuthorizationRequest]) (*connect.Response[v1.PushedAuthorizationResponse], error)
 	Request(context.Context, *connect.Request[v1.RequestRequest]) (*connect.Response[v1.RequestResponse], error)
 	RegistrationCreate(context.Context, *connect.Request[v1.RegistrationCreateRequest]) (*connect.Response[v1.RegistrationCreateResponse], error)
 	RegistrationDelete(context.Context, *connect.Request[v1.RegistrationDeleteRequest]) (*connect.Response[v1.RegistrationDeleteResponse], error)
@@ -339,6 +356,12 @@ func NewProviderServiceHandler(svc ProviderServiceHandler, opts ...connect.Handl
 		connect.WithSchema(providerServiceMethods.ByName("Userinfo")),
 		connect.WithHandlerOptions(opts...),
 	)
+	providerServicePushedAuthorizationHandler := connect.NewUnaryHandler(
+		ProviderServicePushedAuthorizationProcedure,
+		svc.PushedAuthorization,
+		connect.WithSchema(providerServiceMethods.ByName("PushedAuthorization")),
+		connect.WithHandlerOptions(opts...),
+	)
 	providerServiceRequestHandler := connect.NewUnaryHandler(
 		ProviderServiceRequestProcedure,
 		svc.Request,
@@ -381,6 +404,8 @@ func NewProviderServiceHandler(svc ProviderServiceHandler, opts ...connect.Handl
 			providerServiceTokenHandler.ServeHTTP(w, r)
 		case ProviderServiceUserinfoProcedure:
 			providerServiceUserinfoHandler.ServeHTTP(w, r)
+		case ProviderServicePushedAuthorizationProcedure:
+			providerServicePushedAuthorizationHandler.ServeHTTP(w, r)
 		case ProviderServiceRequestProcedure:
 			providerServiceRequestHandler.ServeHTTP(w, r)
 		case ProviderServiceRegistrationCreateProcedure:
@@ -428,6 +453,10 @@ func (UnimplementedProviderServiceHandler) Token(context.Context, *connect.Reque
 
 func (UnimplementedProviderServiceHandler) Userinfo(context.Context, *connect.Request[v1.UserinfoRequest]) (*connect.Response[v1.UserinfoResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("oppb.v1.ProviderService.Userinfo is not implemented"))
+}
+
+func (UnimplementedProviderServiceHandler) PushedAuthorization(context.Context, *connect.Request[v1.PushedAuthorizationRequest]) (*connect.Response[v1.PushedAuthorizationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("oppb.v1.ProviderService.PushedAuthorization is not implemented"))
 }
 
 func (UnimplementedProviderServiceHandler) Request(context.Context, *connect.Request[v1.RequestRequest]) (*connect.Response[v1.RequestResponse], error) {
