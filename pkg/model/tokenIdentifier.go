@@ -51,11 +51,12 @@ type TokenIdentifier struct {
 	SessionId string // delete key
 }
 
+func GetTokenIdentiferCollectionName(issuerId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/tokens", version, issuerId)
+}
+
 func (t TokenIdentifier) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/tokens/%s",
-		version,
-		t.Details.Authorized.Request.Client.Issuer.Id,
-		t.Details.Identifier)
+	return GetTokenIdentiferCollectionName(t.Details.Authorized.Request.Client.Issuer.Id) + "/" + t.Details.Identifier
 }
 
 func (t TokenIdentifier) ExpireAtUnix(_ context.Context) int64 {

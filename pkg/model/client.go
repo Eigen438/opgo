@@ -43,11 +43,12 @@ type Client struct {
 	Attribute *oppb.ClientAttribute
 }
 
+func GetClientCollectionName(issuerId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/clients", version, issuerId)
+}
+
 func (c *Client) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/clients/%s",
-		version,
-		c.Issuer.Id,
-		c.Identity.ClientId)
+	return GetClientCollectionName(c.Issuer.Id) + "/" + c.Identity.ClientId
 }
 
 // get key for parsing jwt

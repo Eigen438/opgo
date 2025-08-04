@@ -45,11 +45,12 @@ type Request struct {
 	ExpireAt time.Time
 }
 
+func GetRequestCollectionName(issuerId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/requests", version, issuerId)
+}
+
 func (r Request) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/requests/%s",
-		version,
-		r.Details.Client.Issuer.Id,
-		r.Details.Key.Id)
+	return GetRequestCollectionName(r.Details.Client.Issuer.Id) + "/" + r.Details.Key.Id
 }
 
 func (r Request) ExpireAtUnix(_ context.Context) int64 {

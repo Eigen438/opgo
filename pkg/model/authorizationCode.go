@@ -40,11 +40,12 @@ type AuthorizationCode struct {
 	ExpireAt time.Time
 }
 
+func GetAuthorizationCodeCollectionName(issuerId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/authorizationCodes", version, issuerId)
+}
+
 func (ac *AuthorizationCode) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/authorizationCodes/%s",
-		version,
-		ac.Details.Authorized.Request.Client.Issuer.Id,
-		ac.Details.Code)
+	return GetAuthorizationCodeCollectionName(ac.Details.Authorized.Request.Client.Issuer.Id) + "/" + ac.Details.Code
 }
 
 func (ac *AuthorizationCode) ExpireAtUnix(_ context.Context) int64 {

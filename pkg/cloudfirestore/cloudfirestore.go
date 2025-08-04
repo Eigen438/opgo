@@ -30,6 +30,7 @@ import (
 	apiv1 "cloud.google.com/go/firestore/apiv1/admin"
 	"cloud.google.com/go/firestore/apiv1/admin/adminpb"
 	"github.com/Eigen438/cloudfirestore"
+	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/Eigen438/opgo/pkg/provider"
 	"google.golang.org/api/option"
 )
@@ -56,15 +57,15 @@ type inner struct {
 	cloudfirestore.CloudFirestore
 }
 
-func (inner) DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error {
-	q := cloudfirestore.Collection("peridot/v1/issuers/"+issuerId+"/tokens").Where("RequestId", "==", requestId)
-	_, err := cloudfirestore.DeleteWithQuery(ctx, q, 10)
+func (i *inner) DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error {
+	q := i.CloudFirestore.Collection(model.GetTokenIdentiferCollectionName(issuerId)).Where("RequestId", "==", requestId)
+	_, err := i.CloudFirestore.DeleteWithQuery(ctx, q, 10)
 	return err
 }
 
-func (inner) DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error {
-	q := cloudfirestore.Collection("peridot/v1/issuers/"+issuerId+"/tokens").Where("SessionId", "==", sessionId)
-	_, err := cloudfirestore.DeleteWithQuery(ctx, q, 10)
+func (i *inner) DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error {
+	q := i.CloudFirestore.Collection(model.GetTokenIdentiferCollectionName(issuerId)).Where("SessionId", "==", sessionId)
+	_, err := i.CloudFirestore.DeleteWithQuery(ctx, q, 10)
 	return err
 }
 

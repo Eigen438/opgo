@@ -38,10 +38,10 @@ type PushedAuthorization struct {
 	ExpireAt time.Time
 }
 
+func GetPushedAuthorizationCollectionName(issuerId, clientId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/clients/%s/pars", version, issuerId, clientId)
+}
+
 func (i *PushedAuthorization) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/clients/%s/pars/%s",
-		version,
-		i.Client.Issuer.Id,
-		i.Client.Identity.ClientId,
-		i.Key.Id)
+	return GetPushedAuthorizationCollectionName(i.Client.Issuer.Id, i.Client.Identity.ClientId) + "/" + i.Key.Id
 }

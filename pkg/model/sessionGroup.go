@@ -35,9 +35,10 @@ type SessionGroup struct {
 	Attribute *oppb.SessionGroupAttribute
 }
 
+func GetSessionGroupCollectionName(issuerId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/sessionGroups", version, issuerId)
+}
+
 func (s *SessionGroup) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/sessionGroups/%s",
-		version,
-		s.Issuer.Id,
-		s.Key.Id)
+	return GetSessionGroupCollectionName(s.Issuer.Id) + "/" + s.Key.Id
 }

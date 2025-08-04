@@ -43,11 +43,12 @@ type Session struct {
 	ExpireAt time.Time
 }
 
+func GetSessionCollectionName(issuerId string) string {
+	return fmt.Sprintf("opgo/%s/issuers/%s/sessions", version, issuerId)
+}
+
 func (s Session) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/sessions/%s",
-		version,
-		s.Details.Issuer.Id,
-		s.Details.Key.Id)
+	return GetSessionCollectionName(s.Details.Issuer.Id) + "/" + s.Details.Key.Id
 }
 
 func (s Session) ExpireAtUnix(_ context.Context) int64 {
