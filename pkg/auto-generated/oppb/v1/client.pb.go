@@ -94,11 +94,11 @@ func (EnumClientProfile) EnumDescriptor() ([]byte, []int) {
 
 type ClientAttribute struct {
 	state                            protoimpl.MessageState `protogen:"open.v1"`
-	AccessTokenLifetimeSeconds       int64                  `protobuf:"varint,1,opt,name=access_token_lifetime_seconds,proto3" json:"access_token_lifetime_seconds,omitempty"`
-	AuthorizationCodeLifetimeSeconds int64                  `protobuf:"varint,2,opt,name=authorization_code_lifetime_seconds,proto3" json:"authorization_code_lifetime_seconds,omitempty"`
-	IdTokenLifetimeSeconds           int64                  `protobuf:"varint,3,opt,name=id_token_lifetime_seconds,proto3" json:"id_token_lifetime_seconds,omitempty"`
-	RefreshTokenLifetimeSeconds      int64                  `protobuf:"varint,4,opt,name=refresh_token_lifetime_seconds,proto3" json:"refresh_token_lifetime_seconds,omitempty"`
-	RequestLifetimeSeconds           int64                  `protobuf:"varint,5,opt,name=request_lifetime_seconds,proto3" json:"request_lifetime_seconds,omitempty"`
+	AccessTokenLifetimeSeconds       int32                  `protobuf:"varint,1,opt,name=access_token_lifetime_seconds,proto3" json:"access_token_lifetime_seconds,omitempty"`
+	AuthorizationCodeLifetimeSeconds int32                  `protobuf:"varint,2,opt,name=authorization_code_lifetime_seconds,proto3" json:"authorization_code_lifetime_seconds,omitempty"`
+	IdTokenLifetimeSeconds           int32                  `protobuf:"varint,3,opt,name=id_token_lifetime_seconds,proto3" json:"id_token_lifetime_seconds,omitempty"`
+	RefreshTokenLifetimeSeconds      int32                  `protobuf:"varint,4,opt,name=refresh_token_lifetime_seconds,proto3" json:"refresh_token_lifetime_seconds,omitempty"`
+	RequestLifetimeSeconds           int32                  `protobuf:"varint,5,opt,name=request_lifetime_seconds,proto3" json:"request_lifetime_seconds,omitempty"`
 	SessionGroupId                   string                 `protobuf:"bytes,6,opt,name=session_group_id,proto3" json:"session_group_id,omitempty"`
 	Profile                          EnumClientProfile      `protobuf:"varint,11,opt,name=profile,proto3,enum=oppb.v1.EnumClientProfile" json:"profile,omitempty"`
 	TlsClientCertificates            []string               `protobuf:"bytes,12,rep,name=tls_client_certificates,proto3" json:"tls_client_certificates,omitempty"`
@@ -136,35 +136,35 @@ func (*ClientAttribute) Descriptor() ([]byte, []int) {
 	return file_oppb_v1_client_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ClientAttribute) GetAccessTokenLifetimeSeconds() int64 {
+func (x *ClientAttribute) GetAccessTokenLifetimeSeconds() int32 {
 	if x != nil {
 		return x.AccessTokenLifetimeSeconds
 	}
 	return 0
 }
 
-func (x *ClientAttribute) GetAuthorizationCodeLifetimeSeconds() int64 {
+func (x *ClientAttribute) GetAuthorizationCodeLifetimeSeconds() int32 {
 	if x != nil {
 		return x.AuthorizationCodeLifetimeSeconds
 	}
 	return 0
 }
 
-func (x *ClientAttribute) GetIdTokenLifetimeSeconds() int64 {
+func (x *ClientAttribute) GetIdTokenLifetimeSeconds() int32 {
 	if x != nil {
 		return x.IdTokenLifetimeSeconds
 	}
 	return 0
 }
 
-func (x *ClientAttribute) GetRefreshTokenLifetimeSeconds() int64 {
+func (x *ClientAttribute) GetRefreshTokenLifetimeSeconds() int32 {
 	if x != nil {
 		return x.RefreshTokenLifetimeSeconds
 	}
 	return 0
 }
 
-func (x *ClientAttribute) GetRequestLifetimeSeconds() int64 {
+func (x *ClientAttribute) GetRequestLifetimeSeconds() int32 {
 	if x != nil {
 		return x.RequestLifetimeSeconds
 	}
@@ -266,11 +266,11 @@ const file_oppb_v1_client_proto_rawDesc = "" +
 	"\n" +
 	"\x14oppb/v1/client.proto\x12\aoppb.v1\x1a\x19oppb/v1/client_meta.proto\x1a\x14oppb/v1/common.proto\"\x87\x04\n" +
 	"\x0fClientAttribute\x12D\n" +
-	"\x1daccess_token_lifetime_seconds\x18\x01 \x01(\x03R\x1daccess_token_lifetime_seconds\x12P\n" +
-	"#authorization_code_lifetime_seconds\x18\x02 \x01(\x03R#authorization_code_lifetime_seconds\x12<\n" +
-	"\x19id_token_lifetime_seconds\x18\x03 \x01(\x03R\x19id_token_lifetime_seconds\x12F\n" +
-	"\x1erefresh_token_lifetime_seconds\x18\x04 \x01(\x03R\x1erefresh_token_lifetime_seconds\x12:\n" +
-	"\x18request_lifetime_seconds\x18\x05 \x01(\x03R\x18request_lifetime_seconds\x12*\n" +
+	"\x1daccess_token_lifetime_seconds\x18\x01 \x01(\x05R\x1daccess_token_lifetime_seconds\x12P\n" +
+	"#authorization_code_lifetime_seconds\x18\x02 \x01(\x05R#authorization_code_lifetime_seconds\x12<\n" +
+	"\x19id_token_lifetime_seconds\x18\x03 \x01(\x05R\x19id_token_lifetime_seconds\x12F\n" +
+	"\x1erefresh_token_lifetime_seconds\x18\x04 \x01(\x05R\x1erefresh_token_lifetime_seconds\x12:\n" +
+	"\x18request_lifetime_seconds\x18\x05 \x01(\x05R\x18request_lifetime_seconds\x12*\n" +
 	"\x10session_group_id\x18\x06 \x01(\tR\x10session_group_id\x124\n" +
 	"\aprofile\x18\v \x01(\x0e2\x1a.oppb.v1.EnumClientProfileR\aprofile\x128\n" +
 	"\x17tls_client_certificates\x18\f \x03(\tR\x17tls_client_certificates\"\xca\x01\n" +

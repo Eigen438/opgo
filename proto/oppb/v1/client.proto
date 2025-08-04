@@ -36,11 +36,11 @@ enum EnumClientProfile {
 }
 
 message ClientAttribute {
-  int64 access_token_lifetime_seconds = 1 [json_name = "access_token_lifetime_seconds"];
-  int64 authorization_code_lifetime_seconds = 2 [json_name = "authorization_code_lifetime_seconds"];
-  int64 id_token_lifetime_seconds = 3 [json_name = "id_token_lifetime_seconds"];
-  int64 refresh_token_lifetime_seconds = 4 [json_name = "refresh_token_lifetime_seconds"];
-  int64 request_lifetime_seconds = 5 [json_name = "request_lifetime_seconds"];
+  int32 access_token_lifetime_seconds = 1 [json_name = "access_token_lifetime_seconds"];
+  int32 authorization_code_lifetime_seconds = 2 [json_name = "authorization_code_lifetime_seconds"];
+  int32 id_token_lifetime_seconds = 3 [json_name = "id_token_lifetime_seconds"];
+  int32 refresh_token_lifetime_seconds = 4 [json_name = "refresh_token_lifetime_seconds"];
+  int32 request_lifetime_seconds = 5 [json_name = "request_lifetime_seconds"];
   string session_group_id = 6 [json_name = "session_group_id"];
   EnumClientProfile profile = 11 [json_name = "profile"];
   repeated string tls_client_certificates = 12 [json_name = "tls_client_certificates"];

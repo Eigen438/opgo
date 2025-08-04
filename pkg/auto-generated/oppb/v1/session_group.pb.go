@@ -45,7 +45,7 @@ const (
 
 type SessionGroupAttribute struct {
 	state                           protoimpl.MessageState `protogen:"open.v1"`
-	AuthorizeSessionLifetimeSeconds int64                  `protobuf:"varint,1,opt,name=authorize_session_lifetime_seconds,proto3" json:"authorize_session_lifetime_seconds,omitempty"`
+	AuthorizeSessionLifetimeSeconds int32                  `protobuf:"varint,1,opt,name=authorize_session_lifetime_seconds,proto3" json:"authorize_session_lifetime_seconds,omitempty"`
 	unknownFields                   protoimpl.UnknownFields
 	sizeCache                       protoimpl.SizeCache
 }
@@ -80,7 +80,7 @@ func (*SessionGroupAttribute) Descriptor() ([]byte, []int) {
 	return file_oppb_v1_session_group_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SessionGroupAttribute) GetAuthorizeSessionLifetimeSeconds() int64 {
+func (x *SessionGroupAttribute) GetAuthorizeSessionLifetimeSeconds() int32 {
 	if x != nil {
 		return x.AuthorizeSessionLifetimeSeconds
 	}
@@ -153,7 +153,7 @@ const file_oppb_v1_session_group_proto_rawDesc = "" +
 	"\n" +
 	"\x1boppb/v1/session_group.proto\x12\aoppb.v1\x1a\x14oppb/v1/common.proto\"g\n" +
 	"\x15SessionGroupAttribute\x12N\n" +
-	"\"authorize_session_lifetime_seconds\x18\x01 \x01(\x03R\"authorize_session_lifetime_seconds\"\x9e\x01\n" +
+	"\"authorize_session_lifetime_seconds\x18\x01 \x01(\x05R\"authorize_session_lifetime_seconds\"\x9e\x01\n" +
 	"\fSessionGroup\x12$\n" +
 	"\x03key\x18\x01 \x01(\v2\x12.oppb.v1.CommonKeyR\x03key\x12*\n" +
 	"\x06issuer\x18\x02 \x01(\v2\x12.oppb.v1.CommonKeyR\x06issuer\x12<\n" +

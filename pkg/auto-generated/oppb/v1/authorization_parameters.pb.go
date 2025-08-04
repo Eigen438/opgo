@@ -31,7 +31,6 @@ package oppb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -262,55 +261,11 @@ func (x *AuthorizationParameters) GetRequestUri() string {
 	return ""
 }
 
-type PushedAuthorizationAttribute struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExpireAt      *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=expire_at,json=expireAt,proto3" json:"expire_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PushedAuthorizationAttribute) Reset() {
-	*x = PushedAuthorizationAttribute{}
-	mi := &file_oppb_v1_authorization_parameters_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PushedAuthorizationAttribute) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PushedAuthorizationAttribute) ProtoMessage() {}
-
-func (x *PushedAuthorizationAttribute) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_authorization_parameters_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PushedAuthorizationAttribute.ProtoReflect.Descriptor instead.
-func (*PushedAuthorizationAttribute) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_authorization_parameters_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *PushedAuthorizationAttribute) GetExpireAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ExpireAt
-	}
-	return nil
-}
-
 var File_oppb_v1_authorization_parameters_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\n" +
-	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfb\x05\n" +
+	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xfb\x05\n" +
 	"\x17AuthorizationParameters\x12\x16\n" +
 	"\x06scopes\x18\x01 \x03(\tR\x06scopes\x12$\n" +
 	"\rresponse_type\x18\x02 \x01(\tR\rresponse_type\x12\x1c\n" +
@@ -340,9 +295,7 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\x0ecode_challenge\x18\x13 \x01(\tR\x0ecode_challenge\x124\n" +
 	"\x15code_challenge_method\x18\x14 \x01(\tR\x15code_challenge_method\x12\x18\n" +
 	"\arequest\x18\x15 \x01(\tR\arequest\x12 \n" +
-	"\vrequest_uri\x18\x16 \x01(\tR\vrequest_uri\"W\n" +
-	"\x1cPushedAuthorizationAttribute\x127\n" +
-	"\texpire_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\bexpireAtB\xa2\x01\n" +
+	"\vrequest_uri\x18\x16 \x01(\tR\vrequest_uriB\xa2\x01\n" +
 	"\vcom.oppb.v1B\x1cAuthorizationParametersProtoP\x01Z8github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb\xa2\x02\x03OXX\xaa\x02\aOppb.V1\xca\x02\aOppb\\V1\xe2\x02\x13Oppb\\V1\\GPBMetadata\xea\x02\bOppb::V1b\x06proto3"
 
 var (
@@ -357,19 +310,16 @@ func file_oppb_v1_authorization_parameters_proto_rawDescGZIP() []byte {
 	return file_oppb_v1_authorization_parameters_proto_rawDescData
 }
 
-var file_oppb_v1_authorization_parameters_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_oppb_v1_authorization_parameters_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_oppb_v1_authorization_parameters_proto_goTypes = []any{
-	(*AuthorizationParameters)(nil),      // 0: oppb.v1.AuthorizationParameters
-	(*PushedAuthorizationAttribute)(nil), // 1: oppb.v1.PushedAuthorizationAttribute
-	(*timestamppb.Timestamp)(nil),        // 2: google.protobuf.Timestamp
+	(*AuthorizationParameters)(nil), // 0: oppb.v1.AuthorizationParameters
 }
 var file_oppb_v1_authorization_parameters_proto_depIdxs = []int32{
-	2, // 0: oppb.v1.PushedAuthorizationAttribute.expire_at:type_name -> google.protobuf.Timestamp
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_authorization_parameters_proto_init() }
@@ -383,7 +333,7 @@ func file_oppb_v1_authorization_parameters_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_oppb_v1_authorization_parameters_proto_rawDesc), len(file_oppb_v1_authorization_parameters_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

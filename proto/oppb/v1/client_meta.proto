@@ -79,6 +79,6 @@ message ClientIdentity {
   string client_secret = 2 [json_name = "client_secret"];
   string registration_access_token = 3 [json_name = "registration_access_token"];
   string registration_client_uri = 4 [json_name = "registration_client_uri"];
-  int64 client_id_issued_at = 5 [json_name = "client_id_issued_at"];
-  int64 client_secret_expires_at = 6 [json_name = "client_secret_expires_at"];
+  int32 client_id_issued_at = 5 [json_name = "client_id_issued_at"];
+  int32 client_secret_expires_at = 6 [json_name = "client_secret_expires_at"];
 }

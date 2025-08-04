@@ -35,11 +35,11 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *innerSdk) TokenEndpoint() http.HandlerFunc {
+func (i *innerSdk) PushedAuthorizationEndpoint() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		if err := func() error {
-			req := connect.NewRequest(&oppb.TokenRequest{
+			req := connect.NewRequest(&oppb.PushedAuthorizationRequest{
 				ContentType:          r.Header.Get(httphelper.HeaderContentType),
 				Method:               r.Method,
 				TlsClientCertificate: r.Header.Get("X-Client-Cert-Hash"),
@@ -59,7 +59,7 @@ func (i *innerSdk) TokenEndpoint() http.HandlerFunc {
 				}
 			}
 			auth.SetAuth(req, i)
-			res, err := i.provider.Token(ctx, req)
+			res, err := i.provider.PushedAuthorization(ctx, req)
 			if err != nil {
 				return err
 			}

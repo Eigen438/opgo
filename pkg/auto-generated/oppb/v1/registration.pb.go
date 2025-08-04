@@ -735,8 +735,8 @@ type RegistrationCreateSuccessResponse struct {
 	ClientSecret            string `protobuf:"bytes,2,opt,name=client_secret,proto3" json:"client_secret,omitempty"`
 	RegistrationAccessToken string `protobuf:"bytes,3,opt,name=registration_access_token,proto3" json:"registration_access_token,omitempty"`
 	RegistrationClientUri   string `protobuf:"bytes,4,opt,name=registration_client_uri,proto3" json:"registration_client_uri,omitempty"`
-	ClientIdIssuedAt        int64  `protobuf:"varint,5,opt,name=client_id_issued_at,proto3" json:"client_id_issued_at,omitempty"`
-	ClientSecretExpiresAt   int64  `protobuf:"varint,6,opt,name=client_secret_expires_at,proto3" json:"client_secret_expires_at,omitempty"`
+	ClientIdIssuedAt        int32  `protobuf:"varint,5,opt,name=client_id_issued_at,proto3" json:"client_id_issued_at,omitempty"`
+	ClientSecretExpiresAt   int32  `protobuf:"varint,6,opt,name=client_secret_expires_at,proto3" json:"client_secret_expires_at,omitempty"`
 	// ClientMeta
 	// https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
 	RedirectUris                 []string `protobuf:"bytes,101,rep,name=redirect_uris,proto3" json:"redirect_uris,omitempty"`
@@ -841,14 +841,14 @@ func (x *RegistrationCreateSuccessResponse) GetRegistrationClientUri() string {
 	return ""
 }
 
-func (x *RegistrationCreateSuccessResponse) GetClientIdIssuedAt() int64 {
+func (x *RegistrationCreateSuccessResponse) GetClientIdIssuedAt() int32 {
 	if x != nil {
 		return x.ClientIdIssuedAt
 	}
 	return 0
 }
 
-func (x *RegistrationCreateSuccessResponse) GetClientSecretExpiresAt() int64 {
+func (x *RegistrationCreateSuccessResponse) GetClientSecretExpiresAt() int32 {
 	if x != nil {
 		return x.ClientSecretExpiresAt
 	}
@@ -1115,8 +1115,8 @@ type RegistrationGetSuccessResponse struct {
 	ClientSecret string `protobuf:"bytes,2,opt,name=client_secret,proto3" json:"client_secret,omitempty"`
 	// string registration_access_token = 3 [json_name = "registration_access_token"];
 	// string registration_client_uri = 4 [json_name = "registration_client_uri"];
-	ClientIdIssuedAt      int64 `protobuf:"varint,5,opt,name=client_id_issued_at,proto3" json:"client_id_issued_at,omitempty"`
-	ClientSecretExpiresAt int64 `protobuf:"varint,6,opt,name=client_secret_expires_at,proto3" json:"client_secret_expires_at,omitempty"`
+	ClientIdIssuedAt      int32 `protobuf:"varint,5,opt,name=client_id_issued_at,proto3" json:"client_id_issued_at,omitempty"`
+	ClientSecretExpiresAt int32 `protobuf:"varint,6,opt,name=client_secret_expires_at,proto3" json:"client_secret_expires_at,omitempty"`
 	// ClientMeta
 	// https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
 	RedirectUris                 []string `protobuf:"bytes,101,rep,name=redirect_uris,proto3" json:"redirect_uris,omitempty"`
@@ -1207,14 +1207,14 @@ func (x *RegistrationGetSuccessResponse) GetClientSecret() string {
 	return ""
 }
 
-func (x *RegistrationGetSuccessResponse) GetClientIdIssuedAt() int64 {
+func (x *RegistrationGetSuccessResponse) GetClientIdIssuedAt() int32 {
 	if x != nil {
 		return x.ClientIdIssuedAt
 	}
 	return 0
 }
 
-func (x *RegistrationGetSuccessResponse) GetClientSecretExpiresAt() int64 {
+func (x *RegistrationGetSuccessResponse) GetClientSecretExpiresAt() int32 {
 	if x != nil {
 		return x.ClientSecretExpiresAt
 	}
@@ -1683,8 +1683,8 @@ const file_oppb_v1_registration_proto_rawDesc = "" +
 	"\rclient_secret\x18\x02 \x01(\tR\rclient_secret\x12<\n" +
 	"\x19registration_access_token\x18\x03 \x01(\tR\x19registration_access_token\x128\n" +
 	"\x17registration_client_uri\x18\x04 \x01(\tR\x17registration_client_uri\x120\n" +
-	"\x13client_id_issued_at\x18\x05 \x01(\x03R\x13client_id_issued_at\x12:\n" +
-	"\x18client_secret_expires_at\x18\x06 \x01(\x03R\x18client_secret_expires_at\x12$\n" +
+	"\x13client_id_issued_at\x18\x05 \x01(\x05R\x13client_id_issued_at\x12:\n" +
+	"\x18client_secret_expires_at\x18\x06 \x01(\x05R\x18client_secret_expires_at\x12$\n" +
 	"\rredirect_uris\x18e \x03(\tR\rredirect_uris\x12&\n" +
 	"\x0eresponse_types\x18f \x03(\tR\x0eresponse_types\x12 \n" +
 	"\vgrant_types\x18g \x03(\tR\vgrant_types\x12*\n" +
@@ -1728,8 +1728,8 @@ const file_oppb_v1_registration_proto_rawDesc = "" +
 	"\x1eRegistrationGetSuccessResponse\x12\x1c\n" +
 	"\tclient_id\x18\x01 \x01(\tR\tclient_id\x12$\n" +
 	"\rclient_secret\x18\x02 \x01(\tR\rclient_secret\x120\n" +
-	"\x13client_id_issued_at\x18\x05 \x01(\x03R\x13client_id_issued_at\x12:\n" +
-	"\x18client_secret_expires_at\x18\x06 \x01(\x03R\x18client_secret_expires_at\x12$\n" +
+	"\x13client_id_issued_at\x18\x05 \x01(\x05R\x13client_id_issued_at\x12:\n" +
+	"\x18client_secret_expires_at\x18\x06 \x01(\x05R\x18client_secret_expires_at\x12$\n" +
 	"\rredirect_uris\x18e \x03(\tR\rredirect_uris\x12&\n" +
 	"\x0eresponse_types\x18f \x03(\tR\x0eresponse_types\x12 \n" +
 	"\vgrant_types\x18g \x03(\tR\vgrant_types\x12*\n" +

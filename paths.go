@@ -25,21 +25,23 @@ package opgo
 import "net/http"
 
 const (
-	DEFAULT_AUTHORIZATION_PATH = "/authorize"
-	DEFAULT_DISCOVERY_PATH     = "/.well-known/openid-configuration"
-	DEFAULT_JWKS_PATH          = "/.well-known/jwks.json"
-	DEFAULT_TOKEN_PATH         = "/token"
-	DEFAULT_USERINFO_PATH      = "/userinfo"
-	DEFAULT_REGISTRATION_PATH  = "/registration"
+	DEFAULT_AUTHORIZATION_PATH        = "/authorize"
+	DEFAULT_DISCOVERY_PATH            = "/.well-known/openid-configuration"
+	DEFAULT_JWKS_PATH                 = "/.well-known/jwks.json"
+	DEFAULT_TOKEN_PATH                = "/token"
+	DEFAULT_USERINFO_PATH             = "/userinfo"
+	DEFAULT_REGISTRATION_PATH         = "/registration"
+	DEFAULT_PUSHED_AUTHORIZATION_PATH = "/par"
 )
 
 type Paths struct {
-	UseDiscovery      bool
-	AuthorizationPath string
-	TokenPath         string
-	UserinfoPath      string
-	JwksPath          string
-	RegistrationPath  string
+	UseDiscovery            bool
+	AuthorizationPath       string
+	TokenPath               string
+	UserinfoPath            string
+	JwksPath                string
+	RegistrationPath        string
+	PushedAuthorizationPath string
 }
 
 func (p *Paths) useDiscovery() bool {
@@ -84,6 +86,13 @@ func (p *Paths) registrationPath() string {
 	return p.RegistrationPath
 }
 
+func (p *Paths) pushedAuthorizationPath() string {
+	if p == nil {
+		return ""
+	}
+	return p.PushedAuthorizationPath
+}
+
 func DefaultPaths() *Paths {
 	return &Paths{
 		UseDiscovery:      false,
@@ -108,6 +117,9 @@ func (i *innerSdk) ServeMux(paths *Paths) *http.ServeMux {
 	}
 	if paths.registrationPath() != "" {
 		mux.HandleFunc(paths.registrationPath(), i.RegistrationEndpoint())
+	}
+	if paths.pushedAuthorizationPath() != "" {
+		mux.HandleFunc(paths.pushedAuthorizationPath(), i.PushedAuthorizationEndpoint())
 	}
 	return mux
 }

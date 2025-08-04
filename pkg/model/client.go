@@ -109,7 +109,7 @@ func MakeDefaultClient(iss *Issuer, clientId string, sessionGroupId string, now 
 			ClientSecret:            "secret",
 			RegistrationAccessToken: "",
 			RegistrationClientUri:   "",
-			ClientIdIssuedAt:        time.Now().Unix(),
+			ClientIdIssuedAt:        int32(time.Now().Unix()),
 			ClientSecretExpiresAt:   0,
 		},
 		Issuer: iss.Key,

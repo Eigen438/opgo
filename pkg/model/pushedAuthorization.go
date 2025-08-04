@@ -25,15 +25,17 @@ package model
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 )
 
 type PushedAuthorization struct {
-	Key       *oppb.CommonKey
-	Client    *Client
-	Params    *oppb.AuthorizationParameters
-	Attribute *oppb.PushedAuthorizationAttribute
+	Key      *oppb.CommonKey
+	Client   *Client
+	Params   *oppb.AuthorizationParameters
+	CreateAt time.Time
+	ExpireAt time.Time
 }
 
 func (i *PushedAuthorization) Path(_ context.Context) string {

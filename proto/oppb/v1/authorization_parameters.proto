@@ -24,8 +24,6 @@ syntax = "proto3";
 
 package oppb.v1;
 
-import "google/protobuf/timestamp.proto";
-
 option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
 
 message AuthorizationParameters {
@@ -57,8 +55,4 @@ message AuthorizationParameters {
   // https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
   string request = 21 [json_name = "request"];
   string request_uri = 22 [json_name = "request_uri"];
-}
-
-message PushedAuthorizationAttribute {
-  google.protobuf.Timestamp expire_at = 1;
 }

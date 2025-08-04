@@ -380,8 +380,8 @@ type ClientIdentity struct {
 	ClientSecret            string `protobuf:"bytes,2,opt,name=client_secret,proto3" json:"client_secret,omitempty"`
 	RegistrationAccessToken string `protobuf:"bytes,3,opt,name=registration_access_token,proto3" json:"registration_access_token,omitempty"`
 	RegistrationClientUri   string `protobuf:"bytes,4,opt,name=registration_client_uri,proto3" json:"registration_client_uri,omitempty"`
-	ClientIdIssuedAt        int64  `protobuf:"varint,5,opt,name=client_id_issued_at,proto3" json:"client_id_issued_at,omitempty"`
-	ClientSecretExpiresAt   int64  `protobuf:"varint,6,opt,name=client_secret_expires_at,proto3" json:"client_secret_expires_at,omitempty"`
+	ClientIdIssuedAt        int32  `protobuf:"varint,5,opt,name=client_id_issued_at,proto3" json:"client_id_issued_at,omitempty"`
+	ClientSecretExpiresAt   int32  `protobuf:"varint,6,opt,name=client_secret_expires_at,proto3" json:"client_secret_expires_at,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -444,14 +444,14 @@ func (x *ClientIdentity) GetRegistrationClientUri() string {
 	return ""
 }
 
-func (x *ClientIdentity) GetClientIdIssuedAt() int64 {
+func (x *ClientIdentity) GetClientIdIssuedAt() int32 {
 	if x != nil {
 		return x.ClientIdIssuedAt
 	}
 	return 0
 }
 
-func (x *ClientIdentity) GetClientSecretExpiresAt() int64 {
+func (x *ClientIdentity) GetClientSecretExpiresAt() int32 {
 	if x != nil {
 		return x.ClientSecretExpiresAt
 	}
@@ -510,8 +510,8 @@ const file_oppb_v1_client_meta_proto_rawDesc = "" +
 	"\rclient_secret\x18\x02 \x01(\tR\rclient_secret\x12<\n" +
 	"\x19registration_access_token\x18\x03 \x01(\tR\x19registration_access_token\x128\n" +
 	"\x17registration_client_uri\x18\x04 \x01(\tR\x17registration_client_uri\x120\n" +
-	"\x13client_id_issued_at\x18\x05 \x01(\x03R\x13client_id_issued_at\x12:\n" +
-	"\x18client_secret_expires_at\x18\x06 \x01(\x03R\x18client_secret_expires_atB\x95\x01\n" +
+	"\x13client_id_issued_at\x18\x05 \x01(\x05R\x13client_id_issued_at\x12:\n" +
+	"\x18client_secret_expires_at\x18\x06 \x01(\x05R\x18client_secret_expires_atB\x95\x01\n" +
 	"\vcom.oppb.v1B\x0fClientMetaProtoP\x01Z8github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb\xa2\x02\x03OXX\xaa\x02\aOppb.V1\xca\x02\aOppb\\V1\xe2\x02\x13Oppb\\V1\\GPBMetadata\xea\x02\bOppb::V1b\x06proto3"
 
 var (

@@ -29,7 +29,7 @@ import "oppb/v1/common.proto";
 option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
 
 message SessionGroupAttribute {
-  int64 authorize_session_lifetime_seconds = 1 [json_name = "authorize_session_lifetime_seconds"];
+  int32 authorize_session_lifetime_seconds = 1 [json_name = "authorize_session_lifetime_seconds"];
 }
 
 message SessionGroup {

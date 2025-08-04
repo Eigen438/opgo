@@ -67,7 +67,7 @@ func (p *Provider) RegistrationCreate(ctx context.Context,
 			}), nil
 		}
 
-		// redirect_urisチェック
+		// check redirect_uris
 		for _, uri := range req.Msg.RedirectUris {
 			u, err := url.Parse(uri)
 			if err != nil {
@@ -98,7 +98,7 @@ func (p *Provider) RegistrationCreate(ctx context.Context,
 			}
 		}
 
-		// sector_identifier_uriチェック
+		// check sector_identifier_uri
 		if len(req.Msg.SectorIdentifierUri) > 0 {
 			r, err := http.NewRequest(http.MethodGet, req.Msg.SectorIdentifierUri, nil)
 			if err != nil {
@@ -161,7 +161,6 @@ func (p *Provider) RegistrationCreate(ctx context.Context,
 			}
 		}
 
-		// 値が設定されてない場合、デフォルト値を設定する[start]
 		// https://openid.net/specs/openid-connect-registration-1_0-errata2.html#ClientMetadata
 		// The default, if omitted, is web.
 		if req.Msg.ApplicationType == "" {
@@ -182,7 +181,6 @@ func (p *Provider) RegistrationCreate(ctx context.Context,
 		if req.Msg.TokenEndpointAuthMethod == "" {
 			req.Msg.TokenEndpointAuthMethod = "client_secret_basic"
 		}
-		// 値が設定されてない場合、デフォルト値を設定する[end]
 
 		protohelper.Override(client.Meta, req.Msg)
 
@@ -195,6 +193,7 @@ func (p *Provider) RegistrationCreate(ctx context.Context,
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create registration_access_token error"))
 		}
 		client.Identity.RegistrationClientUri = iss.Meta.RegistrationEndpoint + "?client_id=" + magicWord
+		client.Identity.ClientSecretExpiresAt = 0 // time.Now().Add(24 * time.Hour).Unix() // TODO:
 
 		sg := &model.SessionGroup{
 			Key: &oppb.CommonKey{

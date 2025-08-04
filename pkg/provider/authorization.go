@@ -300,7 +300,7 @@ func authorization(ctx context.Context,
 				}
 				return nil, err
 			}
-			if time.Now().Unix() > par.Attribute.ExpireAt.AsTime().Unix() {
+			if time.Now().Unix() > par.ExpireAt.Unix() {
 				// 該当のPARが期限切れ場合
 				return connect.NewResponse(&oppb.AuthorizationResponse{
 					AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{

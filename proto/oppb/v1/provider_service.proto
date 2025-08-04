@@ -209,7 +209,7 @@ message TokenSuccessResponse {
   // https://www.rfc-editor.org/rfc/rfc6749.html#section-5.1
   string access_token = 1 [json_name = "access_token"];
   string token_type = 2 [json_name = "token_type"];
-  int64 expires_in = 3 [json_name = "expires_in"];
+  int32 expires_in = 3 [json_name = "expires_in"];
   string refresh_token = 4 [json_name = "refresh_token"];
   string scope = 5 [json_name = "scope"];
   // https://openid.net/specs/openid-connect-core-1_0.html#TokenResponse
@@ -229,8 +229,7 @@ message PushedAuthorizationSuccessResponse {
 
 message PushedAuthorizationFailResponse {
   int32 status_code = 1;
-  string error = 2;
-  string error_description = 3;
+  OauthError error = 2;
 }
 
 message OauthError {

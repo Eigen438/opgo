@@ -1717,7 +1717,7 @@ type TokenSuccessResponse struct {
 	// https://www.rfc-editor.org/rfc/rfc6749.html#section-5.1
 	AccessToken  string `protobuf:"bytes,1,opt,name=access_token,proto3" json:"access_token,omitempty"`
 	TokenType    string `protobuf:"bytes,2,opt,name=token_type,proto3" json:"token_type,omitempty"`
-	ExpiresIn    int64  `protobuf:"varint,3,opt,name=expires_in,proto3" json:"expires_in,omitempty"`
+	ExpiresIn    int32  `protobuf:"varint,3,opt,name=expires_in,proto3" json:"expires_in,omitempty"`
 	RefreshToken string `protobuf:"bytes,4,opt,name=refresh_token,proto3" json:"refresh_token,omitempty"`
 	Scope        string `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#TokenResponse
@@ -1770,7 +1770,7 @@ func (x *TokenSuccessResponse) GetTokenType() string {
 	return ""
 }
 
-func (x *TokenSuccessResponse) GetExpiresIn() int64 {
+func (x *TokenSuccessResponse) GetExpiresIn() int32 {
 	if x != nil {
 		return x.ExpiresIn
 	}
@@ -1911,12 +1911,11 @@ func (x *PushedAuthorizationSuccessResponse) GetExpiresIn() int32 {
 }
 
 type PushedAuthorizationFailResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	StatusCode       int32                  `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
-	Error            string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	ErrorDescription string                 `protobuf:"bytes,3,opt,name=error_description,json=errorDescription,proto3" json:"error_description,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StatusCode    int32                  `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	Error         *OauthError            `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PushedAuthorizationFailResponse) Reset() {
@@ -1956,18 +1955,11 @@ func (x *PushedAuthorizationFailResponse) GetStatusCode() int32 {
 	return 0
 }
 
-func (x *PushedAuthorizationFailResponse) GetError() string {
+func (x *PushedAuthorizationFailResponse) GetError() *OauthError {
 	if x != nil {
 		return x.Error
 	}
-	return ""
-}
-
-func (x *PushedAuthorizationFailResponse) GetErrorDescription() string {
-	if x != nil {
-		return x.ErrorDescription
-	}
-	return ""
+	return nil
 }
 
 type OauthError struct {
@@ -2216,7 +2208,7 @@ const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"token_type\x18\x02 \x01(\tR\n" +
 	"token_type\x12\x1e\n" +
 	"\n" +
-	"expires_in\x18\x03 \x01(\x03R\n" +
+	"expires_in\x18\x03 \x01(\x05R\n" +
 	"expires_in\x12$\n" +
 	"\rrefresh_token\x18\x04 \x01(\tR\rrefresh_token\x12\x14\n" +
 	"\x05scope\x18\x05 \x01(\tR\x05scope\x12\x1a\n" +
@@ -2231,12 +2223,11 @@ const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"\vrequest_uri\x18\x02 \x01(\tR\n" +
 	"requestUri\x12\x1d\n" +
 	"\n" +
-	"expires_in\x18\x03 \x01(\x05R\texpiresIn\"\x85\x01\n" +
+	"expires_in\x18\x03 \x01(\x05R\texpiresIn\"m\n" +
 	"\x1fPushedAuthorizationFailResponse\x12\x1f\n" +
 	"\vstatus_code\x18\x01 \x01(\x05R\n" +
-	"statusCode\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\x12+\n" +
-	"\x11error_description\x18\x03 \x01(\tR\x10errorDescription\"n\n" +
+	"statusCode\x12)\n" +
+	"\x05error\x18\x02 \x01(\v2\x13.oppb.v1.OauthErrorR\x05error\"n\n" +
 	"\n" +
 	"OauthError\x12\x14\n" +
 	"\x05error\x18\x01 \x01(\tR\x05error\x12,\n" +
@@ -2352,37 +2343,38 @@ var file_oppb_v1_provider_service_proto_depIdxs = []int32{
 	37, // 27: oppb.v1.AuthorizationNextActionIssue.client:type_name -> oppb.v1.ClientMeta
 	36, // 28: oppb.v1.AuthorizationNextActionIssue.auth_params:type_name -> oppb.v1.AuthorizationParameters
 	30, // 29: oppb.v1.TokenFailResponse.error:type_name -> oppb.v1.OauthError
-	0,  // 30: oppb.v1.ProviderService.Discovery:input_type -> oppb.v1.DiscoveryRequest
-	2,  // 31: oppb.v1.ProviderService.Jwks:input_type -> oppb.v1.JwksRequest
-	4,  // 32: oppb.v1.ProviderService.Authorization:input_type -> oppb.v1.AuthorizationRequest
-	6,  // 33: oppb.v1.ProviderService.AuthorizationIssue:input_type -> oppb.v1.AuthorizationIssueRequest
-	8,  // 34: oppb.v1.ProviderService.AuthorizationCancel:input_type -> oppb.v1.AuthorizationCancelRequest
-	10, // 35: oppb.v1.ProviderService.StartSession:input_type -> oppb.v1.StartSessionRequest
-	12, // 36: oppb.v1.ProviderService.Token:input_type -> oppb.v1.TokenRequest
-	14, // 37: oppb.v1.ProviderService.Userinfo:input_type -> oppb.v1.UserinfoRequest
-	16, // 38: oppb.v1.ProviderService.PushedAuthorization:input_type -> oppb.v1.PushedAuthorizationRequest
-	18, // 39: oppb.v1.ProviderService.Request:input_type -> oppb.v1.RequestRequest
-	39, // 40: oppb.v1.ProviderService.RegistrationCreate:input_type -> oppb.v1.RegistrationCreateRequest
-	40, // 41: oppb.v1.ProviderService.RegistrationDelete:input_type -> oppb.v1.RegistrationDeleteRequest
-	41, // 42: oppb.v1.ProviderService.RegistrationGet:input_type -> oppb.v1.RegistrationGetRequest
-	1,  // 43: oppb.v1.ProviderService.Discovery:output_type -> oppb.v1.DiscoveryResponse
-	3,  // 44: oppb.v1.ProviderService.Jwks:output_type -> oppb.v1.JwksResponse
-	5,  // 45: oppb.v1.ProviderService.Authorization:output_type -> oppb.v1.AuthorizationResponse
-	7,  // 46: oppb.v1.ProviderService.AuthorizationIssue:output_type -> oppb.v1.AuthorizationIssueResponse
-	9,  // 47: oppb.v1.ProviderService.AuthorizationCancel:output_type -> oppb.v1.AuthorizationCancelResponse
-	11, // 48: oppb.v1.ProviderService.StartSession:output_type -> oppb.v1.StartSessionResponse
-	13, // 49: oppb.v1.ProviderService.Token:output_type -> oppb.v1.TokenResponse
-	15, // 50: oppb.v1.ProviderService.Userinfo:output_type -> oppb.v1.UserinfoResponse
-	17, // 51: oppb.v1.ProviderService.PushedAuthorization:output_type -> oppb.v1.PushedAuthorizationResponse
-	19, // 52: oppb.v1.ProviderService.Request:output_type -> oppb.v1.RequestResponse
-	42, // 53: oppb.v1.ProviderService.RegistrationCreate:output_type -> oppb.v1.RegistrationCreateResponse
-	43, // 54: oppb.v1.ProviderService.RegistrationDelete:output_type -> oppb.v1.RegistrationDeleteResponse
-	44, // 55: oppb.v1.ProviderService.RegistrationGet:output_type -> oppb.v1.RegistrationGetResponse
-	43, // [43:56] is the sub-list for method output_type
-	30, // [30:43] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	30, // 30: oppb.v1.PushedAuthorizationFailResponse.error:type_name -> oppb.v1.OauthError
+	0,  // 31: oppb.v1.ProviderService.Discovery:input_type -> oppb.v1.DiscoveryRequest
+	2,  // 32: oppb.v1.ProviderService.Jwks:input_type -> oppb.v1.JwksRequest
+	4,  // 33: oppb.v1.ProviderService.Authorization:input_type -> oppb.v1.AuthorizationRequest
+	6,  // 34: oppb.v1.ProviderService.AuthorizationIssue:input_type -> oppb.v1.AuthorizationIssueRequest
+	8,  // 35: oppb.v1.ProviderService.AuthorizationCancel:input_type -> oppb.v1.AuthorizationCancelRequest
+	10, // 36: oppb.v1.ProviderService.StartSession:input_type -> oppb.v1.StartSessionRequest
+	12, // 37: oppb.v1.ProviderService.Token:input_type -> oppb.v1.TokenRequest
+	14, // 38: oppb.v1.ProviderService.Userinfo:input_type -> oppb.v1.UserinfoRequest
+	16, // 39: oppb.v1.ProviderService.PushedAuthorization:input_type -> oppb.v1.PushedAuthorizationRequest
+	18, // 40: oppb.v1.ProviderService.Request:input_type -> oppb.v1.RequestRequest
+	39, // 41: oppb.v1.ProviderService.RegistrationCreate:input_type -> oppb.v1.RegistrationCreateRequest
+	40, // 42: oppb.v1.ProviderService.RegistrationDelete:input_type -> oppb.v1.RegistrationDeleteRequest
+	41, // 43: oppb.v1.ProviderService.RegistrationGet:input_type -> oppb.v1.RegistrationGetRequest
+	1,  // 44: oppb.v1.ProviderService.Discovery:output_type -> oppb.v1.DiscoveryResponse
+	3,  // 45: oppb.v1.ProviderService.Jwks:output_type -> oppb.v1.JwksResponse
+	5,  // 46: oppb.v1.ProviderService.Authorization:output_type -> oppb.v1.AuthorizationResponse
+	7,  // 47: oppb.v1.ProviderService.AuthorizationIssue:output_type -> oppb.v1.AuthorizationIssueResponse
+	9,  // 48: oppb.v1.ProviderService.AuthorizationCancel:output_type -> oppb.v1.AuthorizationCancelResponse
+	11, // 49: oppb.v1.ProviderService.StartSession:output_type -> oppb.v1.StartSessionResponse
+	13, // 50: oppb.v1.ProviderService.Token:output_type -> oppb.v1.TokenResponse
+	15, // 51: oppb.v1.ProviderService.Userinfo:output_type -> oppb.v1.UserinfoResponse
+	17, // 52: oppb.v1.ProviderService.PushedAuthorization:output_type -> oppb.v1.PushedAuthorizationResponse
+	19, // 53: oppb.v1.ProviderService.Request:output_type -> oppb.v1.RequestResponse
+	42, // 54: oppb.v1.ProviderService.RegistrationCreate:output_type -> oppb.v1.RegistrationCreateResponse
+	43, // 55: oppb.v1.ProviderService.RegistrationDelete:output_type -> oppb.v1.RegistrationDeleteResponse
+	44, // 56: oppb.v1.ProviderService.RegistrationGet:output_type -> oppb.v1.RegistrationGetResponse
+	44, // [44:57] is the sub-list for method output_type
+	31, // [31:44] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_provider_service_proto_init() }

@@ -31,12 +31,14 @@ import (
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		if r.Method == http.MethodPost {
+		switch r.Method {
+		case http.MethodPost:
 			reqBody := &oppb.RegistrationCreateRequest{}
 			defer r.Body.Close()
 			if r.Body != nil {
@@ -63,7 +65,11 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 					w.Header().Set(key, val)
 				}
 				w.WriteHeader(http.StatusCreated)
-				j, _ := json.MarshalIndent(success, "", "  ")
+				m := protojson.MarshalOptions{
+					EmitUnpopulated: true,
+					Indent:          "  ",
+				}
+				j, _ := m.Marshal(success)
 				w.Write(j)
 			} else if fail := res.Msg.GetFail(); fail != nil {
 				for key, val := range httphelper.DefaultJsonHeader() {
@@ -75,7 +81,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 			}
 			return
 
-		} else if r.Method == http.MethodDelete {
+		case http.MethodDelete:
 			h := r.Header.Get(httphelper.HeaderAuthorization)
 			h, _ = strings.CutPrefix(h, "Bearer ")
 			reqBody := &oppb.RegistrationDeleteRequest{
@@ -105,7 +111,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 			}
 			return
 
-		} else if r.Method == http.MethodGet {
+		case http.MethodGet:
 			h := r.Header.Get(httphelper.HeaderAuthorization)
 			h, _ = strings.CutPrefix(h, "Bearer ")
 			reqBody := &oppb.RegistrationGetRequest{
@@ -139,7 +145,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 				w.Write(j)
 			}
 			return
-		} else {
+		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}

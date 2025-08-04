@@ -85,12 +85,10 @@ func NewRedirectBuilder(iss *model.Issuer, client *model.Client, params *oppb.Au
 }
 
 func (b *RedirectBuilder) Build(ctx context.Context, now time.Time) (string, error) {
-	// jwt形式のresponse_modeの場合はjwtを作成する
 	if b.responseMode == oauth.ResponseModeQueryJwt ||
 		b.responseMode == oauth.ResponseModeFragmentJwt ||
 		b.responseMode == oauth.ResponseModeFormPostJwt {
 
-		//返却用クレームを作成する
 		claims := jwt.MapClaims{}
 		for k, v := range b.Values {
 			if v != "" {

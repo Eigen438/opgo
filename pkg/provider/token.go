@@ -91,7 +91,8 @@ func (p *Provider) Token(ctx context.Context,
 			Scope:        vals.Get("scope"),
 		}
 
-		if tr.GrantType == "authorization_code" {
+		switch tr.GrantType {
+		case "authorization_code":
 			authCode := &model.AuthorizationCode{
 				Details: model.AuthorizationCodeDetails{
 					Code: tr.Code,
@@ -197,7 +198,8 @@ func (p *Provider) Token(ctx context.Context,
 
 			// PKCEチェック
 			if authCode.Details.Authorized.Request.AuthParams.CodeChallenge != "" {
-				if authCode.Details.Authorized.Request.AuthParams.CodeChallengeMethod == oauth.PkceAlgorithmS256 {
+				switch authCode.Details.Authorized.Request.AuthParams.CodeChallengeMethod {
+				case oauth.PkceAlgorithmS256:
 					sha := sha256.Sum256([]byte(tr.CodeVerifier))
 					encodedSha := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(sha[:])
 					if encodedSha != authCode.Details.Authorized.Request.AuthParams.CodeChallenge {
@@ -213,7 +215,7 @@ func (p *Provider) Token(ctx context.Context,
 							},
 						}), nil
 					}
-				} else if authCode.Details.Authorized.Request.AuthParams.CodeChallengeMethod == oauth.PkceAlgorithmPlane {
+				case oauth.PkceAlgorithmPlane:
 					if tr.CodeVerifier != authCode.Details.Authorized.Request.AuthParams.CodeChallenge {
 						return connect.NewResponse(&oppb.TokenResponse{
 							TokenResponseOneof: &oppb.TokenResponse_Fail{
@@ -227,7 +229,7 @@ func (p *Provider) Token(ctx context.Context,
 							},
 						}), nil
 					}
-				} else if authCode.Details.Authorized.Request.AuthParams.CodeChallengeMethod == "" {
+				case "":
 					if tr.CodeVerifier != authCode.Details.Authorized.Request.AuthParams.CodeChallenge {
 						return connect.NewResponse(&oppb.TokenResponse{
 							TokenResponseOneof: &oppb.TokenResponse_Fail{
@@ -369,7 +371,7 @@ func (p *Provider) Token(ctx context.Context,
 				},
 			}), nil
 
-		} else if tr.GrantType == "refresh_token" {
+		case "refresh_token":
 			refreshToken := &model.TokenIdentifier{
 				Details: model.TokenIdentifierDetails{
 					Identifier: tr.RefreshToken,
@@ -527,7 +529,7 @@ func (p *Provider) Token(ctx context.Context,
 				},
 			}), nil
 
-		} else {
+		default:
 			return connect.NewResponse(&oppb.TokenResponse{
 				TokenResponseOneof: &oppb.TokenResponse_Fail{
 					Fail: &oppb.TokenFailResponse{
