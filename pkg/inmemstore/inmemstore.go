@@ -115,7 +115,7 @@ type tokenIdentifierLink struct {
 }
 
 func (t *tokenIdentifierLink) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/v1/issuers/%s/tokensList/%s/kind/%s", t.IssuerId, t.Key, t.Kind)
+	return fmt.Sprintf("opgo/%s/issuers/%s/tokensList/%s/kind/%s", model.GetVersion(), t.IssuerId, t.Key, t.Kind)
 }
 
 func (t *tokenIdentifierLink) ExpireAtUnix(_ context.Context) int64 {

@@ -37,8 +37,10 @@ type Issuer struct {
 	Resources *oppb.IssuerResources
 }
 
+func GetIssuerCollectionName() string {
+	return fmt.Sprintf("opgo/%s/issuers", version)
+}
+
 func (i *Issuer) Path(_ context.Context) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s",
-		version,
-		i.Key.Id)
+	return fmt.Sprintf(GetIssuerCollectionName() + "/" + i.Key.Id)
 }
