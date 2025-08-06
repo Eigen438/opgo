@@ -47,61 +47,74 @@ const (
 // The order of the descriptions should follow the RFC they were cited from.
 type IssuerMeta struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// https://tex2e.github.io/rfc-translater/html/rfc8414.html#2--Authorization-Server-Metadata
+	//
+	//	required for RFC8414
+	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
+	// required for RFC8414
+	AuthorizationEndpoint string `protobuf:"bytes,2,opt,name=authorization_endpoint,proto3" json:"authorization_endpoint,omitempty"`
+	// required for RFC8414
+	TokenEndpoint        string   `protobuf:"bytes,3,opt,name=token_endpoint,proto3" json:"token_endpoint,omitempty"`
+	JwksUri              string   `protobuf:"bytes,4,opt,name=jwks_uri,proto3" json:"jwks_uri,omitempty"`
+	RegistrationEndpoint string   `protobuf:"bytes,5,opt,name=registration_endpoint,proto3" json:"registration_endpoint,omitempty"`
+	ScopesSupported      []string `protobuf:"bytes,6,rep,name=scopes_supported,proto3" json:"scopes_supported,omitempty"`
+	// required for RFC8414
+	ResponseTypesSupported                             []string `protobuf:"bytes,7,rep,name=response_types_supported,proto3" json:"response_types_supported,omitempty"`
+	ResponseModesSupported                             []string `protobuf:"bytes,8,rep,name=response_modes_supported,proto3" json:"response_modes_supported,omitempty"`
+	GrantTypesSupported                                []string `protobuf:"bytes,9,rep,name=grant_types_supported,proto3" json:"grant_types_supported,omitempty"`
+	TokenEndpointAuthMethodsSupported                  []string `protobuf:"bytes,10,rep,name=token_endpoint_auth_methods_supported,proto3" json:"token_endpoint_auth_methods_supported,omitempty"`
+	TokenEndpointAuthSigningAlgValuesSupported         []string `protobuf:"bytes,11,rep,name=token_endpoint_auth_signing_alg_values_supported,proto3" json:"token_endpoint_auth_signing_alg_values_supported,omitempty"`
+	ServiceDocumentation                               string   `protobuf:"bytes,12,opt,name=service_documentation,proto3" json:"service_documentation,omitempty"`
+	UiLocalesSupported                                 []string `protobuf:"bytes,13,rep,name=ui_locales_supported,proto3" json:"ui_locales_supported,omitempty"`
+	OpPolicyUri                                        string   `protobuf:"bytes,14,opt,name=op_policy_uri,proto3" json:"op_policy_uri,omitempty"`
+	OpTosUri                                           string   `protobuf:"bytes,15,opt,name=op_tos_uri,proto3" json:"op_tos_uri,omitempty"`
+	RevocationEndpoint                                 string   `protobuf:"bytes,16,opt,name=revocation_endpoint,proto3" json:"revocation_endpoint,omitempty"`
+	RevocationEndpointAuthMethodsSupported             []string `protobuf:"bytes,17,rep,name=revocation_endpoint_auth_methods_supported,proto3" json:"revocation_endpoint_auth_methods_supported,omitempty"`
+	RevocationEndpointAuthSigningAlgValuesSupported    []string `protobuf:"bytes,18,rep,name=revocation_endpoint_auth_signing_alg_values_supported,proto3" json:"revocation_endpoint_auth_signing_alg_values_supported,omitempty"`
+	IntrospectionEndpoint                              string   `protobuf:"bytes,19,opt,name=introspection_endpoint,proto3" json:"introspection_endpoint,omitempty"`
+	IntrospectionEndpointAuthMethodsSupported          []string `protobuf:"bytes,20,rep,name=introspection_endpoint_auth_methods_supported,proto3" json:"introspection_endpoint_auth_methods_supported,omitempty"`
+	IntrospectionEndpointAuthSigningAlgValuesSupported []string `protobuf:"bytes,21,rep,name=introspection_endpoint_auth_signing_alg_values_supported,proto3" json:"introspection_endpoint_auth_signing_alg_values_supported,omitempty"`
+	CodeChallengeMethodsSupported                      []string `protobuf:"bytes,22,rep,name=code_challenge_methods_supported,proto3" json:"code_challenge_methods_supported,omitempty"`
 	// https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
-	Issuer                                     string   `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
-	AuthorizationEndpoint                      string   `protobuf:"bytes,2,opt,name=authorization_endpoint,proto3" json:"authorization_endpoint,omitempty"`
-	TokenEndpoint                              string   `protobuf:"bytes,3,opt,name=token_endpoint,proto3" json:"token_endpoint,omitempty"`
-	UserinfoEndpoint                           string   `protobuf:"bytes,4,opt,name=userinfo_endpoint,proto3" json:"userinfo_endpoint,omitempty"`
-	JwksUri                                    string   `protobuf:"bytes,5,opt,name=jwks_uri,proto3" json:"jwks_uri,omitempty"`
-	RegistrationEndpoint                       string   `protobuf:"bytes,6,opt,name=registration_endpoint,proto3" json:"registration_endpoint,omitempty"`
-	ScopesSupported                            []string `protobuf:"bytes,7,rep,name=scopes_supported,proto3" json:"scopes_supported,omitempty"`
-	ResponseTypesSupported                     []string `protobuf:"bytes,8,rep,name=response_types_supported,proto3" json:"response_types_supported,omitempty"`
-	ResponseModesSupported                     []string `protobuf:"bytes,9,rep,name=response_modes_supported,proto3" json:"response_modes_supported,omitempty"`
-	GrantTypesSupported                        []string `protobuf:"bytes,10,rep,name=grant_types_supported,proto3" json:"grant_types_supported,omitempty"`
-	AcrValuesSupported                         []string `protobuf:"bytes,11,rep,name=acr_values_supported,proto3" json:"acr_values_supported,omitempty"`
-	SubjectTypesSupported                      []string `protobuf:"bytes,12,rep,name=subject_types_supported,proto3" json:"subject_types_supported,omitempty"`
-	IdTokenSigningAlgValuesSupported           []string `protobuf:"bytes,13,rep,name=id_token_signing_alg_values_supported,proto3" json:"id_token_signing_alg_values_supported,omitempty"`
-	IdTokenEncryptionAlgValuesSupported        []string `protobuf:"bytes,14,rep,name=id_token_encryption_alg_values_supported,proto3" json:"id_token_encryption_alg_values_supported,omitempty"`
-	IdTokenEncryptionEncValuesSupported        []string `protobuf:"bytes,15,rep,name=id_token_encryption_enc_values_supported,proto3" json:"id_token_encryption_enc_values_supported,omitempty"`
-	UserinfoSigningAlgValuesSupported          []string `protobuf:"bytes,16,rep,name=userinfo_signing_alg_values_supported,proto3" json:"userinfo_signing_alg_values_supported,omitempty"`
-	UserinfoEncryptionAlgValuesSupported       []string `protobuf:"bytes,17,rep,name=userinfo_encryption_alg_values_supported,proto3" json:"userinfo_encryption_alg_values_supported,omitempty"`
-	UserinfoEncryptionEncValuesSupported       []string `protobuf:"bytes,18,rep,name=userinfo_encryption_enc_values_supported,proto3" json:"userinfo_encryption_enc_values_supported,omitempty"`
-	RequestObjectSigningAlgValuesSupported     []string `protobuf:"bytes,19,rep,name=request_object_signing_alg_values_supported,proto3" json:"request_object_signing_alg_values_supported,omitempty"`
-	RequestObjectEncryptionAlgValuesSupported  []string `protobuf:"bytes,20,rep,name=request_object_encryption_alg_values_supported,proto3" json:"request_object_encryption_alg_values_supported,omitempty"`
-	RequestObjectEncryptionEncValuesSupported  []string `protobuf:"bytes,21,rep,name=request_object_encryption_enc_values_supported,proto3" json:"request_object_encryption_enc_values_supported,omitempty"`
-	TokenEndpointAuthMethodsSupported          []string `protobuf:"bytes,22,rep,name=token_endpoint_auth_methods_supported,proto3" json:"token_endpoint_auth_methods_supported,omitempty"`
-	TokenEndpointAuthSigningAlgValuesSupported []string `protobuf:"bytes,23,rep,name=token_endpoint_auth_signing_alg_values_supported,proto3" json:"token_endpoint_auth_signing_alg_values_supported,omitempty"`
-	DisplayValuesSupported                     []string `protobuf:"bytes,24,rep,name=display_values_supported,proto3" json:"display_values_supported,omitempty"`
-	ClaimTypesSupported                        []string `protobuf:"bytes,25,rep,name=claim_types_supported,proto3" json:"claim_types_supported,omitempty"`
-	ClaimsSupported                            []string `protobuf:"bytes,26,rep,name=claims_supported,proto3" json:"claims_supported,omitempty"`
-	ServiceDocumentation                       string   `protobuf:"bytes,27,opt,name=service_documentation,proto3" json:"service_documentation,omitempty"`
-	ClaimsLocalesSupported                     []string `protobuf:"bytes,28,rep,name=claims_locales_supported,proto3" json:"claims_locales_supported,omitempty"`
-	UiLocalesSupported                         []string `protobuf:"bytes,29,rep,name=ui_locales_supported,proto3" json:"ui_locales_supported,omitempty"`
-	ClaimsParameterSupported                   bool     `protobuf:"varint,30,opt,name=claims_parameter_supported,proto3" json:"claims_parameter_supported,omitempty"`
-	RequestParameterSupported                  bool     `protobuf:"varint,31,opt,name=request_parameter_supported,proto3" json:"request_parameter_supported,omitempty"`
-	RequestUriParameterSupported               bool     `protobuf:"varint,32,opt,name=request_uri_parameter_supported,proto3" json:"request_uri_parameter_supported,omitempty"`
-	RequireRequestUriRegistration              bool     `protobuf:"varint,33,opt,name=require_request_uri_registration,proto3" json:"require_request_uri_registration,omitempty"`
-	OpPolicyUri                                string   `protobuf:"bytes,34,opt,name=op_policy_uri,proto3" json:"op_policy_uri,omitempty"`
-	OpTosUri                                   string   `protobuf:"bytes,35,opt,name=op_tos_uri,proto3" json:"op_tos_uri,omitempty"`
+	UserinfoEndpoint                          string   `protobuf:"bytes,30,opt,name=userinfo_endpoint,proto3" json:"userinfo_endpoint,omitempty"`
+	AcrValuesSupported                        []string `protobuf:"bytes,31,rep,name=acr_values_supported,proto3" json:"acr_values_supported,omitempty"`
+	SubjectTypesSupported                     []string `protobuf:"bytes,32,rep,name=subject_types_supported,proto3" json:"subject_types_supported,omitempty"`
+	IdTokenSigningAlgValuesSupported          []string `protobuf:"bytes,33,rep,name=id_token_signing_alg_values_supported,proto3" json:"id_token_signing_alg_values_supported,omitempty"`
+	IdTokenEncryptionAlgValuesSupported       []string `protobuf:"bytes,34,rep,name=id_token_encryption_alg_values_supported,proto3" json:"id_token_encryption_alg_values_supported,omitempty"`
+	IdTokenEncryptionEncValuesSupported       []string `protobuf:"bytes,35,rep,name=id_token_encryption_enc_values_supported,proto3" json:"id_token_encryption_enc_values_supported,omitempty"`
+	UserinfoSigningAlgValuesSupported         []string `protobuf:"bytes,36,rep,name=userinfo_signing_alg_values_supported,proto3" json:"userinfo_signing_alg_values_supported,omitempty"`
+	UserinfoEncryptionAlgValuesSupported      []string `protobuf:"bytes,37,rep,name=userinfo_encryption_alg_values_supported,proto3" json:"userinfo_encryption_alg_values_supported,omitempty"`
+	UserinfoEncryptionEncValuesSupported      []string `protobuf:"bytes,38,rep,name=userinfo_encryption_enc_values_supported,proto3" json:"userinfo_encryption_enc_values_supported,omitempty"`
+	RequestObjectSigningAlgValuesSupported    []string `protobuf:"bytes,39,rep,name=request_object_signing_alg_values_supported,proto3" json:"request_object_signing_alg_values_supported,omitempty"`
+	RequestObjectEncryptionAlgValuesSupported []string `protobuf:"bytes,40,rep,name=request_object_encryption_alg_values_supported,proto3" json:"request_object_encryption_alg_values_supported,omitempty"`
+	RequestObjectEncryptionEncValuesSupported []string `protobuf:"bytes,41,rep,name=request_object_encryption_enc_values_supported,proto3" json:"request_object_encryption_enc_values_supported,omitempty"`
+	DisplayValuesSupported                    []string `protobuf:"bytes,42,rep,name=display_values_supported,proto3" json:"display_values_supported,omitempty"`
+	ClaimTypesSupported                       []string `protobuf:"bytes,43,rep,name=claim_types_supported,proto3" json:"claim_types_supported,omitempty"`
+	ClaimsSupported                           []string `protobuf:"bytes,44,rep,name=claims_supported,proto3" json:"claims_supported,omitempty"`
+	ClaimsLocalesSupported                    []string `protobuf:"bytes,45,rep,name=claims_locales_supported,proto3" json:"claims_locales_supported,omitempty"`
+	ClaimsParameterSupported                  bool     `protobuf:"varint,46,opt,name=claims_parameter_supported,proto3" json:"claims_parameter_supported,omitempty"`
+	RequestParameterSupported                 bool     `protobuf:"varint,47,opt,name=request_parameter_supported,proto3" json:"request_parameter_supported,omitempty"`
+	RequestUriParameterSupported              bool     `protobuf:"varint,48,opt,name=request_uri_parameter_supported,proto3" json:"request_uri_parameter_supported,omitempty"`
+	RequireRequestUriRegistration             bool     `protobuf:"varint,49,opt,name=require_request_uri_registration,proto3" json:"require_request_uri_registration,omitempty"`
 	// https://openid.net/specs/openid-connect-rpinitiated-1_0.html#OPMetadata
-	EndSessionEndpoint string `protobuf:"bytes,36,opt,name=end_session_endpoint,proto3" json:"end_session_endpoint,omitempty"`
+	EndSessionEndpoint string `protobuf:"bytes,50,opt,name=end_session_endpoint,proto3" json:"end_session_endpoint,omitempty"`
 	// https://www.rfc-editor.org/rfc/rfc9126.html#section-5
-	PushedAuthorizationRequestEndpoint string `protobuf:"bytes,37,opt,name=pushed_authorization_request_endpoint,proto3" json:"pushed_authorization_request_endpoint,omitempty"`
-	RequirePushedAuthorizationRequests bool   `protobuf:"varint,38,opt,name=require_pushed_authorization_requests,proto3" json:"require_pushed_authorization_requests,omitempty"`
+	PushedAuthorizationRequestEndpoint string `protobuf:"bytes,60,opt,name=pushed_authorization_request_endpoint,proto3" json:"pushed_authorization_request_endpoint,omitempty"`
+	RequirePushedAuthorizationRequests bool   `protobuf:"varint,61,opt,name=require_pushed_authorization_requests,proto3" json:"require_pushed_authorization_requests,omitempty"`
 	// https://openid.net/specs/openid-financial-api-jarm.html#authorization-server-metadata
-	AuthorizationSigningAlgValuesSupported    []string `protobuf:"bytes,39,rep,name=authorization_signing_alg_values_supported,proto3" json:"authorization_signing_alg_values_supported,omitempty"`
-	AuthorizationEncryptionAlgValuesSupported []string `protobuf:"bytes,40,rep,name=authorization_encryption_alg_values_supported,proto3" json:"authorization_encryption_alg_values_supported,omitempty"`
-	AuthorizationEncryptionEncValuesSupported []string `protobuf:"bytes,41,rep,name=authorization_encryption_enc_values_supported,proto3" json:"authorization_encryption_enc_values_supported,omitempty"`
+	AuthorizationSigningAlgValuesSupported    []string `protobuf:"bytes,70,rep,name=authorization_signing_alg_values_supported,proto3" json:"authorization_signing_alg_values_supported,omitempty"`
+	AuthorizationEncryptionAlgValuesSupported []string `protobuf:"bytes,71,rep,name=authorization_encryption_alg_values_supported,proto3" json:"authorization_encryption_alg_values_supported,omitempty"`
+	AuthorizationEncryptionEncValuesSupported []string `protobuf:"bytes,72,rep,name=authorization_encryption_enc_values_supported,proto3" json:"authorization_encryption_enc_values_supported,omitempty"`
 	// https://datatracker.ietf.org/doc/html/rfc9207#name-authorization-server-metada
-	AuthorizationResponseIssParameterSupported bool `protobuf:"varint,42,opt,name=authorization_response_iss_parameter_supported,proto3" json:"authorization_response_iss_parameter_supported,omitempty"`
+	AuthorizationResponseIssParameterSupported bool `protobuf:"varint,80,opt,name=authorization_response_iss_parameter_supported,proto3" json:"authorization_response_iss_parameter_supported,omitempty"`
 	// https://openid.net/specs/openid-connect-backchannel-1_0.html#BCSupport
-	BackchannelLogoutSupported        bool `protobuf:"varint,43,opt,name=backchannel_logout_supported,proto3" json:"backchannel_logout_supported,omitempty"`
-	BackchannelLogoutSessionSupported bool `protobuf:"varint,44,opt,name=backchannel_logout_session_supported,proto3" json:"backchannel_logout_session_supported,omitempty"`
+	BackchannelLogoutSupported        bool `protobuf:"varint,90,opt,name=backchannel_logout_supported,proto3" json:"backchannel_logout_supported,omitempty"`
+	BackchannelLogoutSessionSupported bool `protobuf:"varint,91,opt,name=backchannel_logout_session_supported,proto3" json:"backchannel_logout_session_supported,omitempty"`
 	// https://openid.net/specs/openid-connect-frontchannel-1_0.html#OPLogout
-	FrontchannelLogoutSupported        bool `protobuf:"varint,45,opt,name=frontchannel_logout_supported,proto3" json:"frontchannel_logout_supported,omitempty"`
-	FrontchannelLogoutSessionSupported bool `protobuf:"varint,46,opt,name=frontchannel_logout_session_supported,proto3" json:"frontchannel_logout_session_supported,omitempty"`
+	FrontchannelLogoutSupported        bool `protobuf:"varint,100,opt,name=frontchannel_logout_supported,proto3" json:"frontchannel_logout_supported,omitempty"`
+	FrontchannelLogoutSessionSupported bool `protobuf:"varint,101,opt,name=frontchannel_logout_session_supported,proto3" json:"frontchannel_logout_session_supported,omitempty"`
 	// https://datatracker.ietf.org/doc/html/rfc8705#section-3.3
-	TlsClientCertificateBoundAccessTokens bool `protobuf:"varint,47,opt,name=tls_client_certificate_bound_access_tokens,proto3" json:"tls_client_certificate_bound_access_tokens,omitempty"`
+	TlsClientCertificateBoundAccessTokens bool `protobuf:"varint,110,opt,name=tls_client_certificate_bound_access_tokens,proto3" json:"tls_client_certificate_bound_access_tokens,omitempty"`
 	unknownFields                         protoimpl.UnknownFields
 	sizeCache                             protoimpl.SizeCache
 }
@@ -157,13 +170,6 @@ func (x *IssuerMeta) GetTokenEndpoint() string {
 	return ""
 }
 
-func (x *IssuerMeta) GetUserinfoEndpoint() string {
-	if x != nil {
-		return x.UserinfoEndpoint
-	}
-	return ""
-}
-
 func (x *IssuerMeta) GetJwksUri() string {
 	if x != nil {
 		return x.JwksUri
@@ -204,6 +210,104 @@ func (x *IssuerMeta) GetGrantTypesSupported() []string {
 		return x.GrantTypesSupported
 	}
 	return nil
+}
+
+func (x *IssuerMeta) GetTokenEndpointAuthMethodsSupported() []string {
+	if x != nil {
+		return x.TokenEndpointAuthMethodsSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetTokenEndpointAuthSigningAlgValuesSupported() []string {
+	if x != nil {
+		return x.TokenEndpointAuthSigningAlgValuesSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetServiceDocumentation() string {
+	if x != nil {
+		return x.ServiceDocumentation
+	}
+	return ""
+}
+
+func (x *IssuerMeta) GetUiLocalesSupported() []string {
+	if x != nil {
+		return x.UiLocalesSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetOpPolicyUri() string {
+	if x != nil {
+		return x.OpPolicyUri
+	}
+	return ""
+}
+
+func (x *IssuerMeta) GetOpTosUri() string {
+	if x != nil {
+		return x.OpTosUri
+	}
+	return ""
+}
+
+func (x *IssuerMeta) GetRevocationEndpoint() string {
+	if x != nil {
+		return x.RevocationEndpoint
+	}
+	return ""
+}
+
+func (x *IssuerMeta) GetRevocationEndpointAuthMethodsSupported() []string {
+	if x != nil {
+		return x.RevocationEndpointAuthMethodsSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetRevocationEndpointAuthSigningAlgValuesSupported() []string {
+	if x != nil {
+		return x.RevocationEndpointAuthSigningAlgValuesSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetIntrospectionEndpoint() string {
+	if x != nil {
+		return x.IntrospectionEndpoint
+	}
+	return ""
+}
+
+func (x *IssuerMeta) GetIntrospectionEndpointAuthMethodsSupported() []string {
+	if x != nil {
+		return x.IntrospectionEndpointAuthMethodsSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetIntrospectionEndpointAuthSigningAlgValuesSupported() []string {
+	if x != nil {
+		return x.IntrospectionEndpointAuthSigningAlgValuesSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetCodeChallengeMethodsSupported() []string {
+	if x != nil {
+		return x.CodeChallengeMethodsSupported
+	}
+	return nil
+}
+
+func (x *IssuerMeta) GetUserinfoEndpoint() string {
+	if x != nil {
+		return x.UserinfoEndpoint
+	}
+	return ""
 }
 
 func (x *IssuerMeta) GetAcrValuesSupported() []string {
@@ -283,20 +387,6 @@ func (x *IssuerMeta) GetRequestObjectEncryptionEncValuesSupported() []string {
 	return nil
 }
 
-func (x *IssuerMeta) GetTokenEndpointAuthMethodsSupported() []string {
-	if x != nil {
-		return x.TokenEndpointAuthMethodsSupported
-	}
-	return nil
-}
-
-func (x *IssuerMeta) GetTokenEndpointAuthSigningAlgValuesSupported() []string {
-	if x != nil {
-		return x.TokenEndpointAuthSigningAlgValuesSupported
-	}
-	return nil
-}
-
 func (x *IssuerMeta) GetDisplayValuesSupported() []string {
 	if x != nil {
 		return x.DisplayValuesSupported
@@ -318,23 +408,9 @@ func (x *IssuerMeta) GetClaimsSupported() []string {
 	return nil
 }
 
-func (x *IssuerMeta) GetServiceDocumentation() string {
-	if x != nil {
-		return x.ServiceDocumentation
-	}
-	return ""
-}
-
 func (x *IssuerMeta) GetClaimsLocalesSupported() []string {
 	if x != nil {
 		return x.ClaimsLocalesSupported
-	}
-	return nil
-}
-
-func (x *IssuerMeta) GetUiLocalesSupported() []string {
-	if x != nil {
-		return x.UiLocalesSupported
 	}
 	return nil
 }
@@ -365,20 +441,6 @@ func (x *IssuerMeta) GetRequireRequestUriRegistration() bool {
 		return x.RequireRequestUriRegistration
 	}
 	return false
-}
-
-func (x *IssuerMeta) GetOpPolicyUri() string {
-	if x != nil {
-		return x.OpPolicyUri
-	}
-	return ""
-}
-
-func (x *IssuerMeta) GetOpTosUri() string {
-	if x != nil {
-		return x.OpTosUri
-	}
-	return ""
 }
 
 func (x *IssuerMeta) GetEndSessionEndpoint() string {
@@ -469,59 +531,66 @@ var File_oppb_v1_issuer_meta_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_issuer_meta_proto_rawDesc = "" +
 	"\n" +
-	"\x19oppb/v1/issuer_meta.proto\x12\aoppb.v1\x1a\x1bbuf/validate/validate.proto\"\xe0\x1a\n" +
+	"\x19oppb/v1/issuer_meta.proto\x12\aoppb.v1\x1a\x1bbuf/validate/validate.proto\"\x95 \n" +
 	"\n" +
 	"IssuerMeta\x12 \n" +
 	"\x06issuer\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x06issuer\x12@\n" +
 	"\x16authorization_endpoint\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x16authorization_endpoint\x120\n" +
-	"\x0etoken_endpoint\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x0etoken_endpoint\x126\n" +
-	"\x11userinfo_endpoint\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x11userinfo_endpoint\x12$\n" +
-	"\bjwks_uri\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\bjwks_uri\x124\n" +
-	"\x15registration_endpoint\x18\x06 \x01(\tR\x15registration_endpoint\x124\n" +
-	"\x10scopes_supported\x18\a \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x10scopes_supported\x12D\n" +
-	"\x18response_types_supported\x18\b \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x18response_types_supported\x12:\n" +
-	"\x18response_modes_supported\x18\t \x03(\tR\x18response_modes_supported\x124\n" +
-	"\x15grant_types_supported\x18\n" +
-	" \x03(\tR\x15grant_types_supported\x122\n" +
-	"\x14acr_values_supported\x18\v \x03(\tR\x14acr_values_supported\x12B\n" +
-	"\x17subject_types_supported\x18\f \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x17subject_types_supported\x12^\n" +
-	"%id_token_signing_alg_values_supported\x18\r \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R%id_token_signing_alg_values_supported\x12Z\n" +
-	"(id_token_encryption_alg_values_supported\x18\x0e \x03(\tR(id_token_encryption_alg_values_supported\x12Z\n" +
-	"(id_token_encryption_enc_values_supported\x18\x0f \x03(\tR(id_token_encryption_enc_values_supported\x12T\n" +
-	"%userinfo_signing_alg_values_supported\x18\x10 \x03(\tR%userinfo_signing_alg_values_supported\x12Z\n" +
-	"(userinfo_encryption_alg_values_supported\x18\x11 \x03(\tR(userinfo_encryption_alg_values_supported\x12Z\n" +
-	"(userinfo_encryption_enc_values_supported\x18\x12 \x03(\tR(userinfo_encryption_enc_values_supported\x12`\n" +
-	"+request_object_signing_alg_values_supported\x18\x13 \x03(\tR+request_object_signing_alg_values_supported\x12f\n" +
-	".request_object_encryption_alg_values_supported\x18\x14 \x03(\tR.request_object_encryption_alg_values_supported\x12f\n" +
-	".request_object_encryption_enc_values_supported\x18\x15 \x03(\tR.request_object_encryption_enc_values_supported\x12T\n" +
-	"%token_endpoint_auth_methods_supported\x18\x16 \x03(\tR%token_endpoint_auth_methods_supported\x12j\n" +
-	"0token_endpoint_auth_signing_alg_values_supported\x18\x17 \x03(\tR0token_endpoint_auth_signing_alg_values_supported\x12:\n" +
-	"\x18display_values_supported\x18\x18 \x03(\tR\x18display_values_supported\x124\n" +
-	"\x15claim_types_supported\x18\x19 \x03(\tR\x15claim_types_supported\x12*\n" +
-	"\x10claims_supported\x18\x1a \x03(\tR\x10claims_supported\x124\n" +
-	"\x15service_documentation\x18\x1b \x01(\tR\x15service_documentation\x12:\n" +
-	"\x18claims_locales_supported\x18\x1c \x03(\tR\x18claims_locales_supported\x122\n" +
-	"\x14ui_locales_supported\x18\x1d \x03(\tR\x14ui_locales_supported\x12>\n" +
-	"\x1aclaims_parameter_supported\x18\x1e \x01(\bR\x1aclaims_parameter_supported\x12@\n" +
-	"\x1brequest_parameter_supported\x18\x1f \x01(\bR\x1brequest_parameter_supported\x12H\n" +
-	"\x1frequest_uri_parameter_supported\x18  \x01(\bR\x1frequest_uri_parameter_supported\x12J\n" +
-	" require_request_uri_registration\x18! \x01(\bR require_request_uri_registration\x12$\n" +
-	"\rop_policy_uri\x18\" \x01(\tR\rop_policy_uri\x12\x1e\n" +
+	"\x0etoken_endpoint\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x0etoken_endpoint\x12\x1a\n" +
+	"\bjwks_uri\x18\x04 \x01(\tR\bjwks_uri\x12>\n" +
+	"\x15registration_endpoint\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x15registration_endpoint\x124\n" +
+	"\x10scopes_supported\x18\x06 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x10scopes_supported\x12D\n" +
+	"\x18response_types_supported\x18\a \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x18response_types_supported\x12:\n" +
+	"\x18response_modes_supported\x18\b \x03(\tR\x18response_modes_supported\x124\n" +
+	"\x15grant_types_supported\x18\t \x03(\tR\x15grant_types_supported\x12T\n" +
+	"%token_endpoint_auth_methods_supported\x18\n" +
+	" \x03(\tR%token_endpoint_auth_methods_supported\x12j\n" +
+	"0token_endpoint_auth_signing_alg_values_supported\x18\v \x03(\tR0token_endpoint_auth_signing_alg_values_supported\x124\n" +
+	"\x15service_documentation\x18\f \x01(\tR\x15service_documentation\x122\n" +
+	"\x14ui_locales_supported\x18\r \x03(\tR\x14ui_locales_supported\x12$\n" +
+	"\rop_policy_uri\x18\x0e \x01(\tR\rop_policy_uri\x12\x1e\n" +
 	"\n" +
-	"op_tos_uri\x18# \x01(\tR\n" +
-	"op_tos_uri\x122\n" +
-	"\x14end_session_endpoint\x18$ \x01(\tR\x14end_session_endpoint\x12T\n" +
-	"%pushed_authorization_request_endpoint\x18% \x01(\tR%pushed_authorization_request_endpoint\x12T\n" +
-	"%require_pushed_authorization_requests\x18& \x01(\bR%require_pushed_authorization_requests\x12^\n" +
-	"*authorization_signing_alg_values_supported\x18' \x03(\tR*authorization_signing_alg_values_supported\x12d\n" +
-	"-authorization_encryption_alg_values_supported\x18( \x03(\tR-authorization_encryption_alg_values_supported\x12d\n" +
-	"-authorization_encryption_enc_values_supported\x18) \x03(\tR-authorization_encryption_enc_values_supported\x12f\n" +
-	".authorization_response_iss_parameter_supported\x18* \x01(\bR.authorization_response_iss_parameter_supported\x12B\n" +
-	"\x1cbackchannel_logout_supported\x18+ \x01(\bR\x1cbackchannel_logout_supported\x12R\n" +
-	"$backchannel_logout_session_supported\x18, \x01(\bR$backchannel_logout_session_supported\x12D\n" +
-	"\x1dfrontchannel_logout_supported\x18- \x01(\bR\x1dfrontchannel_logout_supported\x12T\n" +
-	"%frontchannel_logout_session_supported\x18. \x01(\bR%frontchannel_logout_session_supported\x12^\n" +
-	"*tls_client_certificate_bound_access_tokens\x18/ \x01(\bR*tls_client_certificate_bound_access_tokensB\x95\x01\n" +
+	"op_tos_uri\x18\x0f \x01(\tR\n" +
+	"op_tos_uri\x12:\n" +
+	"\x13revocation_endpoint\x18\x10 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x13revocation_endpoint\x12h\n" +
+	"*revocation_endpoint_auth_methods_supported\x18\x11 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R*revocation_endpoint_auth_methods_supported\x12~\n" +
+	"5revocation_endpoint_auth_signing_alg_values_supported\x18\x12 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R5revocation_endpoint_auth_signing_alg_values_supported\x12@\n" +
+	"\x16introspection_endpoint\x18\x13 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x16introspection_endpoint\x12n\n" +
+	"-introspection_endpoint_auth_methods_supported\x18\x14 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R-introspection_endpoint_auth_methods_supported\x12\x84\x01\n" +
+	"8introspection_endpoint_auth_signing_alg_values_supported\x18\x15 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R8introspection_endpoint_auth_signing_alg_values_supported\x12T\n" +
+	" code_challenge_methods_supported\x18\x16 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R code_challenge_methods_supported\x126\n" +
+	"\x11userinfo_endpoint\x18\x1e \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x11userinfo_endpoint\x122\n" +
+	"\x14acr_values_supported\x18\x1f \x03(\tR\x14acr_values_supported\x12B\n" +
+	"\x17subject_types_supported\x18  \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x17subject_types_supported\x12^\n" +
+	"%id_token_signing_alg_values_supported\x18! \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R%id_token_signing_alg_values_supported\x12Z\n" +
+	"(id_token_encryption_alg_values_supported\x18\" \x03(\tR(id_token_encryption_alg_values_supported\x12Z\n" +
+	"(id_token_encryption_enc_values_supported\x18# \x03(\tR(id_token_encryption_enc_values_supported\x12T\n" +
+	"%userinfo_signing_alg_values_supported\x18$ \x03(\tR%userinfo_signing_alg_values_supported\x12Z\n" +
+	"(userinfo_encryption_alg_values_supported\x18% \x03(\tR(userinfo_encryption_alg_values_supported\x12Z\n" +
+	"(userinfo_encryption_enc_values_supported\x18& \x03(\tR(userinfo_encryption_enc_values_supported\x12`\n" +
+	"+request_object_signing_alg_values_supported\x18' \x03(\tR+request_object_signing_alg_values_supported\x12f\n" +
+	".request_object_encryption_alg_values_supported\x18( \x03(\tR.request_object_encryption_alg_values_supported\x12f\n" +
+	".request_object_encryption_enc_values_supported\x18) \x03(\tR.request_object_encryption_enc_values_supported\x12:\n" +
+	"\x18display_values_supported\x18* \x03(\tR\x18display_values_supported\x124\n" +
+	"\x15claim_types_supported\x18+ \x03(\tR\x15claim_types_supported\x12*\n" +
+	"\x10claims_supported\x18, \x03(\tR\x10claims_supported\x12:\n" +
+	"\x18claims_locales_supported\x18- \x03(\tR\x18claims_locales_supported\x12>\n" +
+	"\x1aclaims_parameter_supported\x18. \x01(\bR\x1aclaims_parameter_supported\x12@\n" +
+	"\x1brequest_parameter_supported\x18/ \x01(\bR\x1brequest_parameter_supported\x12H\n" +
+	"\x1frequest_uri_parameter_supported\x180 \x01(\bR\x1frequest_uri_parameter_supported\x12J\n" +
+	" require_request_uri_registration\x181 \x01(\bR require_request_uri_registration\x122\n" +
+	"\x14end_session_endpoint\x182 \x01(\tR\x14end_session_endpoint\x12T\n" +
+	"%pushed_authorization_request_endpoint\x18< \x01(\tR%pushed_authorization_request_endpoint\x12T\n" +
+	"%require_pushed_authorization_requests\x18= \x01(\bR%require_pushed_authorization_requests\x12^\n" +
+	"*authorization_signing_alg_values_supported\x18F \x03(\tR*authorization_signing_alg_values_supported\x12d\n" +
+	"-authorization_encryption_alg_values_supported\x18G \x03(\tR-authorization_encryption_alg_values_supported\x12d\n" +
+	"-authorization_encryption_enc_values_supported\x18H \x03(\tR-authorization_encryption_enc_values_supported\x12f\n" +
+	".authorization_response_iss_parameter_supported\x18P \x01(\bR.authorization_response_iss_parameter_supported\x12B\n" +
+	"\x1cbackchannel_logout_supported\x18Z \x01(\bR\x1cbackchannel_logout_supported\x12R\n" +
+	"$backchannel_logout_session_supported\x18[ \x01(\bR$backchannel_logout_session_supported\x12D\n" +
+	"\x1dfrontchannel_logout_supported\x18d \x01(\bR\x1dfrontchannel_logout_supported\x12T\n" +
+	"%frontchannel_logout_session_supported\x18e \x01(\bR%frontchannel_logout_session_supported\x12^\n" +
+	"*tls_client_certificate_bound_access_tokens\x18n \x01(\bR*tls_client_certificate_bound_access_tokensB\x95\x01\n" +
 	"\vcom.oppb.v1B\x0fIssuerMetaProtoP\x01Z8github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb\xa2\x02\x03OXX\xaa\x02\aOppb.V1\xca\x02\aOppb\\V1\xe2\x02\x13Oppb\\V1\\GPBMetadata\xea\x02\bOppb::V1b\x06proto3"
 
 var (
