@@ -31,35 +31,13 @@ option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
 // The order of the descriptions should follow the RFC they were cited from.
 message IssuerMeta {
   // https://tex2e.github.io/rfc-translater/html/rfc8414.html#2--Authorization-Server-Metadata
-  //  required for RFC8414
-  string issuer = 1 [
-    json_name = "issuer",
-    (buf.validate.field).string.uri = true
-  ];
-  //  required for RFC8414
-  string authorization_endpoint = 2 [
-    json_name = "authorization_endpoint",
-    (buf.validate.field).string.uri = true
-  ];
-  //  required for RFC8414
-  string token_endpoint = 3 [
-    json_name = "token_endpoint",
-    (buf.validate.field).string.uri = true
-  ];
+  string issuer = 1 [json_name = "issuer"];
+  string authorization_endpoint = 2 [json_name = "authorization_endpoint"];
+  string token_endpoint = 3 [json_name = "token_endpoint"];
   string jwks_uri = 4 [json_name = "jwks_uri"];
-  string registration_endpoint = 5 [
-    json_name = "registration_endpoint",
-    (buf.validate.field).string.uri = true
-  ];
-  repeated string scopes_supported = 6 [
-    json_name = "scopes_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
-  //  required for RFC8414
-  repeated string response_types_supported = 7 [
-    json_name = "response_types_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
+  string registration_endpoint = 5 [json_name = "registration_endpoint"];
+  repeated string scopes_supported = 6 [json_name = "scopes_supported"];
+  repeated string response_types_supported = 7 [json_name = "response_types_supported"];
   repeated string response_modes_supported = 8 [json_name = "response_modes_supported"];
   repeated string grant_types_supported = 9 [json_name = "grant_types_supported"];
   repeated string token_endpoint_auth_methods_supported = 10 [json_name = "token_endpoint_auth_methods_supported"];
@@ -68,48 +46,18 @@ message IssuerMeta {
   repeated string ui_locales_supported = 13 [json_name = "ui_locales_supported"];
   string op_policy_uri = 14 [json_name = "op_policy_uri"];
   string op_tos_uri = 15 [json_name = "op_tos_uri"];
-  string revocation_endpoint = 16 [
-    json_name = "revocation_endpoint",
-    (buf.validate.field).string.uri = true
-  ];
-  repeated string revocation_endpoint_auth_methods_supported = 17 [
-    json_name = "revocation_endpoint_auth_methods_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
-  repeated string revocation_endpoint_auth_signing_alg_values_supported = 18 [
-    json_name = "revocation_endpoint_auth_signing_alg_values_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
-  string introspection_endpoint = 19 [
-    json_name = "introspection_endpoint",
-    (buf.validate.field).string.uri = true
-  ];
-  repeated string introspection_endpoint_auth_methods_supported = 20 [
-    json_name = "introspection_endpoint_auth_methods_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
-  repeated string introspection_endpoint_auth_signing_alg_values_supported = 21 [
-    json_name = "introspection_endpoint_auth_signing_alg_values_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
-  repeated string code_challenge_methods_supported = 22 [
-    json_name = "code_challenge_methods_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
+  string revocation_endpoint = 16 [json_name = "revocation_endpoint"];
+  repeated string revocation_endpoint_auth_methods_supported = 17 [json_name = "revocation_endpoint_auth_methods_supported"];
+  repeated string revocation_endpoint_auth_signing_alg_values_supported = 18 [json_name = "revocation_endpoint_auth_signing_alg_values_supported"];
+  string introspection_endpoint = 19 [json_name = "introspection_endpoint"];
+  repeated string introspection_endpoint_auth_methods_supported = 20 [json_name = "introspection_endpoint_auth_methods_supported"];
+  repeated string introspection_endpoint_auth_signing_alg_values_supported = 21 [json_name = "introspection_endpoint_auth_signing_alg_values_supported"];
+  repeated string code_challenge_methods_supported = 22 [json_name = "code_challenge_methods_supported"];
   // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
-  string userinfo_endpoint = 30 [
-    json_name = "userinfo_endpoint",
-    (buf.validate.field).string.uri = true
-  ];
+  string userinfo_endpoint = 30 [json_name = "userinfo_endpoint"];
   repeated string acr_values_supported = 31 [json_name = "acr_values_supported"];
-  repeated string subject_types_supported = 32 [
-    json_name = "subject_types_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
-  repeated string id_token_signing_alg_values_supported = 33 [
-    json_name = "id_token_signing_alg_values_supported",
-    (buf.validate.field).repeated.min_items = 1
-  ];
+  repeated string subject_types_supported = 32 [json_name = "subject_types_supported"];
+  repeated string id_token_signing_alg_values_supported = 33 [json_name = "id_token_signing_alg_values_supported"];
   repeated string id_token_encryption_alg_values_supported = 34 [json_name = "id_token_encryption_alg_values_supported"];
   repeated string id_token_encryption_enc_values_supported = 35 [json_name = "id_token_encryption_enc_values_supported"];
   repeated string userinfo_signing_alg_values_supported = 36 [json_name = "userinfo_signing_alg_values_supported"];
