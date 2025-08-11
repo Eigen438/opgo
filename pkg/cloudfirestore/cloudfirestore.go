@@ -31,13 +31,12 @@ import (
 	"cloud.google.com/go/firestore/apiv1/admin/adminpb"
 	"github.com/Eigen438/cloudfirestore"
 	"github.com/Eigen438/opgo/pkg/model"
-	"github.com/Eigen438/opgo/pkg/provider"
 	"google.golang.org/api/option"
 )
 
 type CloudFirestore interface {
 	cloudfirestore.CloudFirestore
-	provider.ProviderCallbacks
+	model.ProviderCallbacks
 }
 
 func NewWithDatabase(ctx context.Context, projectID, databaseID string, opts ...option.ClientOption) (CloudFirestore, error) {

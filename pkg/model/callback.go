@@ -20,18 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package provider
+package model
 
-import "github.com/Eigen438/opgo/pkg/model"
+import "context"
 
-const retryCount = 10
-
-type Provider struct {
-	callbacks model.ProviderCallbacks
-}
-
-func NewProvider(callbacks model.ProviderCallbacks) *Provider {
-	return &Provider{
-		callbacks: callbacks,
-	}
+type ProviderCallbacks interface {
+	DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error
+	DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error
 }

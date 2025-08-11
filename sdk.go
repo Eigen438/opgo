@@ -32,6 +32,7 @@ import (
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1/oppbconnect"
+	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/Eigen438/opgo/pkg/provider"
 	"github.com/Eigen438/opgo/pkg/rest"
 	"github.com/go-playground/validator/v10"
@@ -129,7 +130,7 @@ func NewHostedSdk(
 	ctx context.Context,
 	issuerMeta *oppb.IssuerMeta,
 	sdkCallbacks SdkCallbacks,
-	providerCallbacks provider.ProviderCallbacks) (Sdk, error) {
+	providerCallbacks model.ProviderCallbacks) (Sdk, error) {
 	if issuerMeta == nil {
 		return nil, fmt.Errorf("parameter issuerMeta is required")
 	}
