@@ -72,7 +72,7 @@ func (i *innerSdk) authorizationIssue(w http.ResponseWriter, r *http.Request, re
 
 	if sessionId == "" {
 		// Session create
-		err, sessionId = i.startSession(w, r, requestId, subject)
+		sessionId, err = i.startSession(w, r, requestId, subject)
 		if err != nil {
 			return err
 		}
