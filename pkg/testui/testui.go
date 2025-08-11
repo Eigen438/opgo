@@ -34,7 +34,6 @@ import (
 	"time"
 
 	"github.com/Eigen438/opgo"
-	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
 //go:embed login.html
@@ -55,21 +54,10 @@ func (p *indexParams) writeLoginHtml(w http.ResponseWriter) {
 
 func CancelHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
 		requestId := r.FormValue("request_id")
-		res, err := s.AuthorizationCancel(ctx, requestId)
+		err := s.AuthorizationCancel(w, r, requestId)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if out := res.GetRedirect(); out != nil {
-			http.Redirect(w, r, out.Url, http.StatusFound)
-			return
-		} else if out := res.GetHtml(); out != nil {
-			for k, v := range httphelper.DefaultHtmlHeader() {
-				w.Header().Set(k, v)
-			}
-			w.Write([]byte(out.Content))
 			return
 		}
 	}
@@ -81,24 +69,9 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 		requestId := r.FormValue("request_id")
 
 		if r.FormValue("username") == "user" && r.FormValue("password") == "pass" {
-			issue := &opgo.IssueRequest{
-				RequestId: requestId,
-				Subject:   "abcdef12345",
-			}
-			s.StartSession(issue).ServeHTTP(w, r)
-			res, err := s.AuthorizationIssue(ctx, issue)
+			err := s.AuthorizationIssue(w, r, requestId, "abcdef12345")
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			if out := res.GetRedirect(); out != nil {
-				http.Redirect(w, r, out.Url, http.StatusFound)
-				return
-			} else if out := res.GetHtml(); out != nil {
-				for k, v := range httphelper.DefaultHtmlHeader() {
-					w.Header().Set(k, v)
-				}
-				w.Write([]byte(out.Content))
 				return
 			}
 		} else {

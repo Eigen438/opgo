@@ -67,21 +67,9 @@ func (i *innerSdk) AuthorizationEndpoint() http.HandlerFunc {
 				b, _ := json.MarshalIndent(fail.Error, "", "  ")
 				w.Write(b)
 			} else if out := res.Msg.GetIssue(); out != nil {
-				resIssue, err := i.AuthorizationIssue(ctx, &IssueRequest{
-					RequestId: out.RequestId,
-					SessionId: out.SessionId,
-					Subject:   out.Subject,
-				})
+				err := i.authorizationIssue(w, r, out.RequestId, out.SessionId, out.Subject)
 				if err != nil {
 					return err
-				}
-				if out := resIssue.GetRedirect(); out != nil {
-					http.Redirect(w, r, out.Url, http.StatusFound)
-				} else if out := resIssue.GetHtml(); out != nil {
-					for k, v := range httphelper.DefaultHtmlHeader() {
-						w.Header().Set(k, v)
-					}
-					w.Write([]byte(out.Content))
 				}
 			} else if out := res.Msg.GetRedirect(); out != nil {
 				http.Redirect(w, r, out.Url, http.StatusFound)

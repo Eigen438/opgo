@@ -10,7 +10,11 @@
       <label for="password">Password:</label>
       <input type="password" id="password" v-model="password" required>
     </div>
-    <button @click="login">Login</button>
+    <button @click.once="login">Login</button>
+    <form action="/api/login" ref="loginForm" method="POST">
+      <input type="hidden" name="request_id" v-model="formData.requestId" />
+      <input type="hidden" name="id_token" v-model="formData.idToken" />
+    </form>
   </div>
 </template>
 
@@ -18,38 +22,25 @@
 import { getAuthInstance, signInWithEmailAndPassword } from '../firebase.config';
 
 const route = useRoute()
-const requestId = route.query.request_id || '';
 const email = ref('');
 const password = ref('');
 const errorMessage = ref('');
+const formData = reactive({
+  requestId: route.query.request_id || '',
+  idToken: "",
+})
+const loginForm = ref<HTMLFormElement>();
 
 const login = async () => {
   try {
     const userCredential = await signInWithEmailAndPassword(await getAuthInstance(), email.value, password.value);
     const user = userCredential.user;
-    const token = await user.getIdToken();
-    const response = await fetch(
-      "/api/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token,
-        },
-        body: JSON.stringify({
-          requestId: requestId,
-        }),
-      }
-    )
-    if (response.status == 200) {
-      const data = await response.json();
-      window.location.href = data["url"];
-    } else {
-      const data = await response.json();
-      errorMessage.value = data.message || 'unknown error';
-    }
-  } catch (error) {
-    errorMessage.value = error
+    formData.idToken = await user.getIdToken();
+    nextTick(() => {
+      loginForm.value!.submit();
+    });
+  } catch {
+    errorMessage.value = 'Login failed. Please check your credentials.';
   }
 };
 </script>

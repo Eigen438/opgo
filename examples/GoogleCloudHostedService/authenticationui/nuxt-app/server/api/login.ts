@@ -1,12 +1,8 @@
 export default defineEventHandler(async (event) => {
     const body = await readBody(event); 
     console.log(body);
-    //const object = JSON.parse(body);
-    setHeader(event, 'Content-Type', 'application/json')
-    if (body.requestId == "valid_request_id") {
-        return {
-            url: "https://example.com",
-        }    
+    if (body.request_id == "valid_request_id") {
+        return '<html><body><h1>Login Successful</h1><p>Your request ID is valid.</p></body></html>';    
     } else {
         throw createError({
             statusCode: 400,

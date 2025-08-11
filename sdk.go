@@ -50,9 +50,21 @@ type SdkCallbacks interface {
 
 type Sdk interface {
 	ServeMux(*Paths) *http.ServeMux
-	StartSession(*IssueRequest) http.HandlerFunc
-	AuthorizationIssue(context.Context, *IssueRequest) (*oppb.AuthorizationIssueResponse, error)
-	AuthorizationCancel(context.Context, string) (*oppb.AuthorizationCancelResponse, error)
+
+	// AuthorizationIssue issues an authorization request.
+	// It returns an error if the request fails.
+	// w is the http.ResponseWriter to write the response to.
+	// r is the http.Request containing the request data.
+	// requestId is the ID of the authorization request.
+	// subject is the subject of the authorization request.
+	AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string) error
+
+	// AuthorizationCancel cancels an authorization request.
+	// It returns an error if the cancellation fails.
+	// w is the http.ResponseWriter to write the response to.
+	// r is the http.Request containing the request data.
+	// requestId is the ID of the authorization request to cancel.
+	AuthorizationCancel(w http.ResponseWriter, r *http.Request, requestId string) error
 	GetWriteHtmlParam(context.Context, string) (*WriteHtmlParam, error)
 	//
 	ClientCreate(context.Context, ClientParam) error

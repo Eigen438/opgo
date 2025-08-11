@@ -30,7 +30,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	firebase "firebase.google.com/go"
 	"github.com/Eigen438/opgo"
@@ -94,29 +93,10 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 // and the authentication result (ID token) is used to construct the opgo flow.
 func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		accessToken := ""
-		authHeader := r.Header.Get("Authorization")
-		if authHeader != "" {
-			authHeaderStrings := strings.Split(authHeader, " ")
-			if len(authHeaderStrings) == 2 && strings.ToLower(authHeaderStrings[0]) == "bearer" {
-				// Authorizationヘッダから取得
-				accessToken = authHeaderStrings[1]
-			} else {
-				log.Println("Invalid Authorization header format")
-				http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
-				return
-			}
-		} else {
-			log.Println("Authorization header is missing")
-			http.Error(w, "Authorization header is missing", http.StatusUnauthorized)
-			return
-		}
-		type input struct {
-			RequestId string `json:"requestId"`
-		}
 		ctx := r.Context()
-		i := &input{}
-		json.NewDecoder(r.Body).Decode(i)
+
+		idToken := r.FormValue("id_token")
+		requestId := r.FormValue("request_id")
 
 		app, err := firebase.NewApp(ctx, nil)
 		if err != nil {
@@ -130,36 +110,16 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		token, err := auth.VerifyIDToken(ctx, accessToken)
+		token, err := auth.VerifyIDToken(ctx, idToken)
 		if err != nil {
 			log.Printf("auth.VerifyIDToken error: %v", err)
 			http.Error(w, "Authentication failed", http.StatusUnauthorized)
 			return
 		}
 
-		issue := &opgo.IssueRequest{
-			RequestId: i.RequestId,
-			Subject:   token.Subject,
-		}
-		s.StartSession(issue).ServeHTTP(w, r)
-		res, err := s.AuthorizationIssue(ctx, issue)
+		err = s.AuthorizationIssue(w, r, requestId, token.Subject)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if out := res.GetRedirect(); out != nil {
-			type redirect struct {
-				Url string `json:"url"`
-			}
-			json.NewEncoder(w).Encode(redirect{
-				Url: out.Url,
-			})
-			return
-		} else if out := res.GetHtml(); out != nil {
-			for k, v := range httphelper.DefaultHtmlHeader() {
-				w.Header().Set(k, v)
-			}
-			w.Write([]byte(out.Content))
 			return
 		}
 	}
