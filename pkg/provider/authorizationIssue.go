@@ -31,7 +31,6 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/oauth"
@@ -53,8 +52,8 @@ type responseSuccess struct {
 
 func (p *Provider) AuthorizationIssue(ctx context.Context,
 	req *connect.Request[oppb.AuthorizationIssueRequest]) (*connect.Response[oppb.AuthorizationIssueResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(AuthorizationIssue)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// リクエスト情報を取り出す
 		r := &model.Request{

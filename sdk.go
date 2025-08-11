@@ -24,6 +24,7 @@ package opgo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -53,19 +54,17 @@ type Sdk interface {
 	ServeMux(*Paths) *http.ServeMux
 
 	// AuthorizationIssue issues an authorization request.
-	// It returns an error if the request fails.
 	// w is the http.ResponseWriter to write the response to.
 	// r is the http.Request containing the request data.
 	// requestId is the ID of the authorization request.
 	// subject is the subject of the authorization request.
-	AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string) error
+	AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string)
 
 	// AuthorizationCancel cancels an authorization request.
-	// It returns an error if the cancellation fails.
 	// w is the http.ResponseWriter to write the response to.
 	// r is the http.Request containing the request data.
 	// requestId is the ID of the authorization request to cancel.
-	AuthorizationCancel(w http.ResponseWriter, r *http.Request, requestId string) error
+	AuthorizationCancel(w http.ResponseWriter, r *http.Request, requestId string)
 	GetWriteHtmlParam(context.Context, string) (*WriteHtmlParam, error)
 	//
 	ClientCreate(context.Context, ClientParam) error
@@ -162,4 +161,17 @@ func NewHostedSdk(
 		rest:     rest.NewRest(res.Key.Id, res.Secret.Password, true),
 	}
 	return i, nil
+}
+
+func writeError(w http.ResponseWriter, err error) {
+	if connect.CodeOf(err) == connect.CodeUnauthenticated {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(errors.Unwrap(err).Error()))
+	} else if connect.CodeOf(err) == connect.CodeInternal {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(errors.Unwrap(err).Error()))
+	} else {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		w.Write([]byte(err.Error()))
+	}
 }

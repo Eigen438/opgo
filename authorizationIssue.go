@@ -37,29 +37,12 @@ type IssueRequest struct {
 	Subject   string
 }
 
-/*
-func (i *innerSdk) AuthorizationIssue(ctx context.Context, param *IssueRequest) (*oppb.AuthorizationIssueResponse, error) {
-	claims, err := i.config.Callbacks.GetUserClaimsCallback(ctx, param.Subject)
+func (i *innerSdk) AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string) {
+	err := i.authorizationIssue(w, r, requestId, "", subject)
 	if err != nil {
-		return nil, err
+		writeError(w, err)
+		return
 	}
-	req := connect.NewRequest(&oppb.AuthorizationIssueRequest{
-		RequestId: param.RequestId,
-		SessionId: param.SessionId,
-		Subject:   param.Subject,
-		Claims:    claims,
-	})
-	auth.SetAuth(req, i)
-	res, err := i.provider.AuthorizationIssue(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	return res.Msg, nil
-}
-*/
-
-func (i *innerSdk) AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string) error {
-	return i.authorizationIssue(w, r, requestId, "", subject)
 }
 
 func (i *innerSdk) authorizationIssue(w http.ResponseWriter, r *http.Request, requestId, sessionId, subject string) error {

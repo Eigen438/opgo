@@ -30,34 +30,28 @@ import (
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func (i *innerSdk) JwksEndpoint() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) jwksEndpoint(w http.ResponseWriter, r *http.Request) {
+	err := func() error {
 		req := connect.NewRequest(&oppb.JwksRequest{})
 		auth.SetAuth(req, i)
 		res, err := i.provider.Jwks(r.Context(), req)
 		if err != nil {
-			if status.Code(err) == codes.Unauthenticated {
-				w.WriteHeader(http.StatusUnauthorized)
-			} else {
-				w.WriteHeader(http.StatusServiceUnavailable)
-			}
-			w.Write([]byte(err.Error()))
-			return
+			return err
 		}
 		body, err := json.MarshalIndent(res.Msg, "", "  ")
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
+			return err
 		}
 		for key, val := range httphelper.DefaultJsonHeader() {
 			w.Header().Add(key, val)
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(body)
+		return nil
+	}()
+	if err != nil {
+		writeError(w, err)
 	}
 }

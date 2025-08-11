@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"slices"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/pkg/auth"
@@ -37,8 +36,8 @@ import (
 
 func (rest *Rest) ClientCreate(ctx context.Context,
 	req *connect.Request[oppb.ClientCreateRequest]) (*connect.Response[oppb.ClientCreateResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(ClientCreate)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// Check
 		for _, v := range req.Msg.Meta.ResponseTypes {

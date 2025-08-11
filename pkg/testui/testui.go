@@ -55,11 +55,7 @@ func (p *indexParams) writeLoginHtml(w http.ResponseWriter) {
 func CancelHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestId := r.FormValue("request_id")
-		err := s.AuthorizationCancel(w, r, requestId)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		s.AuthorizationCancel(w, r, requestId)
 	}
 }
 
@@ -69,11 +65,7 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 		requestId := r.FormValue("request_id")
 
 		if r.FormValue("username") == "user" && r.FormValue("password") == "pass" {
-			err := s.AuthorizationIssue(w, r, requestId, "abcdef12345")
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
+			s.AuthorizationIssue(w, r, requestId, "abcdef12345")
 		} else {
 			param, err := s.GetWriteHtmlParam(ctx, requestId)
 			if err != nil {

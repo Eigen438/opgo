@@ -105,21 +105,21 @@ func DefaultPaths() *Paths {
 func (i *innerSdk) ServeMux(paths *Paths) *http.ServeMux {
 	mux := http.NewServeMux()
 	if paths.useDiscovery() {
-		mux.HandleFunc(DEFAULT_DISCOVERY_PATH, i.DiscoveryEndpoint())
+		mux.HandleFunc(DEFAULT_DISCOVERY_PATH, i.discoveryEndpoint)
 	}
-	mux.HandleFunc(paths.authorizationPath(), i.AuthorizationEndpoint())
-	mux.HandleFunc(paths.tokenPath(), i.TokenEndpoint())
+	mux.HandleFunc(paths.authorizationPath(), i.authorizationEndpoint)
+	mux.HandleFunc(paths.tokenPath(), i.tokenEndpoint)
 	if paths.jwksPath() != "" {
-		mux.HandleFunc(paths.jwksPath(), i.JwksEndpoint())
+		mux.HandleFunc(paths.jwksPath(), i.jwksEndpoint)
 	}
 	if paths.userinfoPath() != "" {
-		mux.HandleFunc(paths.userinfoPath(), i.UserinfoEndpoint())
+		mux.HandleFunc(paths.userinfoPath(), i.userinfoEndpoint)
 	}
 	if paths.registrationPath() != "" {
-		mux.HandleFunc(paths.registrationPath(), i.RegistrationEndpoint())
+		mux.HandleFunc(paths.registrationPath(), i.registrationEndpoint)
 	}
 	if paths.pushedAuthorizationPath() != "" {
-		mux.HandleFunc(paths.pushedAuthorizationPath(), i.PushedAuthorizationEndpoint())
+		mux.HandleFunc(paths.pushedAuthorizationPath(), i.pushedAuthorizationEndpoint)
 	}
 	return mux
 }

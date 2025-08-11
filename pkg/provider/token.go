@@ -34,7 +34,6 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/oauth"
@@ -62,8 +61,8 @@ type tokenRequest struct {
 
 func (p *Provider) Token(ctx context.Context,
 	req *connect.Request[oppb.TokenRequest]) (*connect.Response[oppb.TokenResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(Token)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// ヘッダチェック
 		if ct := req.Msg.ContentType; !strings.HasPrefix(ct, httphelper.MimeTypeWwwFormUnlencoded) {

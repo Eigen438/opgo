@@ -23,7 +23,6 @@
 package opgo
 
 import (
-	"errors"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -32,28 +31,22 @@ import (
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func (i *innerSdk) DiscoveryEndpoint() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) discoveryEndpoint(w http.ResponseWriter, r *http.Request) {
+	err := func() error {
 		req := connect.NewRequest(&oppb.DiscoveryRequest{})
 		auth.SetAuth(req, i)
 		res, err := i.provider.Discovery(r.Context(), req)
 		if err != nil {
-			if connect.CodeOf(err) == connect.CodeUnauthenticated {
-				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(errors.Unwrap(err).Error()))
-			} else if connect.CodeOf(err) == connect.CodeInternal {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(errors.Unwrap(err).Error()))
-			} else {
-				w.WriteHeader(http.StatusServiceUnavailable)
-				w.Write([]byte(err.Error()))
-			}
-			return
+			return err
 		}
 		for key, val := range httphelper.DefaultJsonHeader() {
 			w.Header().Add(key, val)
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(res.Msg.Content))
+		return nil
+	}()
+	if err != nil {
+		writeError(w, err)
 	}
 }

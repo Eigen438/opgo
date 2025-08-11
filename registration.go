@@ -24,6 +24,7 @@ package opgo
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -34,31 +35,25 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) registrationEndpoint(w http.ResponseWriter, r *http.Request) {
+	if err := func() error {
 		ctx := r.Context()
 		switch r.Method {
 		case http.MethodPost:
 			reqBody := &oppb.RegistrationCreateRequest{}
 			defer r.Body.Close()
-			if r.Body != nil {
-				if err := json.NewDecoder(r.Body).Decode(reqBody); err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(err.Error()))
-				}
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte("body not found"))
+			if r.Body == nil {
+				return fmt.Errorf("request body not found")
+			}
+			if err := json.NewDecoder(r.Body).Decode(reqBody); err != nil {
+				return err
 			}
 
 			req := connect.NewRequest(reqBody)
 			auth.SetAuth(req, i)
 			res, err := i.provider.RegistrationCreate(ctx, req)
-
 			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(err.Error()))
-				return
+				return err
 			}
 			if success := res.Msg.GetSuccess(); success != nil {
 				for key, val := range httphelper.DefaultJsonHeader() {
@@ -79,7 +74,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 				j, _ := json.MarshalIndent(fail.Error, "", "  ")
 				w.Write(j)
 			}
-			return
+			return nil
 
 		case http.MethodDelete:
 			h := r.Header.Get(httphelper.HeaderAuthorization)
@@ -94,9 +89,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 			res, err := i.provider.RegistrationDelete(ctx, req)
 
 			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(err.Error()))
-				return
+				return err
 			}
 
 			if success := res.Msg.GetSuccess(); success != nil {
@@ -109,7 +102,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 				j, _ := json.MarshalIndent(fail.Error, "", "  ")
 				w.Write(j)
 			}
-			return
+			return nil
 
 		case http.MethodGet:
 			h := r.Header.Get(httphelper.HeaderAuthorization)
@@ -124,9 +117,7 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 			res, err := i.provider.RegistrationGet(ctx, req)
 
 			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(err.Error()))
-				return
+				return err
 			}
 
 			if success := res.Msg.GetSuccess(); success != nil {
@@ -144,10 +135,14 @@ func (i *innerSdk) RegistrationEndpoint() http.HandlerFunc {
 				j, _ := json.MarshalIndent(fail.Error, "", "  ")
 				w.Write(j)
 			}
-			return
+			return nil
+
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
+			return nil
 		}
+	}(); err != nil {
+		writeError(w, err)
+		return
 	}
 }

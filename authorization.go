@@ -31,69 +31,60 @@ import (
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func (i *innerSdk) AuthorizationEndpoint() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) authorizationEndpoint(w http.ResponseWriter, r *http.Request) {
+	if err := func() error {
 		ctx := r.Context()
-		if err := func() error {
-			req := connect.NewRequest(&oppb.AuthorizationRequest{
-				Sessions:    map[string]string{},
-				ContentType: r.Header.Get(httphelper.HeaderContentType),
-				Method:      r.Method,
-				Url:         r.URL.String(),
-			})
-			// Cookie取得
-			for _, cookie := range r.Cookies() {
-				req.Msg.Sessions[cookie.Name] = cookie.Value
+		req := connect.NewRequest(&oppb.AuthorizationRequest{
+			Sessions:    map[string]string{},
+			ContentType: r.Header.Get(httphelper.HeaderContentType),
+			Method:      r.Method,
+			Url:         r.URL.String(),
+		})
+		// Cookie取得
+		for _, cookie := range r.Cookies() {
+			req.Msg.Sessions[cookie.Name] = cookie.Value
+		}
+		// Formデータ取得
+		defer r.Body.Close()
+		if r.Body != nil {
+			if b, err := io.ReadAll(r.Body); err == nil {
+				req.Msg.Form = string(b)
 			}
-			// Formデータ取得
-			defer r.Body.Close()
-			if r.Body != nil {
-				if b, err := io.ReadAll(r.Body); err == nil {
-					req.Msg.Form = string(b)
-				}
-			}
-			auth.SetAuth(req, i)
-			res, err := i.provider.Authorization(ctx, req)
+		}
+		auth.SetAuth(req, i)
+		res, err := i.provider.Authorization(ctx, req)
+		if err != nil {
+			return err
+		}
+
+		if fail := res.Msg.GetFail(); fail != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			b, _ := json.MarshalIndent(fail.Error, "", "  ")
+			w.Write(b)
+		} else if out := res.Msg.GetIssue(); out != nil {
+			err := i.authorizationIssue(w, r, out.RequestId, out.SessionId, out.Subject)
 			if err != nil {
 				return err
 			}
-
-			if fail := res.Msg.GetFail(); fail != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				b, _ := json.MarshalIndent(fail.Error, "", "  ")
-				w.Write(b)
-			} else if out := res.Msg.GetIssue(); out != nil {
-				err := i.authorizationIssue(w, r, out.RequestId, out.SessionId, out.Subject)
-				if err != nil {
-					return err
-				}
-			} else if out := res.Msg.GetRedirect(); out != nil {
-				http.Redirect(w, r, out.Url, http.StatusFound)
-			} else if out := res.Msg.GetHtml(); out != nil {
-				for k, v := range httphelper.DefaultHtmlHeader() {
-					w.Header().Set(k, v)
-				}
-				w.Write([]byte(out.Content))
-			} else if out := res.Msg.GetLogin(); out != nil {
-				i.config.Callbacks.WriteLoginHtmlCallback(&WriteHtmlParam{
-					RequestId:  out.RequestId,
-					Client:     out.Client,
-					AuthParams: out.AuthParams,
-				}).ServeHTTP(w, r)
+		} else if out := res.Msg.GetRedirect(); out != nil {
+			http.Redirect(w, r, out.Url, http.StatusFound)
+		} else if out := res.Msg.GetHtml(); out != nil {
+			for k, v := range httphelper.DefaultHtmlHeader() {
+				w.Header().Set(k, v)
 			}
-			return nil
-		}(); err != nil {
-			if status.Code(err) == codes.Unauthenticated {
-				w.WriteHeader(http.StatusUnauthorized)
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-			w.Write([]byte(err.Error()))
-			return
+			w.Write([]byte(out.Content))
+		} else if out := res.Msg.GetLogin(); out != nil {
+			i.config.Callbacks.WriteLoginHtmlCallback(&WriteHtmlParam{
+				RequestId:  out.RequestId,
+				Client:     out.Client,
+				AuthParams: out.AuthParams,
+			}).ServeHTTP(w, r)
 		}
+		return nil
+	}(); err != nil {
+		writeError(w, err)
+		return
 	}
 }

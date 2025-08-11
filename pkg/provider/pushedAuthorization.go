@@ -30,7 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/oauth"
@@ -48,8 +47,8 @@ import (
 
 func (p *Provider) PushedAuthorization(ctx context.Context,
 	req *connect.Request[oppb.PushedAuthorizationRequest]) (*connect.Response[oppb.PushedAuthorizationResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(PushedAuthorization)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		if req.Msg.Method == http.MethodPost {
 			// Check content type.

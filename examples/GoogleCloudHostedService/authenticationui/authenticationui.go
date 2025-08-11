@@ -117,11 +117,7 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 			return
 		}
 
-		err = s.AuthorizationIssue(w, r, requestId, token.Subject)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		s.AuthorizationIssue(w, r, requestId, token.Subject)
 	}
 }
 

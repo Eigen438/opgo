@@ -26,7 +26,6 @@ import (
 	"context"
 	"crypto/subtle"
 	"fmt"
-	"log"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -62,35 +61,6 @@ func GetIssuer[T any](ctx context.Context, req *connect.Request[T]) (*model.Issu
 		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid provider password"))
 	}
 	return iss, nil
-}
-
-// Deprecated: use CheckIssuer or GetIssuer instead
-func CheckIssuer[T any](ctx context.Context, req *connect.Request[T]) *model.Issuer {
-	r := &http.Request{
-		Header: req.Header(),
-	}
-	username, password, ok := r.BasicAuth()
-	if !ok || username == "" {
-		return nil
-	}
-
-	iss := &model.Issuer{
-		Key: &oppb.CommonKey{
-			Id: username,
-		},
-	}
-	if err := dataprovider.Get(ctx, iss); err != nil {
-		log.Printf("authenticate dataprovider.Get error:%s", err.Error())
-		if status.Code(err) == codes.NotFound {
-			return nil
-		} else {
-			return nil
-		}
-	}
-	if !equal(password, iss.Secret.Password) {
-		return nil
-	}
-	return iss
 }
 
 func equal(left, right string) bool {

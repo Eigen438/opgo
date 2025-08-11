@@ -31,70 +31,61 @@ import (
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func (i *innerSdk) PushedAuthorizationEndpoint() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) pushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Request) {
+	if err := func() error {
 		ctx := r.Context()
-		if err := func() error {
-			req := connect.NewRequest(&oppb.PushedAuthorizationRequest{
-				ContentType:          r.Header.Get(httphelper.HeaderContentType),
-				Method:               r.Method,
-				TlsClientCertificate: r.Header.Get("X-Client-Cert-Hash"),
-			})
-			// Get form
-			defer r.Body.Close()
-			if r.Body != nil {
-				if b, err := io.ReadAll(r.Body); err == nil {
-					req.Msg.Form = string(b)
-				}
+		req := connect.NewRequest(&oppb.PushedAuthorizationRequest{
+			ContentType:          r.Header.Get(httphelper.HeaderContentType),
+			Method:               r.Method,
+			TlsClientCertificate: r.Header.Get("X-Client-Cert-Hash"),
+		})
+		// Get form
+		defer r.Body.Close()
+		if r.Body != nil {
+			if b, err := io.ReadAll(r.Body); err == nil {
+				req.Msg.Form = string(b)
 			}
-			// Set Basic auth
-			if username, password, ok := r.BasicAuth(); ok {
-				req.Msg.BasicAuth = &oppb.BasicAuth{
-					Username: username,
-					Password: password,
-				}
+		}
+		// Set Basic auth
+		if username, password, ok := r.BasicAuth(); ok {
+			req.Msg.BasicAuth = &oppb.BasicAuth{
+				Username: username,
+				Password: password,
 			}
-			auth.SetAuth(req, i)
-			res, err := i.provider.PushedAuthorization(ctx, req)
+		}
+		auth.SetAuth(req, i)
+		res, err := i.provider.PushedAuthorization(ctx, req)
+		if err != nil {
+			return err
+		}
+		if fail := res.Msg.GetFail(); fail != nil {
+			body, err := json.MarshalIndent(fail.Error, "", "  ")
 			if err != nil {
 				return err
 			}
-			if fail := res.Msg.GetFail(); fail != nil {
-				body, err := json.MarshalIndent(fail.Error, "", "  ")
-				if err != nil {
-					return err
-				}
 
-				for key, val := range httphelper.DefaultJsonHeader() {
-					w.Header().Add(key, val)
-				}
-				w.WriteHeader(int(fail.StatusCode))
-				w.Write(body)
-			} else if success := res.Msg.GetSuccess(); success != nil {
-				body, err := json.MarshalIndent(success, "", "  ")
-				if err != nil {
-					return err
-				}
+			for key, val := range httphelper.DefaultJsonHeader() {
+				w.Header().Add(key, val)
+			}
+			w.WriteHeader(int(fail.StatusCode))
+			w.Write(body)
+		} else if success := res.Msg.GetSuccess(); success != nil {
+			body, err := json.MarshalIndent(success, "", "  ")
+			if err != nil {
+				return err
+			}
 
-				for key, val := range httphelper.DefaultJsonHeader() {
-					w.Header().Add(key, val)
-				}
-				w.WriteHeader(http.StatusOK)
-				w.Write(body)
+			for key, val := range httphelper.DefaultJsonHeader() {
+				w.Header().Add(key, val)
 			}
-			return nil
-		}(); err != nil {
-			if status.Code(err) == codes.Unauthenticated {
-				w.WriteHeader(http.StatusUnauthorized)
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-			w.Write([]byte(err.Error()))
-			return
+			w.WriteHeader(http.StatusOK)
+			w.Write(body)
 		}
+		return nil
+	}(); err != nil {
+		writeError(w, err)
+		return
 	}
 }

@@ -25,7 +25,6 @@ package provider
 import (
 	"context"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/retryhelper"
@@ -36,8 +35,8 @@ import (
 
 func (p *Provider) AuthorizationCancel(ctx context.Context,
 	req *connect.Request[oppb.AuthorizationCancelRequest]) (*connect.Response[oppb.AuthorizationCancelResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(AuthorizationIssue)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// リクエスト情報を取り出す
 		r := &model.Request{

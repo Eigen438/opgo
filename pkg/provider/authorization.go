@@ -34,7 +34,6 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/oauth"
@@ -51,8 +50,8 @@ import (
 
 func (p *Provider) Authorization(ctx context.Context,
 	req *connect.Request[oppb.AuthorizationRequest]) (*connect.Response[oppb.AuthorizationResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(Authorization)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		var parseTarget string
 		if req.Msg.Method == http.MethodGet {

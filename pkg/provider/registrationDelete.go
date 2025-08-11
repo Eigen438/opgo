@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/pkg/auth"
@@ -37,8 +36,8 @@ import (
 
 func (p *Provider) RegistrationDelete(ctx context.Context,
 	req *connect.Request[oppb.RegistrationDeleteRequest]) (*connect.Response[oppb.RegistrationDeleteResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(RegistrationDelete)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		c := &model.Client{
 			Identity: &oppb.ClientIdentity{
