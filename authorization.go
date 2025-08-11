@@ -77,6 +77,11 @@ func (i *innerSdk) AuthorizationEndpoint() http.HandlerFunc {
 				}
 				if out := resIssue.GetRedirect(); out != nil {
 					http.Redirect(w, r, out.Url, http.StatusFound)
+				} else if out := resIssue.GetHtml(); out != nil {
+					for k, v := range httphelper.DefaultHtmlHeader() {
+						w.Header().Set(k, v)
+					}
+					w.Write([]byte(out.Content))
 				}
 			} else if out := res.Msg.GetRedirect(); out != nil {
 				http.Redirect(w, r, out.Url, http.StatusFound)
