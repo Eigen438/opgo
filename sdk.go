@@ -29,7 +29,6 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
-	"github.com/Eigen438/opgo/internal/validate"
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1/oppbconnect"
@@ -127,9 +126,6 @@ func NewHostedSdk(
 	}
 	if providerCallbacks == nil {
 		return nil, fmt.Errorf("parameter providerCallbacks is required")
-	}
-	if err := validate.IssuerMeta(issuerMeta); err != nil {
-		return nil, err
 	}
 
 	localSdkUser := "local_sdk_user" // dummy user

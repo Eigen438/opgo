@@ -24,19 +24,30 @@ syntax = "proto3";
 
 package oppb.v1;
 
-import "buf/validate/validate.proto";
-
 option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
 
 // The order of the descriptions should follow the RFC they were cited from.
 message IssuerMeta {
   // https://tex2e.github.io/rfc-translater/html/rfc8414.html#2--Authorization-Server-Metadata
+
+  // issuer
+  // REQUIRED. URL using the https scheme with no query or fragment components that the OP asserts as its Issuer Identifier.
   string issuer = 1 [json_name = "issuer"];
+  // authorization_endpoint
+  // REQUIRED. URL of the OP's OAuth 2.0 Authorization Endpoint [OpenID.Core]. This URL MUST use the https scheme
+  // and MAY contain port, path, and query parameter components.
   string authorization_endpoint = 2 [json_name = "authorization_endpoint"];
+  // token_endpoint
+  // This is REQUIRED unless only the Implicit Flow is used.
   string token_endpoint = 3 [json_name = "token_endpoint"];
+  // jwks_uri
+  // REQUIRED. URL of the OP's JWK Set [JWK] document, which MUST use the https scheme.
   string jwks_uri = 4 [json_name = "jwks_uri"];
   string registration_endpoint = 5 [json_name = "registration_endpoint"];
   repeated string scopes_supported = 6 [json_name = "scopes_supported"];
+  // response_types_supported
+  // REQUIRED. JSON array containing a list of the OAuth 2.0 response_type values that this OP supports.
+  // Dynamic OpenID Providers MUST support the code, id_token, and the id_token token Response Type values.
   repeated string response_types_supported = 7 [json_name = "response_types_supported"];
   repeated string response_modes_supported = 8 [json_name = "response_modes_supported"];
   repeated string grant_types_supported = 9 [json_name = "grant_types_supported"];
@@ -56,7 +67,12 @@ message IssuerMeta {
   // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
   string userinfo_endpoint = 30 [json_name = "userinfo_endpoint"];
   repeated string acr_values_supported = 31 [json_name = "acr_values_supported"];
+  // subject_types_supported
+  // REQUIRED. JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include pairwise and public.
   repeated string subject_types_supported = 32 [json_name = "subject_types_supported"];
+  // id_token_signing_alg_values_supported
+  // REQUIRED. JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode
+  // the Claims in a JWT [JWT]. The algorithm RS256 MUST be included.
   repeated string id_token_signing_alg_values_supported = 33 [json_name = "id_token_signing_alg_values_supported"];
   repeated string id_token_encryption_alg_values_supported = 34 [json_name = "id_token_encryption_alg_values_supported"];
   repeated string id_token_encryption_enc_values_supported = 35 [json_name = "id_token_encryption_enc_values_supported"];

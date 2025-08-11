@@ -29,7 +29,6 @@
 package oppb
 
 import (
-	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -47,18 +46,24 @@ const (
 // The order of the descriptions should follow the RFC they were cited from.
 type IssuerMeta struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// https://tex2e.github.io/rfc-translater/html/rfc8414.html#2--Authorization-Server-Metadata
-	//
-	//	required for RFC8414
+	// issuer
+	// REQUIRED. URL using the https scheme with no query or fragment components that the OP asserts as its Issuer Identifier.
 	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
-	// required for RFC8414
+	// authorization_endpoint
+	// REQUIRED. URL of the OP's OAuth 2.0 Authorization Endpoint [OpenID.Core]. This URL MUST use the https scheme
+	// and MAY contain port, path, and query parameter components.
 	AuthorizationEndpoint string `protobuf:"bytes,2,opt,name=authorization_endpoint,proto3" json:"authorization_endpoint,omitempty"`
-	// required for RFC8414
-	TokenEndpoint        string   `protobuf:"bytes,3,opt,name=token_endpoint,proto3" json:"token_endpoint,omitempty"`
+	// token_endpoint
+	// This is REQUIRED unless only the Implicit Flow is used.
+	TokenEndpoint string `protobuf:"bytes,3,opt,name=token_endpoint,proto3" json:"token_endpoint,omitempty"`
+	// jwks_uri
+	// REQUIRED. URL of the OP's JWK Set [JWK] document, which MUST use the https scheme.
 	JwksUri              string   `protobuf:"bytes,4,opt,name=jwks_uri,proto3" json:"jwks_uri,omitempty"`
 	RegistrationEndpoint string   `protobuf:"bytes,5,opt,name=registration_endpoint,proto3" json:"registration_endpoint,omitempty"`
 	ScopesSupported      []string `protobuf:"bytes,6,rep,name=scopes_supported,proto3" json:"scopes_supported,omitempty"`
-	// required for RFC8414
+	// response_types_supported
+	// REQUIRED. JSON array containing a list of the OAuth 2.0 response_type values that this OP supports.
+	// Dynamic OpenID Providers MUST support the code, id_token, and the id_token token Response Type values.
 	ResponseTypesSupported                             []string `protobuf:"bytes,7,rep,name=response_types_supported,proto3" json:"response_types_supported,omitempty"`
 	ResponseModesSupported                             []string `protobuf:"bytes,8,rep,name=response_modes_supported,proto3" json:"response_modes_supported,omitempty"`
 	GrantTypesSupported                                []string `protobuf:"bytes,9,rep,name=grant_types_supported,proto3" json:"grant_types_supported,omitempty"`
@@ -76,9 +81,14 @@ type IssuerMeta struct {
 	IntrospectionEndpointAuthSigningAlgValuesSupported []string `protobuf:"bytes,21,rep,name=introspection_endpoint_auth_signing_alg_values_supported,proto3" json:"introspection_endpoint_auth_signing_alg_values_supported,omitempty"`
 	CodeChallengeMethodsSupported                      []string `protobuf:"bytes,22,rep,name=code_challenge_methods_supported,proto3" json:"code_challenge_methods_supported,omitempty"`
 	// https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
-	UserinfoEndpoint                          string   `protobuf:"bytes,30,opt,name=userinfo_endpoint,proto3" json:"userinfo_endpoint,omitempty"`
-	AcrValuesSupported                        []string `protobuf:"bytes,31,rep,name=acr_values_supported,proto3" json:"acr_values_supported,omitempty"`
-	SubjectTypesSupported                     []string `protobuf:"bytes,32,rep,name=subject_types_supported,proto3" json:"subject_types_supported,omitempty"`
+	UserinfoEndpoint   string   `protobuf:"bytes,30,opt,name=userinfo_endpoint,proto3" json:"userinfo_endpoint,omitempty"`
+	AcrValuesSupported []string `protobuf:"bytes,31,rep,name=acr_values_supported,proto3" json:"acr_values_supported,omitempty"`
+	// subject_types_supported
+	// REQUIRED. JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include pairwise and public.
+	SubjectTypesSupported []string `protobuf:"bytes,32,rep,name=subject_types_supported,proto3" json:"subject_types_supported,omitempty"`
+	// id_token_signing_alg_values_supported
+	// REQUIRED. JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode
+	// the Claims in a JWT [JWT]. The algorithm RS256 MUST be included.
 	IdTokenSigningAlgValuesSupported          []string `protobuf:"bytes,33,rep,name=id_token_signing_alg_values_supported,proto3" json:"id_token_signing_alg_values_supported,omitempty"`
 	IdTokenEncryptionAlgValuesSupported       []string `protobuf:"bytes,34,rep,name=id_token_encryption_alg_values_supported,proto3" json:"id_token_encryption_alg_values_supported,omitempty"`
 	IdTokenEncryptionEncValuesSupported       []string `protobuf:"bytes,35,rep,name=id_token_encryption_enc_values_supported,proto3" json:"id_token_encryption_enc_values_supported,omitempty"`
@@ -531,16 +541,16 @@ var File_oppb_v1_issuer_meta_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_issuer_meta_proto_rawDesc = "" +
 	"\n" +
-	"\x19oppb/v1/issuer_meta.proto\x12\aoppb.v1\x1a\x1bbuf/validate/validate.proto\"\x95 \n" +
+	"\x19oppb/v1/issuer_meta.proto\x12\aoppb.v1\"\xf4\x1e\n" +
 	"\n" +
-	"IssuerMeta\x12 \n" +
-	"\x06issuer\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x06issuer\x12@\n" +
-	"\x16authorization_endpoint\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x16authorization_endpoint\x120\n" +
-	"\x0etoken_endpoint\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x0etoken_endpoint\x12\x1a\n" +
-	"\bjwks_uri\x18\x04 \x01(\tR\bjwks_uri\x12>\n" +
-	"\x15registration_endpoint\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x15registration_endpoint\x124\n" +
-	"\x10scopes_supported\x18\x06 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x10scopes_supported\x12D\n" +
-	"\x18response_types_supported\x18\a \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x18response_types_supported\x12:\n" +
+	"IssuerMeta\x12\x16\n" +
+	"\x06issuer\x18\x01 \x01(\tR\x06issuer\x126\n" +
+	"\x16authorization_endpoint\x18\x02 \x01(\tR\x16authorization_endpoint\x12&\n" +
+	"\x0etoken_endpoint\x18\x03 \x01(\tR\x0etoken_endpoint\x12\x1a\n" +
+	"\bjwks_uri\x18\x04 \x01(\tR\bjwks_uri\x124\n" +
+	"\x15registration_endpoint\x18\x05 \x01(\tR\x15registration_endpoint\x12*\n" +
+	"\x10scopes_supported\x18\x06 \x03(\tR\x10scopes_supported\x12:\n" +
+	"\x18response_types_supported\x18\a \x03(\tR\x18response_types_supported\x12:\n" +
 	"\x18response_modes_supported\x18\b \x03(\tR\x18response_modes_supported\x124\n" +
 	"\x15grant_types_supported\x18\t \x03(\tR\x15grant_types_supported\x12T\n" +
 	"%token_endpoint_auth_methods_supported\x18\n" +
@@ -551,18 +561,18 @@ const file_oppb_v1_issuer_meta_proto_rawDesc = "" +
 	"\rop_policy_uri\x18\x0e \x01(\tR\rop_policy_uri\x12\x1e\n" +
 	"\n" +
 	"op_tos_uri\x18\x0f \x01(\tR\n" +
-	"op_tos_uri\x12:\n" +
-	"\x13revocation_endpoint\x18\x10 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x13revocation_endpoint\x12h\n" +
-	"*revocation_endpoint_auth_methods_supported\x18\x11 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R*revocation_endpoint_auth_methods_supported\x12~\n" +
-	"5revocation_endpoint_auth_signing_alg_values_supported\x18\x12 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R5revocation_endpoint_auth_signing_alg_values_supported\x12@\n" +
-	"\x16introspection_endpoint\x18\x13 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x16introspection_endpoint\x12n\n" +
-	"-introspection_endpoint_auth_methods_supported\x18\x14 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R-introspection_endpoint_auth_methods_supported\x12\x84\x01\n" +
-	"8introspection_endpoint_auth_signing_alg_values_supported\x18\x15 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R8introspection_endpoint_auth_signing_alg_values_supported\x12T\n" +
-	" code_challenge_methods_supported\x18\x16 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R code_challenge_methods_supported\x126\n" +
-	"\x11userinfo_endpoint\x18\x1e \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\x11userinfo_endpoint\x122\n" +
-	"\x14acr_values_supported\x18\x1f \x03(\tR\x14acr_values_supported\x12B\n" +
-	"\x17subject_types_supported\x18  \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x17subject_types_supported\x12^\n" +
-	"%id_token_signing_alg_values_supported\x18! \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R%id_token_signing_alg_values_supported\x12Z\n" +
+	"op_tos_uri\x120\n" +
+	"\x13revocation_endpoint\x18\x10 \x01(\tR\x13revocation_endpoint\x12^\n" +
+	"*revocation_endpoint_auth_methods_supported\x18\x11 \x03(\tR*revocation_endpoint_auth_methods_supported\x12t\n" +
+	"5revocation_endpoint_auth_signing_alg_values_supported\x18\x12 \x03(\tR5revocation_endpoint_auth_signing_alg_values_supported\x126\n" +
+	"\x16introspection_endpoint\x18\x13 \x01(\tR\x16introspection_endpoint\x12d\n" +
+	"-introspection_endpoint_auth_methods_supported\x18\x14 \x03(\tR-introspection_endpoint_auth_methods_supported\x12z\n" +
+	"8introspection_endpoint_auth_signing_alg_values_supported\x18\x15 \x03(\tR8introspection_endpoint_auth_signing_alg_values_supported\x12J\n" +
+	" code_challenge_methods_supported\x18\x16 \x03(\tR code_challenge_methods_supported\x12,\n" +
+	"\x11userinfo_endpoint\x18\x1e \x01(\tR\x11userinfo_endpoint\x122\n" +
+	"\x14acr_values_supported\x18\x1f \x03(\tR\x14acr_values_supported\x128\n" +
+	"\x17subject_types_supported\x18  \x03(\tR\x17subject_types_supported\x12T\n" +
+	"%id_token_signing_alg_values_supported\x18! \x03(\tR%id_token_signing_alg_values_supported\x12Z\n" +
 	"(id_token_encryption_alg_values_supported\x18\" \x03(\tR(id_token_encryption_alg_values_supported\x12Z\n" +
 	"(id_token_encryption_enc_values_supported\x18# \x03(\tR(id_token_encryption_enc_values_supported\x12T\n" +
 	"%userinfo_signing_alg_values_supported\x18$ \x03(\tR%userinfo_signing_alg_values_supported\x12Z\n" +
