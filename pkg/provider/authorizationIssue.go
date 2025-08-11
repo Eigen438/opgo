@@ -85,6 +85,10 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 				},
 			}
 			if err := dataprovider.Get(ctx, ses); err == nil {
+				if req.Msg.Subject != ses.Details.Meta.Subject {
+					log.Printf("[BACKEND_ERROR] subject mismatch: %s != %s", req.Msg.Subject, ses.Details.Meta.Subject)
+					return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("subject mismatch"))
+				}
 				authTime = ses.CreateAt
 			}
 		}
