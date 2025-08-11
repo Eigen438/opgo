@@ -29,7 +29,6 @@ option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
 // The order of the descriptions should follow the RFC they were cited from.
 message IssuerMeta {
   // https://tex2e.github.io/rfc-translater/html/rfc8414.html#2--Authorization-Server-Metadata
-
   // issuer
   // REQUIRED. URL using the https scheme with no query or fragment components that the OP asserts as its Issuer Identifier.
   string issuer = 1 [json_name = "issuer"];

@@ -81,7 +81,7 @@ func (*DiscoveryRequest) Descriptor() ([]byte, []int) {
 
 type DiscoveryResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Meta          *IssuerMeta            `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -116,11 +116,11 @@ func (*DiscoveryResponse) Descriptor() ([]byte, []int) {
 	return file_oppb_v1_provider_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *DiscoveryResponse) GetMeta() *IssuerMeta {
+func (x *DiscoveryResponse) GetContent() string {
 	if x != nil {
-		return x.Meta
+		return x.Content
 	}
-	return nil
+	return ""
 }
 
 type JwksRequest struct {
@@ -2079,10 +2079,10 @@ var File_oppb_v1_provider_service_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_provider_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1eoppb/v1/provider_service.proto\x12\aoppb.v1\x1a&oppb/v1/authorization_parameters.proto\x1a\x14oppb/v1/client.proto\x1a\x19oppb/v1/client_meta.proto\x1a\x19oppb/v1/issuer_meta.proto\x1a\x12oppb/v1/jwks.proto\x1a\x1aoppb/v1/registration.proto\"\x12\n" +
-	"\x10DiscoveryRequest\"<\n" +
-	"\x11DiscoveryResponse\x12'\n" +
-	"\x04meta\x18\x01 \x01(\v2\x13.oppb.v1.IssuerMetaR\x04meta\"\r\n" +
+	"\x1eoppb/v1/provider_service.proto\x12\aoppb.v1\x1a&oppb/v1/authorization_parameters.proto\x1a\x14oppb/v1/client.proto\x1a\x19oppb/v1/client_meta.proto\x1a\x12oppb/v1/jwks.proto\x1a\x1aoppb/v1/registration.proto\"\x12\n" +
+	"\x10DiscoveryRequest\"-\n" +
+	"\x11DiscoveryResponse\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\"\r\n" +
 	"\vJwksRequest\"0\n" +
 	"\fJwksResponse\x12 \n" +
 	"\x04keys\x18\x01 \x03(\v2\f.oppb.v1.JwkR\x04keys\"\xfd\x01\n" +
@@ -2300,81 +2300,79 @@ var file_oppb_v1_provider_service_proto_goTypes = []any{
 	(*BasicAuth)(nil),                          // 31: oppb.v1.BasicAuth
 	nil,                                        // 32: oppb.v1.AuthorizationRequest.SessionsEntry
 	nil,                                        // 33: oppb.v1.UserinfoResponse.HeadersEntry
-	(*IssuerMeta)(nil),                         // 34: oppb.v1.IssuerMeta
-	(*Jwk)(nil),                                // 35: oppb.v1.Jwk
-	(*AuthorizationParameters)(nil),            // 36: oppb.v1.AuthorizationParameters
-	(*ClientMeta)(nil),                         // 37: oppb.v1.ClientMeta
-	(*ClientAttribute)(nil),                    // 38: oppb.v1.ClientAttribute
-	(*RegistrationCreateRequest)(nil),          // 39: oppb.v1.RegistrationCreateRequest
-	(*RegistrationDeleteRequest)(nil),          // 40: oppb.v1.RegistrationDeleteRequest
-	(*RegistrationGetRequest)(nil),             // 41: oppb.v1.RegistrationGetRequest
-	(*RegistrationCreateResponse)(nil),         // 42: oppb.v1.RegistrationCreateResponse
-	(*RegistrationDeleteResponse)(nil),         // 43: oppb.v1.RegistrationDeleteResponse
-	(*RegistrationGetResponse)(nil),            // 44: oppb.v1.RegistrationGetResponse
+	(*Jwk)(nil),                                // 34: oppb.v1.Jwk
+	(*AuthorizationParameters)(nil),            // 35: oppb.v1.AuthorizationParameters
+	(*ClientMeta)(nil),                         // 36: oppb.v1.ClientMeta
+	(*ClientAttribute)(nil),                    // 37: oppb.v1.ClientAttribute
+	(*RegistrationCreateRequest)(nil),          // 38: oppb.v1.RegistrationCreateRequest
+	(*RegistrationDeleteRequest)(nil),          // 39: oppb.v1.RegistrationDeleteRequest
+	(*RegistrationGetRequest)(nil),             // 40: oppb.v1.RegistrationGetRequest
+	(*RegistrationCreateResponse)(nil),         // 41: oppb.v1.RegistrationCreateResponse
+	(*RegistrationDeleteResponse)(nil),         // 42: oppb.v1.RegistrationDeleteResponse
+	(*RegistrationGetResponse)(nil),            // 43: oppb.v1.RegistrationGetResponse
 }
 var file_oppb_v1_provider_service_proto_depIdxs = []int32{
-	34, // 0: oppb.v1.DiscoveryResponse.meta:type_name -> oppb.v1.IssuerMeta
-	35, // 1: oppb.v1.JwksResponse.keys:type_name -> oppb.v1.Jwk
-	32, // 2: oppb.v1.AuthorizationRequest.sessions:type_name -> oppb.v1.AuthorizationRequest.SessionsEntry
-	20, // 3: oppb.v1.AuthorizationResponse.fail:type_name -> oppb.v1.AuthorizationFailResponse
-	22, // 4: oppb.v1.AuthorizationResponse.login:type_name -> oppb.v1.AuthorizationNextActionLogin
-	23, // 5: oppb.v1.AuthorizationResponse.issue:type_name -> oppb.v1.AuthorizationNextActionIssue
-	24, // 6: oppb.v1.AuthorizationResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
-	25, // 7: oppb.v1.AuthorizationResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
-	36, // 8: oppb.v1.AuthorizationResponse.params:type_name -> oppb.v1.AuthorizationParameters
-	37, // 9: oppb.v1.AuthorizationResponse.client:type_name -> oppb.v1.ClientMeta
-	38, // 10: oppb.v1.AuthorizationResponse.client_attribute:type_name -> oppb.v1.ClientAttribute
-	24, // 11: oppb.v1.AuthorizationIssueResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
-	25, // 12: oppb.v1.AuthorizationIssueResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
-	24, // 13: oppb.v1.AuthorizationCancelResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
-	25, // 14: oppb.v1.AuthorizationCancelResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
-	31, // 15: oppb.v1.TokenRequest.basic_auth:type_name -> oppb.v1.BasicAuth
-	26, // 16: oppb.v1.TokenResponse.success:type_name -> oppb.v1.TokenSuccessResponse
-	27, // 17: oppb.v1.TokenResponse.fail:type_name -> oppb.v1.TokenFailResponse
-	33, // 18: oppb.v1.UserinfoResponse.headers:type_name -> oppb.v1.UserinfoResponse.HeadersEntry
-	31, // 19: oppb.v1.PushedAuthorizationRequest.basic_auth:type_name -> oppb.v1.BasicAuth
-	28, // 20: oppb.v1.PushedAuthorizationResponse.success:type_name -> oppb.v1.PushedAuthorizationSuccessResponse
-	29, // 21: oppb.v1.PushedAuthorizationResponse.fail:type_name -> oppb.v1.PushedAuthorizationFailResponse
-	37, // 22: oppb.v1.RequestResponse.client:type_name -> oppb.v1.ClientMeta
-	36, // 23: oppb.v1.RequestResponse.auth_params:type_name -> oppb.v1.AuthorizationParameters
-	21, // 24: oppb.v1.AuthorizationFailResponse.error:type_name -> oppb.v1.AuthorizationErrorResponse
-	37, // 25: oppb.v1.AuthorizationNextActionLogin.client:type_name -> oppb.v1.ClientMeta
-	36, // 26: oppb.v1.AuthorizationNextActionLogin.auth_params:type_name -> oppb.v1.AuthorizationParameters
-	37, // 27: oppb.v1.AuthorizationNextActionIssue.client:type_name -> oppb.v1.ClientMeta
-	36, // 28: oppb.v1.AuthorizationNextActionIssue.auth_params:type_name -> oppb.v1.AuthorizationParameters
-	30, // 29: oppb.v1.TokenFailResponse.error:type_name -> oppb.v1.OauthError
-	30, // 30: oppb.v1.PushedAuthorizationFailResponse.error:type_name -> oppb.v1.OauthError
-	0,  // 31: oppb.v1.ProviderService.Discovery:input_type -> oppb.v1.DiscoveryRequest
-	2,  // 32: oppb.v1.ProviderService.Jwks:input_type -> oppb.v1.JwksRequest
-	4,  // 33: oppb.v1.ProviderService.Authorization:input_type -> oppb.v1.AuthorizationRequest
-	6,  // 34: oppb.v1.ProviderService.AuthorizationIssue:input_type -> oppb.v1.AuthorizationIssueRequest
-	8,  // 35: oppb.v1.ProviderService.AuthorizationCancel:input_type -> oppb.v1.AuthorizationCancelRequest
-	10, // 36: oppb.v1.ProviderService.StartSession:input_type -> oppb.v1.StartSessionRequest
-	12, // 37: oppb.v1.ProviderService.Token:input_type -> oppb.v1.TokenRequest
-	14, // 38: oppb.v1.ProviderService.Userinfo:input_type -> oppb.v1.UserinfoRequest
-	16, // 39: oppb.v1.ProviderService.PushedAuthorization:input_type -> oppb.v1.PushedAuthorizationRequest
-	18, // 40: oppb.v1.ProviderService.Request:input_type -> oppb.v1.RequestRequest
-	39, // 41: oppb.v1.ProviderService.RegistrationCreate:input_type -> oppb.v1.RegistrationCreateRequest
-	40, // 42: oppb.v1.ProviderService.RegistrationDelete:input_type -> oppb.v1.RegistrationDeleteRequest
-	41, // 43: oppb.v1.ProviderService.RegistrationGet:input_type -> oppb.v1.RegistrationGetRequest
-	1,  // 44: oppb.v1.ProviderService.Discovery:output_type -> oppb.v1.DiscoveryResponse
-	3,  // 45: oppb.v1.ProviderService.Jwks:output_type -> oppb.v1.JwksResponse
-	5,  // 46: oppb.v1.ProviderService.Authorization:output_type -> oppb.v1.AuthorizationResponse
-	7,  // 47: oppb.v1.ProviderService.AuthorizationIssue:output_type -> oppb.v1.AuthorizationIssueResponse
-	9,  // 48: oppb.v1.ProviderService.AuthorizationCancel:output_type -> oppb.v1.AuthorizationCancelResponse
-	11, // 49: oppb.v1.ProviderService.StartSession:output_type -> oppb.v1.StartSessionResponse
-	13, // 50: oppb.v1.ProviderService.Token:output_type -> oppb.v1.TokenResponse
-	15, // 51: oppb.v1.ProviderService.Userinfo:output_type -> oppb.v1.UserinfoResponse
-	17, // 52: oppb.v1.ProviderService.PushedAuthorization:output_type -> oppb.v1.PushedAuthorizationResponse
-	19, // 53: oppb.v1.ProviderService.Request:output_type -> oppb.v1.RequestResponse
-	42, // 54: oppb.v1.ProviderService.RegistrationCreate:output_type -> oppb.v1.RegistrationCreateResponse
-	43, // 55: oppb.v1.ProviderService.RegistrationDelete:output_type -> oppb.v1.RegistrationDeleteResponse
-	44, // 56: oppb.v1.ProviderService.RegistrationGet:output_type -> oppb.v1.RegistrationGetResponse
-	44, // [44:57] is the sub-list for method output_type
-	31, // [31:44] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	34, // 0: oppb.v1.JwksResponse.keys:type_name -> oppb.v1.Jwk
+	32, // 1: oppb.v1.AuthorizationRequest.sessions:type_name -> oppb.v1.AuthorizationRequest.SessionsEntry
+	20, // 2: oppb.v1.AuthorizationResponse.fail:type_name -> oppb.v1.AuthorizationFailResponse
+	22, // 3: oppb.v1.AuthorizationResponse.login:type_name -> oppb.v1.AuthorizationNextActionLogin
+	23, // 4: oppb.v1.AuthorizationResponse.issue:type_name -> oppb.v1.AuthorizationNextActionIssue
+	24, // 5: oppb.v1.AuthorizationResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
+	25, // 6: oppb.v1.AuthorizationResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
+	35, // 7: oppb.v1.AuthorizationResponse.params:type_name -> oppb.v1.AuthorizationParameters
+	36, // 8: oppb.v1.AuthorizationResponse.client:type_name -> oppb.v1.ClientMeta
+	37, // 9: oppb.v1.AuthorizationResponse.client_attribute:type_name -> oppb.v1.ClientAttribute
+	24, // 10: oppb.v1.AuthorizationIssueResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
+	25, // 11: oppb.v1.AuthorizationIssueResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
+	24, // 12: oppb.v1.AuthorizationCancelResponse.redirect:type_name -> oppb.v1.AuthorizationRedirectResponse
+	25, // 13: oppb.v1.AuthorizationCancelResponse.html:type_name -> oppb.v1.AuthorizationHtmlResponse
+	31, // 14: oppb.v1.TokenRequest.basic_auth:type_name -> oppb.v1.BasicAuth
+	26, // 15: oppb.v1.TokenResponse.success:type_name -> oppb.v1.TokenSuccessResponse
+	27, // 16: oppb.v1.TokenResponse.fail:type_name -> oppb.v1.TokenFailResponse
+	33, // 17: oppb.v1.UserinfoResponse.headers:type_name -> oppb.v1.UserinfoResponse.HeadersEntry
+	31, // 18: oppb.v1.PushedAuthorizationRequest.basic_auth:type_name -> oppb.v1.BasicAuth
+	28, // 19: oppb.v1.PushedAuthorizationResponse.success:type_name -> oppb.v1.PushedAuthorizationSuccessResponse
+	29, // 20: oppb.v1.PushedAuthorizationResponse.fail:type_name -> oppb.v1.PushedAuthorizationFailResponse
+	36, // 21: oppb.v1.RequestResponse.client:type_name -> oppb.v1.ClientMeta
+	35, // 22: oppb.v1.RequestResponse.auth_params:type_name -> oppb.v1.AuthorizationParameters
+	21, // 23: oppb.v1.AuthorizationFailResponse.error:type_name -> oppb.v1.AuthorizationErrorResponse
+	36, // 24: oppb.v1.AuthorizationNextActionLogin.client:type_name -> oppb.v1.ClientMeta
+	35, // 25: oppb.v1.AuthorizationNextActionLogin.auth_params:type_name -> oppb.v1.AuthorizationParameters
+	36, // 26: oppb.v1.AuthorizationNextActionIssue.client:type_name -> oppb.v1.ClientMeta
+	35, // 27: oppb.v1.AuthorizationNextActionIssue.auth_params:type_name -> oppb.v1.AuthorizationParameters
+	30, // 28: oppb.v1.TokenFailResponse.error:type_name -> oppb.v1.OauthError
+	30, // 29: oppb.v1.PushedAuthorizationFailResponse.error:type_name -> oppb.v1.OauthError
+	0,  // 30: oppb.v1.ProviderService.Discovery:input_type -> oppb.v1.DiscoveryRequest
+	2,  // 31: oppb.v1.ProviderService.Jwks:input_type -> oppb.v1.JwksRequest
+	4,  // 32: oppb.v1.ProviderService.Authorization:input_type -> oppb.v1.AuthorizationRequest
+	6,  // 33: oppb.v1.ProviderService.AuthorizationIssue:input_type -> oppb.v1.AuthorizationIssueRequest
+	8,  // 34: oppb.v1.ProviderService.AuthorizationCancel:input_type -> oppb.v1.AuthorizationCancelRequest
+	10, // 35: oppb.v1.ProviderService.StartSession:input_type -> oppb.v1.StartSessionRequest
+	12, // 36: oppb.v1.ProviderService.Token:input_type -> oppb.v1.TokenRequest
+	14, // 37: oppb.v1.ProviderService.Userinfo:input_type -> oppb.v1.UserinfoRequest
+	16, // 38: oppb.v1.ProviderService.PushedAuthorization:input_type -> oppb.v1.PushedAuthorizationRequest
+	18, // 39: oppb.v1.ProviderService.Request:input_type -> oppb.v1.RequestRequest
+	38, // 40: oppb.v1.ProviderService.RegistrationCreate:input_type -> oppb.v1.RegistrationCreateRequest
+	39, // 41: oppb.v1.ProviderService.RegistrationDelete:input_type -> oppb.v1.RegistrationDeleteRequest
+	40, // 42: oppb.v1.ProviderService.RegistrationGet:input_type -> oppb.v1.RegistrationGetRequest
+	1,  // 43: oppb.v1.ProviderService.Discovery:output_type -> oppb.v1.DiscoveryResponse
+	3,  // 44: oppb.v1.ProviderService.Jwks:output_type -> oppb.v1.JwksResponse
+	5,  // 45: oppb.v1.ProviderService.Authorization:output_type -> oppb.v1.AuthorizationResponse
+	7,  // 46: oppb.v1.ProviderService.AuthorizationIssue:output_type -> oppb.v1.AuthorizationIssueResponse
+	9,  // 47: oppb.v1.ProviderService.AuthorizationCancel:output_type -> oppb.v1.AuthorizationCancelResponse
+	11, // 48: oppb.v1.ProviderService.StartSession:output_type -> oppb.v1.StartSessionResponse
+	13, // 49: oppb.v1.ProviderService.Token:output_type -> oppb.v1.TokenResponse
+	15, // 50: oppb.v1.ProviderService.Userinfo:output_type -> oppb.v1.UserinfoResponse
+	17, // 51: oppb.v1.ProviderService.PushedAuthorization:output_type -> oppb.v1.PushedAuthorizationResponse
+	19, // 52: oppb.v1.ProviderService.Request:output_type -> oppb.v1.RequestResponse
+	41, // 53: oppb.v1.ProviderService.RegistrationCreate:output_type -> oppb.v1.RegistrationCreateResponse
+	42, // 54: oppb.v1.ProviderService.RegistrationDelete:output_type -> oppb.v1.RegistrationDeleteResponse
+	43, // 55: oppb.v1.ProviderService.RegistrationGet:output_type -> oppb.v1.RegistrationGetResponse
+	43, // [43:56] is the sub-list for method output_type
+	30, // [30:43] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_provider_service_proto_init() }
@@ -2385,7 +2383,6 @@ func file_oppb_v1_provider_service_proto_init() {
 	file_oppb_v1_authorization_parameters_proto_init()
 	file_oppb_v1_client_proto_init()
 	file_oppb_v1_client_meta_proto_init()
-	file_oppb_v1_issuer_meta_proto_init()
 	file_oppb_v1_jwks_proto_init()
 	file_oppb_v1_registration_proto_init()
 	file_oppb_v1_provider_service_proto_msgTypes[5].OneofWrappers = []any{

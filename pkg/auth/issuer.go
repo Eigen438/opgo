@@ -25,6 +25,7 @@ package auth
 import (
 	"context"
 	"crypto/subtle"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -36,6 +37,34 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func GetIssuer[T any](ctx context.Context, req *connect.Request[T]) (*model.Issuer, error) {
+	r := &http.Request{
+		Header: req.Header(),
+	}
+	username, password, ok := r.BasicAuth()
+	if !ok || username == "" {
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("missing provider authorization"))
+	}
+
+	iss := &model.Issuer{
+		Key: &oppb.CommonKey{
+			Id: username,
+		},
+	}
+	if err := dataprovider.Get(ctx, iss); err != nil {
+		if status.Code(err) == codes.NotFound {
+			return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("provider not found"))
+		} else {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("provider access error: "+err.Error()))
+		}
+	}
+	if !equal(password, iss.Secret.Password) {
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid provider password"))
+	}
+	return iss, nil
+}
+
+// Deprecated: use CheckIssuer or GetIssuer instead
 func CheckIssuer[T any](ctx context.Context, req *connect.Request[T]) *model.Issuer {
 	r := &http.Request{
 		Header: req.Header(),
