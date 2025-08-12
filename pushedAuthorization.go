@@ -80,7 +80,7 @@ func (i *innerSdk) pushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Re
 			for key, val := range httphelper.DefaultJsonHeader() {
 				w.Header().Add(key, val)
 			}
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusCreated)
 			w.Write(body)
 		}
 		return nil

@@ -222,7 +222,7 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 			// the OAuth 2.0 request syntax, since they are REQUIRED by OAuth 2.0.
 			// The values for these parameters MUST match those in the Request Object, if present.
 			//
-			if params.ResponseType != oldResponseType {
+			if len(oldResponseType) > 0 && params.ResponseType != oldResponseType {
 				return connect.NewResponse(&oppb.PushedAuthorizationResponse{
 					PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
 						Fail: &oppb.PushedAuthorizationFailResponse{
@@ -235,7 +235,7 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 					},
 				}), nil
 			}
-			if params.ClientId != oldClientId {
+			if len(oldClientId) > 0 && params.ClientId != oldClientId {
 				return connect.NewResponse(&oppb.PushedAuthorizationResponse{
 					PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
 						Fail: &oppb.PushedAuthorizationFailResponse{
