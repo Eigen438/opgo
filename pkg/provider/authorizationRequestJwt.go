@@ -26,7 +26,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -194,11 +193,15 @@ func parseJwt(ctx context.Context, client *oppb.ClientMeta, jwtString string, ou
 		if t.Header["alg"] == "none" {
 			return jwt.UnsafeAllowNoneSignatureType, nil
 		} else if len(client.JwksUri) > 0 {
-			u, err := url.Parse(client.JwksUri)
+			kf, err := keyfunc.NewDefault([]string{client.JwksUri})
 			if err != nil {
 				return nil, err
 			}
-			storage, err := jwkset.NewStorageFromHTTP(u.String(), jwkset.HTTPClientStorageOptions{})
+			return kf.Keyfunc(t)
+		} else if client.Jwks != nil {
+			var jwks jwkset.JWKSMarshal
+			jwks.Keys = convert.JWKMarchalsFromKeys(client.Jwks.Keys)
+			storage, err := jwks.ToStorage()
 			if err != nil {
 				return nil, err
 			}
@@ -206,38 +209,11 @@ func parseJwt(ctx context.Context, client *oppb.ClientMeta, jwtString string, ou
 			if err != nil {
 				return nil, err
 			}
-			f, err := keyfunc.NewJWKSetJSON(j)
+			kf, err := keyfunc.NewJWKSetJSON(j)
 			if err != nil {
 				return nil, err
 			}
-			return f.Keyfunc(t)
-		} else if client.Jwks != nil {
-			if len(client.Jwks.Keys) == 1 {
-				keys := convert.JWKMarchalsFromKeys(client.Jwks.Keys)
-				jwk, err := jwkset.NewJWKFromMarshal(keys[0], jwkset.JWKMarshalOptions{
-					Private: false,
-				}, jwkset.JWKValidateOptions{})
-				if err != nil {
-					return nil, err
-				}
-				return jwk.Key(), nil
-			} else {
-				var jwks jwkset.JWKSMarshal
-				jwks.Keys = convert.JWKMarchalsFromKeys(client.Jwks.Keys)
-				storage, err := jwks.ToStorage()
-				if err != nil {
-					return nil, err
-				}
-				j, err := storage.JSON(ctx)
-				if err != nil {
-					return nil, err
-				}
-				f, err := keyfunc.NewJWKSetJSON(j)
-				if err != nil {
-					return nil, err
-				}
-				return f.Keyfunc(t)
-			}
+			return kf.Keyfunc(t)
 		} else {
 			return nil, fmt.Errorf("no jwks/jwks_uri found for client %s", client.ClientName)
 		}
