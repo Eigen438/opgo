@@ -73,12 +73,12 @@ func main() {
 		RequestParameterSupported:         true,
 		RequestUriParameterSupported:      true,
 	}
-	s, err := opgo.NewHostedSdk(ctx, meta, testui.Callbacks{}, memstore)
+	sdk, err := opgo.NewHostedSdk(ctx, meta, testui.Callbacks{}, memstore)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := s.ClientCreate(ctx, opgo.ClientParam{
+	if err := sdk.ClientCreate(ctx, opgo.ClientParam{
 		ClientId:     "default",
 		ClientSecret: "secret",
 		Meta: &oppb.ClientMeta{
@@ -94,7 +94,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := s.ServeMux(&opgo.Paths{
+	mux := sdk.ServeMux(&opgo.Paths{
 		UseDiscovery:      true,
 		AuthorizationPath: opgo.DEFAULT_AUTHORIZATION_PATH,
 		TokenPath:         opgo.DEFAULT_TOKEN_PATH,
@@ -103,8 +103,7 @@ func main() {
 		RegistrationPath:  opgo.DEFAULT_REGISTRATION_PATH,
 	})
 	// Add provider-specific handlers
-	mux.HandleFunc("/login", testui.LoginHandler(s))
-	mux.HandleFunc("/cancel", testui.CancelHandler(s))
+	testui.AppendHandlerFunc(mux, sdk)
 
 	log.Printf("start server(port:%s)", port)
 

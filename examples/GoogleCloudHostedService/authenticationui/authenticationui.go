@@ -36,7 +36,8 @@ import (
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func SetupMux(mux *http.ServeMux) {
+func AppendHandlerFunc(mux *http.ServeMux, sdk opgo.Sdk) {
+	mux.HandleFunc("/api/login", loginHandler(sdk))
 	mux.HandleFunc("/web", indexHtmlHandler)
 	mux.HandleFunc("/api/config.json", configHandler)
 	mux.HandleFunc("/", webHandler)
@@ -45,14 +46,14 @@ func SetupMux(mux *http.ServeMux) {
 //go:embed web/index.html
 var indexHtml []byte
 
-//go:embed all:web
-var webFiles embed.FS
-
 func indexHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(httphelper.HeaderCacheControl, "no-cache, no-store, max-age=0, must-revalidate")
 	w.Header().Set(httphelper.HeaderContentType, httphelper.MimeTypeTextHtml+httphelper.DefaultCharSet)
 	w.Write(indexHtml)
 }
+
+//go:embed all:web
+var webFiles embed.FS
 
 func webHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(httphelper.HeaderCacheControl, "no-cache, no-store, max-age=0, must-revalidate")
@@ -66,10 +67,6 @@ func webHandler(w http.ResponseWriter, r *http.Request) {
 // Implement a handler to provide environment variables to the frontend
 // created as a single-page application.
 func configHandler(w http.ResponseWriter, r *http.Request) {
-	type config struct {
-		ApiKey     string `json:"apiKey"`
-		AuthDomain string `json:"authDomain"`
-	}
 	w.Header().Set(httphelper.HeaderCacheControl, "no-cache, no-store, max-age=0, must-revalidate")
 	w.Header().Set(httphelper.HeaderContentType, httphelper.MimeTypeJson+httphelper.DefaultCharSet)
 	apiKey := os.Getenv("FIREBASE_API_KEY")
@@ -81,17 +78,21 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	type config struct {
+		ApiKey     string `json:"apiKey"`
+		AuthDomain string `json:"authDomain"`
+	}
 	json.NewEncoder(w).Encode(config{
 		ApiKey:     apiKey,
 		AuthDomain: authDomain,
 	})
 }
 
-// LoginHandler
+// loginHandler
 //
 // Firebase handles authentication on the frontend,
 // and the authentication result (ID token) is used to construct the opgo flow.
-func LoginHandler(s opgo.Sdk) http.HandlerFunc {
+func loginHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 

@@ -36,36 +36,31 @@ import (
 	"github.com/Eigen438/opgo"
 )
 
-//go:embed login.html
-var loginHtml []byte
-
-type indexParams struct {
-	IsShowMessage bool
-	Message       string
-	RequestInfo   *opgo.RequestInfo
+func AppendHandlerFunc(mux *http.ServeMux, sdk opgo.Sdk) {
+	mux.HandleFunc("/login", loginHandler(sdk))
+	mux.HandleFunc("/cancel", cancelHandler(sdk))
 }
 
-func (p *indexParams) writeLoginHtml(w http.ResponseWriter) {
-	t := template.Must(template.New("default").Parse(string(loginHtml)))
-	if err := t.Execute(w, p); err != nil {
-		log.Printf("t.Execute err:" + err.Error())
-	}
-}
-
-func CancelHandler(s opgo.Sdk) http.HandlerFunc {
+func cancelHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// You need to get the requestId from the browser.
 		requestId := r.FormValue("request_id")
 		s.AuthorizationCancel(w, r, requestId)
 	}
 }
 
-func LoginHandler(s opgo.Sdk) http.HandlerFunc {
+func loginHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// You need to get the requestId from the browser.
 		requestId := r.FormValue("request_id")
 
 		if r.FormValue("username") == "user" && r.FormValue("password") == "pass" {
+			// In this example, only a specific user is authenticated and the subject is fixed,
+			// but in reality it is necessary to support logins by multiple users using a database or similar.
 			s.AuthorizationIssue(w, r, requestId, "abcdef12345")
+
 		} else {
+			// If login authentication fails, redraw the login html
 			c := Callbacks{
 				IsShowMessage: true,
 				Message:       "Username or password is incorrect.",
@@ -76,18 +71,30 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 }
 
 type Callbacks struct {
-	IsShowMessage bool
-	Message       string
+	IsShowMessage bool   // for WriteLoginHtmlCallback
+	Message       string // for WriteLoginHtmlCallback
 }
+
+//go:embed login.html
+var loginHtml []byte
 
 func (c Callbacks) WriteLoginHtmlCallback(info *opgo.RequestInfo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := indexParams{
+		type htmlParams struct {
+			IsShowMessage bool
+			Message       string
+			RequestInfo   *opgo.RequestInfo
+		}
+
+		p := htmlParams{
 			IsShowMessage: c.IsShowMessage,
 			Message:       c.Message,
 			RequestInfo:   info,
 		}
-		p.writeLoginHtml(w)
+		t := template.Must(template.New("default").Parse(string(loginHtml)))
+		if err := t.Execute(w, p); err != nil {
+			log.Printf("t.Execute err:" + err.Error())
+		}
 	}
 }
 
