@@ -123,11 +123,11 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 
 type Callbacks struct{}
 
-func (c Callbacks) WriteLoginHtmlCallback(param *opgo.WriteHtmlParam) http.HandlerFunc {
+func (c Callbacks) WriteLoginHtmlCallback(info *opgo.RequestInfo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		u := r.URL
 		q := u.Query()
-		q.Add("request_id", param.RequestId)
+		q.Add("request_id", info.RequestId)
 		http.Redirect(w, r, "/web?"+q.Encode(), http.StatusFound)
 	}
 }

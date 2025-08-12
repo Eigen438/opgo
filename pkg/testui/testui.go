@@ -42,7 +42,7 @@ var loginHtml []byte
 type indexParams struct {
 	IsShowMessage bool
 	Message       string
-	Param         *opgo.WriteHtmlParam
+	RequestInfo   *opgo.RequestInfo
 }
 
 func (p *indexParams) writeLoginHtml(w http.ResponseWriter) {
@@ -61,22 +61,16 @@ func CancelHandler(s opgo.Sdk) http.HandlerFunc {
 
 func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
 		requestId := r.FormValue("request_id")
 
 		if r.FormValue("username") == "user" && r.FormValue("password") == "pass" {
 			s.AuthorizationIssue(w, r, requestId, "abcdef12345")
 		} else {
-			param, err := s.GetWriteHtmlParam(ctx, requestId)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
 			c := Callbacks{
 				IsShowMessage: true,
 				Message:       "Username or password is incorrect.",
 			}
-			c.WriteLoginHtmlCallback(param).ServeHTTP(w, r)
+			s.WriteLoginHtml(w, r, requestId, c)
 		}
 	}
 }
@@ -86,12 +80,12 @@ type Callbacks struct {
 	Message       string
 }
 
-func (c Callbacks) WriteLoginHtmlCallback(param *opgo.WriteHtmlParam) http.HandlerFunc {
+func (c Callbacks) WriteLoginHtmlCallback(info *opgo.RequestInfo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := indexParams{
 			IsShowMessage: c.IsShowMessage,
 			Message:       c.Message,
-			Param:         param,
+			RequestInfo:   info,
 		}
 		p.writeLoginHtml(w)
 	}

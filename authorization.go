@@ -76,7 +76,7 @@ func (i *innerSdk) authorizationEndpoint(w http.ResponseWriter, r *http.Request)
 			}
 			w.Write([]byte(out.Content))
 		} else if out := res.Msg.GetLogin(); out != nil {
-			i.config.Callbacks.WriteLoginHtmlCallback(&WriteHtmlParam{
+			i.config.Callbacks.WriteLoginHtmlCallback(&RequestInfo{
 				RequestId:  out.RequestId,
 				Client:     out.Client,
 				AuthParams: out.AuthParams,

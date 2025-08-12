@@ -39,19 +39,34 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type WriteHtmlParam struct {
-	RequestId  string
-	Client     *oppb.ClientMeta
+// RequestInfo holds information about a request.
+type RequestInfo struct {
+	// RequestId is the unique identifier for the request.
+	RequestId string
+	// Client contains metadata about the client making the request.
+	Client *oppb.ClientMeta
+	// AuthParams contains the authorization parameters for the request.
 	AuthParams *oppb.AuthorizationParameters
 }
 
+// SdkCallbacks defines the callbacks for the SDK.
+// It includes methods for retrieving user claims and writing login HTML.
 type SdkCallbacks interface {
+	// GetUserClaimsCallback retrieves user claims(json string) for a given subject.
+	// ctx is the context for the request.
+	// subject is the subject for which to retrieve claims.
 	GetUserClaimsCallback(ctx context.Context, subject string) (string, error)
-	WriteLoginHtmlCallback(param *WriteHtmlParam) http.HandlerFunc
+
+	// WriteLoginHtmlCallback writes the login HTML response.
+	// info is the RequestInfo containing request details.
+	// It returns an http.HandlerFunc that serves the HTML response.
+	WriteLoginHtmlCallback(info *RequestInfo) http.HandlerFunc
 }
 
 type Sdk interface {
-	ServeMux(*Paths) *http.ServeMux
+	// ServeMux returns an http.ServeMux that handles the SDK's HTTP routes.
+	// paths is the Paths struct containing the paths for the SDK.
+	ServeMux(paths *Paths) *http.ServeMux
 
 	// AuthorizationIssue issues an authorization request.
 	// w is the http.ResponseWriter to write the response to.
@@ -65,7 +80,19 @@ type Sdk interface {
 	// r is the http.Request containing the request data.
 	// requestId is the ID of the authorization request to cancel.
 	AuthorizationCancel(w http.ResponseWriter, r *http.Request, requestId string)
-	GetWriteHtmlParam(context.Context, string) (*WriteHtmlParam, error)
+
+	// WriteLoginHtml writes the login HTML response.
+	// w is the http.ResponseWriter to write the HTML to.
+	// r is the http.Request containing the request data.
+	// requestId is the ID of the authorization request.
+	// callbacks is the SdkCallbacks interface to handle callbacks.
+	WriteLoginHtml(w http.ResponseWriter, r *http.Request, requestId string, callbacks SdkCallbacks)
+
+	// GetRequestInfo retrieves information about a request.
+	// ctx is the context for the request.
+	// requestId is the ID of the request to retrieve information for.
+	GetRequestInfo(ctx context.Context, requestId string) (*RequestInfo, error)
+
 	//
 	ClientCreate(context.Context, ClientParam) error
 	SessionGroupCreate(context.Context, *oppb.SessionGroupCreateRequest) error
@@ -161,6 +188,21 @@ func NewHostedSdk(
 		rest:     rest.NewRest(res.Key.Id, res.Secret.Password, true),
 	}
 	return i, nil
+}
+
+func (i *innerSdk) WriteLoginHtml(w http.ResponseWriter, r *http.Request, requestId string, callbacks SdkCallbacks) {
+	if callbacks == nil {
+		http.Error(w, "callbacks cannot be nil", http.StatusInternalServerError)
+		return
+	}
+
+	info, err := i.GetRequestInfo(r.Context(), requestId)
+	if err != nil {
+		http.Error(w, "failed to get write HTML param: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	callbacks.WriteLoginHtmlCallback(info).ServeHTTP(w, r)
 }
 
 func writeError(w http.ResponseWriter, err error) {
