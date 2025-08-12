@@ -21,7 +21,7 @@ Additionally, opgo can also function as an OP simulator using the provided sampl
 
 ### Prerequisites
 
-* Go 1.23.10 or higher
+* Go 1.23.12 or higher
 
 ### Installation
 
