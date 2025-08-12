@@ -24,7 +24,6 @@ package rest
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
@@ -36,7 +35,6 @@ import (
 	"github.com/Eigen438/opgo/internal/validate"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
-	"github.com/bufbuild/protovalidate-go"
 )
 
 func (rest *Rest) IssuerCreate(ctx context.Context,
@@ -170,8 +168,8 @@ func (rest *Rest) IssuerUpdate(ctx context.Context,
 	if iss := authn.GetInfo(ctx).(*model.Issuer); iss == nil {
 		return nil, authn.Errorf("invalid authorization(IssuerUpdate)")
 	} else {
-		if err := protovalidate.Validate(req.Msg); err != nil {
-			log.Printf("IssuerUpdate err:%v", err)
+		// Validate request
+		if err := validate.IssuerMeta(req.Msg.Meta); err != nil {
 			return nil, err
 		}
 
