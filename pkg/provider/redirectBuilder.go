@@ -65,7 +65,7 @@ func NewRedirectBuilder(iss *model.Issuer, client *model.Client, params *oppb.Au
 	}
 	table, ok := oauth.MappedResponseMode[params.ResponseType]
 	if !ok {
-		return nil, fmt.Errorf("unknown response_type(%s)", params.ResponseType)
+		table = oauth.MappedResponseMode[oauth.ResponseTypeNone]
 	}
 	mode, ok := table[params.ResponseMode]
 	if !ok {
