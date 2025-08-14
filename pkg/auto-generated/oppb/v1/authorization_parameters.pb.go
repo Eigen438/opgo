@@ -43,7 +43,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// TODO: remove client_assertion_type and client_assertion
 type AuthorizationParameters struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
@@ -65,9 +64,6 @@ type AuthorizationParameters struct {
 	ClaimsLocales string `protobuf:"bytes,15,opt,name=claims_locales,proto3" json:"claims_locales,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
 	Claims string `protobuf:"bytes,16,opt,name=claims,proto3" json:"claims,omitempty"`
-	// https://www.rfc-editor.org/rfc/rfc7521.html#section-4.2
-	ClientAssertionType string `protobuf:"bytes,17,opt,name=client_assertion_type,proto3" json:"client_assertion_type,omitempty"`
-	ClientAssertion     string `protobuf:"bytes,18,opt,name=client_assertion,proto3" json:"client_assertion,omitempty"`
 	// https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
 	CodeChallenge       string `protobuf:"bytes,19,opt,name=code_challenge,proto3" json:"code_challenge,omitempty"`
 	CodeChallengeMethod string `protobuf:"bytes,20,opt,name=code_challenge_method,proto3" json:"code_challenge_method,omitempty"`
@@ -223,20 +219,6 @@ func (x *AuthorizationParameters) GetClaims() string {
 	return ""
 }
 
-func (x *AuthorizationParameters) GetClientAssertionType() string {
-	if x != nil {
-		return x.ClientAssertionType
-	}
-	return ""
-}
-
-func (x *AuthorizationParameters) GetClientAssertion() string {
-	if x != nil {
-		return x.ClientAssertion
-	}
-	return ""
-}
-
 func (x *AuthorizationParameters) GetCodeChallenge() string {
 	if x != nil {
 		return x.CodeChallenge
@@ -283,7 +265,7 @@ var File_oppb_v1_authorization_parameters_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\n" +
-	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xab\x06\n" +
+	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xc9\x05\n" +
 	"\x17AuthorizationParameters\x12\x16\n" +
 	"\x06scopes\x18\x01 \x03(\tR\x06scopes\x12$\n" +
 	"\rresponse_type\x18\x02 \x01(\tR\rresponse_type\x12\x1c\n" +
@@ -307,9 +289,7 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"acr_values\x18\x0e \x03(\tR\n" +
 	"acr_values\x12&\n" +
 	"\x0eclaims_locales\x18\x0f \x01(\tR\x0eclaims_locales\x12\x16\n" +
-	"\x06claims\x18\x10 \x01(\tR\x06claims\x124\n" +
-	"\x15client_assertion_type\x18\x11 \x01(\tR\x15client_assertion_type\x12*\n" +
-	"\x10client_assertion\x18\x12 \x01(\tR\x10client_assertion\x12&\n" +
+	"\x06claims\x18\x10 \x01(\tR\x06claims\x12&\n" +
 	"\x0ecode_challenge\x18\x13 \x01(\tR\x0ecode_challenge\x124\n" +
 	"\x15code_challenge_method\x18\x14 \x01(\tR\x15code_challenge_method\x12\x18\n" +
 	"\arequest\x18\x15 \x01(\tR\arequest\x12 \n" +

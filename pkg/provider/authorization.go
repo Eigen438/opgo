@@ -217,8 +217,6 @@ func parseParams(parseTarget string) *oppb.AuthorizationParameters {
 		AcrValues:           []string{},
 		ClaimsLocales:       vals.Get("claims_locales"),
 		Claims:              vals.Get("claims"),
-		ClientAssertionType: vals.Get("client_assertion_type"),
-		ClientAssertion:     vals.Get("client_assertion"),
 		CodeChallenge:       vals.Get("code_challenge"),
 		CodeChallengeMethod: vals.Get("code_challenge_method"),
 		Request:             vals.Get("request"),

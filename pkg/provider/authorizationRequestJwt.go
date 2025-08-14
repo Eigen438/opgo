@@ -81,7 +81,6 @@ func analyzeAuthorizationRequestJwt(
 		authParam.AcrValues = []string{}
 		authParam.Claims = ""
 		authParam.ClientId = ""
-		authParam.ClientAssertion = ""
 		authParam.CodeChallenge = ""
 		authParam.CodeChallengeMethod = ""
 		authParam.Display = ""

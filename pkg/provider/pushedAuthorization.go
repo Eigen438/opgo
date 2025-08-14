@@ -46,7 +46,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// TODO: need mofity client assertion like token endpoint
 func (p *Provider) PushedAuthorization(ctx context.Context,
 	req *connect.Request[oppb.PushedAuthorizationRequest]) (*connect.Response[oppb.PushedAuthorizationResponse], error) {
 	if iss, err := auth.GetIssuer(ctx, req); err != nil {
@@ -100,15 +99,18 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 			}), nil
 		}
 
+		vals := query.Parse(req.Msg.Form)
+		clientAssertion := vals.Get("client_assertion")
+
 		// Identify client_id
 		clientId := ""
 		if len(params.ClientId) > 0 {
 			// Use client_id if present
 			clientId = params.ClientId
-		} else if len(params.ClientAssertion) > 0 {
+		} else if len(clientAssertion) > 0 {
 			// Get from client_assertion
 			rc := &jwt.RegisteredClaims{}
-			_, _, err := jwt.NewParser().ParseUnverified(params.ClientAssertion, rc)
+			_, _, err := jwt.NewParser().ParseUnverified(clientAssertion, rc)
 			if err != nil {
 				return connect.NewResponse(&oppb.PushedAuthorizationResponse{
 					PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
@@ -116,7 +118,7 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 							StatusCode: http.StatusBadRequest,
 							Error: &oppb.OauthError{
 								Error:            oauth.TokenErrorInvalidRequest,
-								ErrorDescription: "Could not parse client_assertion:" + params.ClientAssertion,
+								ErrorDescription: "Could not parse client_assertion:" + clientAssertion,
 							},
 						},
 					},

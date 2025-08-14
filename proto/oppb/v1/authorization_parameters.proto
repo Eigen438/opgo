@@ -26,7 +26,6 @@ package oppb.v1;
 
 option go_package = "github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb";
 
-// TODO: remove client_assertion_type and client_assertion
 message AuthorizationParameters {
   // https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
   repeated string scopes = 1 [json_name = "scopes"];
@@ -47,9 +46,6 @@ message AuthorizationParameters {
   string claims_locales = 15 [json_name = "claims_locales"];
   // https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
   string claims = 16 [json_name = "claims"];
-  // https://www.rfc-editor.org/rfc/rfc7521.html#section-4.2
-  string client_assertion_type = 17 [json_name = "client_assertion_type"];
-  string client_assertion = 18 [json_name = "client_assertion"];
   // https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
   string code_challenge = 19 [json_name = "code_challenge"];
   string code_challenge_method = 20 [json_name = "code_challenge_method"];
