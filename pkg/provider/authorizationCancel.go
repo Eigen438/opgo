@@ -60,7 +60,7 @@ func (p *Provider) AuthorizationCancel(ctx context.Context,
 			return nil, err
 		}
 
-		res, err := makeFailResponse(ctx, iss, r.Details.Client, r.Details.AuthParams, failAuthorizationLoginRequired())
+		res, err := makeFailResponse(ctx, iss, r.Details.Client, r.Details.AuthParams, failAuthorizationAccessDenied())
 		if err != nil {
 			return nil, err
 		}

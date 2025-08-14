@@ -25,16 +25,16 @@ package opgo
 import "net/http"
 
 const (
-	DEFAULT_AUTHORIZATION_PATH        = "/authorize"
 	DEFAULT_DISCOVERY_PATH            = "/.well-known/openid-configuration"
 	DEFAULT_JWKS_PATH                 = "/.well-known/jwks.json"
+	DEFAULT_AUTHORIZATION_PATH        = "/authorize"
 	DEFAULT_TOKEN_PATH                = "/token"
 	DEFAULT_USERINFO_PATH             = "/userinfo"
 	DEFAULT_REGISTRATION_PATH         = "/registration"
 	DEFAULT_PUSHED_AUTHORIZATION_PATH = "/par"
 )
 
-type Paths struct {
+type SetupHelper struct {
 	UseDiscovery            bool
 	AuthorizationPath       string
 	TokenPath               string
@@ -44,57 +44,8 @@ type Paths struct {
 	PushedAuthorizationPath string
 }
 
-func (p *Paths) useDiscovery() bool {
-	if p == nil {
-		return true
-	}
-	return p.UseDiscovery
-}
-
-func (p *Paths) authorizationPath() string {
-	if p == nil || p.AuthorizationPath == "" {
-		return DEFAULT_AUTHORIZATION_PATH
-	}
-	return p.AuthorizationPath
-}
-
-func (p *Paths) tokenPath() string {
-	if p == nil || p.TokenPath == "" {
-		return DEFAULT_TOKEN_PATH
-	}
-	return p.TokenPath
-}
-
-func (p *Paths) userinfoPath() string {
-	if p == nil {
-		return ""
-	}
-	return p.UserinfoPath
-}
-
-func (p *Paths) jwksPath() string {
-	if p == nil {
-		return ""
-	}
-	return p.JwksPath
-}
-
-func (p *Paths) registrationPath() string {
-	if p == nil {
-		return ""
-	}
-	return p.RegistrationPath
-}
-
-func (p *Paths) pushedAuthorizationPath() string {
-	if p == nil {
-		return ""
-	}
-	return p.PushedAuthorizationPath
-}
-
-func DefaultPaths() *Paths {
-	return &Paths{
+func DefaultPaths() *SetupHelper {
+	return &SetupHelper{
 		UseDiscovery:      false,
 		AuthorizationPath: DEFAULT_AUTHORIZATION_PATH,
 		TokenPath:         DEFAULT_TOKEN_PATH,
@@ -102,24 +53,58 @@ func DefaultPaths() *Paths {
 	}
 }
 
-func (i *innerSdk) ServeMux(paths *Paths) *http.ServeMux {
+func (helper SetupHelper) useDiscovery() bool {
+	return helper.UseDiscovery
+}
+
+func (helper SetupHelper) authorizationPath() string {
+	if helper.AuthorizationPath == "" {
+		return DEFAULT_AUTHORIZATION_PATH
+	}
+	return helper.AuthorizationPath
+}
+
+func (helper SetupHelper) tokenPath() string {
+	if helper.TokenPath == "" {
+		return DEFAULT_TOKEN_PATH
+	}
+	return helper.TokenPath
+}
+
+func (helper SetupHelper) jwksPath() string {
+	return helper.JwksPath
+}
+
+func (helper SetupHelper) userinfoPath() string {
+	return helper.UserinfoPath
+}
+
+func (helper SetupHelper) registrationPath() string {
+	return helper.RegistrationPath
+}
+
+func (helper SetupHelper) pushedAuthorizationPath() string {
+	return helper.PushedAuthorizationPath
+}
+
+func (p *SetupHelper) NewServeMux(sdk Sdk) *http.ServeMux {
 	mux := http.NewServeMux()
-	if paths.useDiscovery() {
-		mux.HandleFunc(DEFAULT_DISCOVERY_PATH, i.discoveryEndpoint)
+	if p.useDiscovery() {
+		mux.HandleFunc(DEFAULT_DISCOVERY_PATH, sdk.DiscoveryEndpoint)
 	}
-	mux.HandleFunc(paths.authorizationPath(), i.authorizationEndpoint)
-	mux.HandleFunc(paths.tokenPath(), i.tokenEndpoint)
-	if paths.jwksPath() != "" {
-		mux.HandleFunc(paths.jwksPath(), i.jwksEndpoint)
+	mux.HandleFunc(p.authorizationPath(), sdk.AuthorizationEndpoint)
+	mux.HandleFunc(p.tokenPath(), sdk.TokenEndpoint)
+	if p.jwksPath() != "" {
+		mux.HandleFunc(p.jwksPath(), sdk.JwksEndpoint)
 	}
-	if paths.userinfoPath() != "" {
-		mux.HandleFunc(paths.userinfoPath(), i.userinfoEndpoint)
+	if p.userinfoPath() != "" {
+		mux.HandleFunc(p.userinfoPath(), sdk.UserinfoEndpoint)
 	}
-	if paths.registrationPath() != "" {
-		mux.HandleFunc(paths.registrationPath(), i.registrationEndpoint)
+	if p.registrationPath() != "" {
+		mux.HandleFunc(p.registrationPath(), sdk.RegistrationEndpoint)
 	}
-	if paths.pushedAuthorizationPath() != "" {
-		mux.HandleFunc(paths.pushedAuthorizationPath(), i.pushedAuthorizationEndpoint)
+	if p.pushedAuthorizationPath() != "" {
+		mux.HandleFunc(p.pushedAuthorizationPath(), sdk.PushedAuthorizationEndpoint)
 	}
 	return mux
 }

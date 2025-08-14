@@ -33,7 +33,7 @@ import (
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func (i *innerSdk) pushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) PushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err := func() error {
 		ctx := r.Context()
 		req := connect.NewRequest(&oppb.PushedAuthorizationRequest{

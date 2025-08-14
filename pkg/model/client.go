@@ -37,10 +37,11 @@ import (
 )
 
 type Client struct {
-	Identity  *oppb.ClientIdentity
-	Issuer    *oppb.CommonKey
-	Meta      *oppb.ClientMeta
-	Attribute *oppb.ClientAttribute
+	Identity   *oppb.ClientIdentity
+	Issuer     *oppb.CommonKey
+	Meta       *oppb.ClientMeta
+	Attribute  *oppb.ClientAttribute
+	Extensions *oppb.ClientExtensions
 }
 
 func GetClientCollectionName(issuerId string) string {
@@ -133,7 +134,8 @@ func MakeDefaultClient(iss *Issuer, clientId string, sessionGroupId string, now 
 			RefreshTokenLifetimeSeconds:      7200,
 			RequestLifetimeSeconds:           86400,
 			SessionGroupId:                   sessionGroupId,
-			//
+		},
+		Extensions: &oppb.ClientExtensions{
 			Profile:               oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_UNSPECIFIED,
 			TlsClientCertificates: []string{},
 		},

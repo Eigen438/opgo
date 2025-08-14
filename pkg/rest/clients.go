@@ -82,10 +82,11 @@ func (rest *Rest) ClientCreate(ctx context.Context,
 		}
 
 		client := &model.Client{
-			Identity:  req.Msg.Identity,
-			Issuer:    iss.Key,
-			Meta:      req.Msg.Meta,
-			Attribute: req.Msg.Attribute,
+			Identity:   req.Msg.Identity,
+			Issuer:     iss.Key,
+			Meta:       req.Msg.Meta,
+			Attribute:  req.Msg.Attribute,
+			Extensions: req.Msg.Extensions,
 		}
 
 		if rest.isSingleTenant {
@@ -99,9 +100,10 @@ func (rest *Rest) ClientCreate(ctx context.Context,
 		}
 
 		return connect.NewResponse(&oppb.ClientCreateResponse{
-			Identity:  req.Msg.Identity,
-			Meta:      req.Msg.Meta,
-			Attribute: req.Msg.Attribute,
+			Identity:   req.Msg.Identity,
+			Meta:       req.Msg.Meta,
+			Attribute:  req.Msg.Attribute,
+			Extensions: req.Msg.Extensions,
 		}), nil
 	}
 }

@@ -36,6 +36,7 @@ type ClientParam struct {
 	ClientSecret string
 	Meta         *oppb.ClientMeta
 	Attribute    *oppb.ClientAttribute
+	Extensions   *oppb.ClientExtensions
 }
 
 func (i *innerSdk) ClientCreate(ctx context.Context, param ClientParam) error {
@@ -46,20 +47,31 @@ func (i *innerSdk) ClientCreate(ctx context.Context, param ClientParam) error {
 		if param.Meta == nil {
 			return fmt.Errorf("param.Meta is required")
 		}
-		req := connect.NewRequest(&oppb.ClientCreateRequest{
-			Identity: &oppb.ClientIdentity{
-				ClientId:     param.ClientId,
-				ClientSecret: param.ClientSecret,
-			},
-			Meta: param.Meta,
-			Attribute: &oppb.ClientAttribute{
+		if param.Attribute == nil {
+			param.Attribute = &oppb.ClientAttribute{
 				AccessTokenLifetimeSeconds:       3600,
 				IdTokenLifetimeSeconds:           3600,
 				RefreshTokenLifetimeSeconds:      7200,
 				AuthorizationCodeLifetimeSeconds: 60,
 				RequestLifetimeSeconds:           86400,
 				SessionGroupId:                   param.ClientId,
+			}
+		}
+		if param.Extensions == nil {
+			param.Extensions = &oppb.ClientExtensions{
+				Profile:               oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_UNSPECIFIED,
+				TlsClientCertificates: []string{},
+			}
+		}
+
+		req := connect.NewRequest(&oppb.ClientCreateRequest{
+			Identity: &oppb.ClientIdentity{
+				ClientId:     param.ClientId,
+				ClientSecret: param.ClientSecret,
 			},
+			Meta:       param.Meta,
+			Attribute:  param.Attribute,
+			Extensions: param.Extensions,
 		})
 		auth.SetAuth(req, i)
 		_, err := i.rest.ClientCreate(ctx, req)

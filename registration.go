@@ -35,7 +35,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-func (i *innerSdk) registrationEndpoint(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) RegistrationEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err := func() error {
 		ctx := r.Context()
 		switch r.Method {

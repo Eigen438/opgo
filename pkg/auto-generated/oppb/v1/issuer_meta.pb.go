@@ -46,6 +46,7 @@ const (
 // The order of the descriptions should follow the RFC they were cited from.
 type IssuerMeta struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// https://tex2e.github.io/rfc-translater/html/rfc8414.html#2--Authorization-Server-Metadata
 	// issuer
 	// REQUIRED. URL using the https scheme with no query or fragment components that the OP asserts as its Issuer Identifier.
 	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`

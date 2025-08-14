@@ -124,6 +124,22 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 				if err := dataprovider.Create(ctx, authCode); err != nil {
 					return err
 				}
+
+				if r.Details.AuthParams.IsPar {
+					// https://www.rfc-editor.org/rfc/rfc9126.html#section-7.3
+					// An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with
+					// such attacks, the authorization server SHOULD make the request URIs one-time use.
+					par := &model.PushedAuthorization{
+						Params: &oppb.AuthorizationParameters{
+							ParKey: r.Details.AuthParams.ParKey,
+						},
+						Client: r.Details.Client,
+					}
+					if err := dataprovider.Delete(ctx, par); err != nil {
+						return err
+					}
+				}
+
 				// リクエスト情報を削除する
 				return dataprovider.Delete(ctx, r)
 			}); err != nil {
@@ -185,15 +201,15 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 		vals["session_state"] = getSessionState(r.Details.Client.Issuer.Id, r.Details.Client.Identity.ClientId, req.Msg.SessionId)
 		vals["state"] = success.State
 
-		builder, fail := NewRedirectBuilder(iss, r.Details.Client, r.Details.AuthParams, vals)
-		if fail != nil {
+		builder, err := NewRedirectBuilder(iss, r.Details.Client, r.Details.AuthParams, vals)
+		if err != nil {
 			log.Printf("[BACKEND_ERROR] redirect build error")
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("redirect build errror1"))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("NewRedirectBuilder error: %v", err))
 		}
 		out, err := builder.Build(ctx, time.Now())
 		if err != nil {
 			log.Printf("[BACKEND_ERROR] redirect build error: %v", err)
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("redirect build errror2"))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("builder.Build error: %v", err))
 		}
 		if builder.IsFormPost() {
 			return connect.NewResponse(&oppb.AuthorizationIssueResponse{

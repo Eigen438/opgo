@@ -32,7 +32,7 @@ import (
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func (i *innerSdk) userinfoEndpoint(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) UserinfoEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err := func() error {
 		req := connect.NewRequest(&oppb.UserinfoRequest{
 			Authorization:        r.Header.Get(httphelper.HeaderAuthorization),

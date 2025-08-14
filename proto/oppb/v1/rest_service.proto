@@ -92,12 +92,14 @@ message ClientCreateRequest {
   ClientIdentity identity = 1 [json_name = "identity"];
   ClientMeta meta = 2 [json_name = "mata"];
   ClientAttribute attribute = 3 [json_name = "attribute"];
+  ClientExtensions extensions = 4 [json_name = "extensions"];
 }
 
 message ClientCreateResponse {
   ClientIdentity identity = 1 [json_name = "identity"];
   ClientMeta meta = 2 [json_name = "mata"];
   ClientAttribute attribute = 3 [json_name = "attribute"];
+  ClientExtensions extensions = 4 [json_name = "extensions"];
 }
 
 message SessionGroupCreateRequest {

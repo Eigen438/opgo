@@ -64,9 +64,13 @@ type SdkCallbacks interface {
 }
 
 type Sdk interface {
-	// ServeMux returns an http.ServeMux that handles the SDK's HTTP routes.
-	// paths is the Paths struct containing the paths for the SDK.
-	ServeMux(paths *Paths) *http.ServeMux
+	DiscoveryEndpoint(w http.ResponseWriter, r *http.Request)
+	JwksEndpoint(w http.ResponseWriter, r *http.Request)
+	AuthorizationEndpoint(w http.ResponseWriter, r *http.Request)
+	TokenEndpoint(w http.ResponseWriter, r *http.Request)
+	UserinfoEndpoint(w http.ResponseWriter, r *http.Request)
+	RegistrationEndpoint(w http.ResponseWriter, r *http.Request)
+	PushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Request)
 
 	// AuthorizationIssue issues an authorization request.
 	// w is the http.ResponseWriter to write the response to.

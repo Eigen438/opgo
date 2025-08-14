@@ -26,6 +26,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -45,6 +46,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// TODO: need mofity client assertion like token endpoint
 func (p *Provider) PushedAuthorization(ctx context.Context,
 	req *connect.Request[oppb.PushedAuthorizationRequest]) (*connect.Response[oppb.PushedAuthorizationResponse], error) {
 	if iss, err := auth.GetIssuer(ctx, req); err != nil {
@@ -248,11 +250,42 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 					},
 				}), nil
 			}
+
+			// Reject if request_uri is present in the request.
+			// https://www.rfc-editor.org/rfc/rfc9126.html#section-2.1
+			if len(params.RequestUri) > 0 {
+				return connect.NewResponse(&oppb.PushedAuthorizationResponse{
+					PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
+						Fail: &oppb.PushedAuthorizationFailResponse{
+							StatusCode: http.StatusBadRequest,
+							Error: &oppb.OauthError{
+								Error:            oauth.AuthorizationErrorInvalidRequestObject,
+								ErrorDescription: "Denied request_uri parameter:" + params.RequestUri,
+							},
+						},
+					},
+				}), nil
+			}
 		}
 
 		// redirect_uri check
 		if len(client.Meta.RedirectUris) > 0 {
-			if !slices.Contains(client.Meta.RedirectUris, params.RedirectUri) {
+			u, err := url.Parse(params.RedirectUri)
+			if err != nil {
+				return connect.NewResponse(&oppb.PushedAuthorizationResponse{
+					PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
+						Fail: &oppb.PushedAuthorizationFailResponse{
+							StatusCode: http.StatusBadRequest,
+							Error: &oppb.OauthError{
+								Error:            oauth.TokenErrorInvalidRequest,
+								ErrorDescription: "redirect_uri parse error",
+							},
+						},
+					},
+				}), nil
+			}
+
+			if !slices.Contains(client.Meta.RedirectUris, u.Scheme+"://"+u.Host+u.Path) {
 				return connect.NewResponse(&oppb.PushedAuthorizationResponse{
 					PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
 						Fail: &oppb.PushedAuthorizationFailResponse{
@@ -267,6 +300,9 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 			}
 		}
 
+		// set par flag
+		params.IsPar = true
+
 		var pa *model.PushedAuthorization
 		if err := retryhelper.RetryIfError(ctx, retryCount, func(ctx context.Context) error {
 			// Generate PAR information
@@ -274,10 +310,8 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 			if err != nil {
 				return err
 			}
+			params.ParKey = pushId
 			pa = &model.PushedAuthorization{
-				Key: &oppb.CommonKey{
-					Id: pushId,
-				},
 				Client:   client,
 				Params:   params,
 				CreateAt: time.Now(),
@@ -291,7 +325,7 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 		return connect.NewResponse(&oppb.PushedAuthorizationResponse{
 			PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Success{
 				Success: &oppb.PushedAuthorizationSuccessResponse{
-					RequestUri: oauth.SchemeRequestURI + pa.Key.Id,
+					RequestUri: oauth.SchemeRequestURI + pa.Params.ParKey,
 					ExpiresIn:  60,
 				},
 			},

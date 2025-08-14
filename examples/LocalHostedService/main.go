@@ -94,14 +94,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := sdk.ServeMux(&opgo.Paths{
+	// Create ServeMux
+	setup := opgo.SetupHelper{
 		UseDiscovery:      true,
 		AuthorizationPath: opgo.DEFAULT_AUTHORIZATION_PATH,
 		TokenPath:         opgo.DEFAULT_TOKEN_PATH,
 		UserinfoPath:      opgo.DEFAULT_USERINFO_PATH,
 		JwksPath:          opgo.DEFAULT_JWKS_PATH,
 		RegistrationPath:  opgo.DEFAULT_REGISTRATION_PATH,
-	})
+	}
+	mux := setup.NewServeMux(sdk)
+
 	// Add provider-specific handlers
 	testui.AppendHandlerFunc(mux, sdk)
 

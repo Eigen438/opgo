@@ -33,7 +33,7 @@ import (
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func (i *innerSdk) tokenEndpoint(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) TokenEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err := func() error {
 		ctx := r.Context()
 		req := connect.NewRequest(&oppb.TokenRequest{

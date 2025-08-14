@@ -58,6 +58,7 @@ type authorizationRequestParamFromJwt struct {
 	Scope               string           `json:"scope"`
 	State               string           `json:"state"`
 	UiLocales           string           `json:"ui_locales"`
+	RequestUri          string           `json:"request_uri"`
 	jwt.RegisteredClaims
 }
 
@@ -74,7 +75,7 @@ func analyzeAuthorizationRequestJwt(
 		return failAuthorizationInvalidRequestObject("request object parse error")
 	}
 
-	if client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
+	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
 		// https://openid.net/specs/openid-financial-api-part-2-1_0-final.html#authorization-server
 		// FAPIの場合はrequest/request_uri指定のパラメータのみを信用するため一旦空にする
 		authParam.AcrValues = []string{}
@@ -147,10 +148,12 @@ func analyzeAuthorizationRequestJwt(
 		authParam.UiLocales = strings.Split(arp.UiLocales, " ")
 	}
 
+	authParam.RequestUri = arp.RequestUri
+
 	// https://openid.net/specs/openid-financial-api-part-2-1_0.html#algorithm-considerations
 	// FAPIではクライアントjwtの署名アルゴリズムは制限がある
-	if client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
-		client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
+	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
+		client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
 		if slices.Contains(fapiRejectionAlg, fmt.Sprintf("%v", token.Header["alg"])) {
 			return failAuthorizationInvalidRequestObject("rsigning alg not allow")
 		}

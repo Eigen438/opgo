@@ -106,8 +106,8 @@ func (b *RedirectBuilder) Build(ctx context.Context, now time.Time) (string, err
 		b.Values = map[string]string{"response": response}
 	}
 
-	if b.responseMode == oauth.ResponseModeQuery ||
-		b.responseMode == oauth.ResponseModeQueryJwt {
+	switch b.responseMode {
+	case oauth.ResponseModeQuery, oauth.ResponseModeQueryJwt:
 		q := b.RedirectUri.Query()
 		for k, v := range b.Values {
 			if len(v) > 0 {
@@ -116,8 +116,7 @@ func (b *RedirectBuilder) Build(ctx context.Context, now time.Time) (string, err
 		}
 		b.RedirectUri.RawQuery = q.Encode()
 		return b.RedirectUri.String(), nil
-	} else if b.responseMode == oauth.ResponseModeFragment ||
-		b.responseMode == oauth.ResponseModeFragmentJwt {
+	case oauth.ResponseModeFragment, oauth.ResponseModeFragmentJwt:
 		fragment := ""
 		for k, v := range b.Values {
 			if len(v) > 0 {
@@ -131,8 +130,7 @@ func (b *RedirectBuilder) Build(ctx context.Context, now time.Time) (string, err
 		}
 		b.RedirectUri.Fragment = fragment
 		return b.RedirectUri.String(), nil
-	} else if b.responseMode == oauth.ResponseModeFormPost ||
-		b.responseMode == oauth.ResponseModeFormPostJwt {
+	case oauth.ResponseModeFormPost, oauth.ResponseModeFormPostJwt:
 		t, err := template.New("FormPost").Parse(formPostHtml)
 		if err != nil {
 			return "", err
@@ -140,7 +138,7 @@ func (b *RedirectBuilder) Build(ctx context.Context, now time.Time) (string, err
 		buf := &bytes.Buffer{}
 		err = t.Execute(buf, b)
 		return buf.String(), err
-	} else {
+	default:
 		return "", fmt.Errorf("unknown response_mode")
 	}
 }

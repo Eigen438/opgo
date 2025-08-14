@@ -43,6 +43,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// TODO: remove client_assertion_type and client_assertion
 type AuthorizationParameters struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
@@ -71,8 +72,11 @@ type AuthorizationParameters struct {
 	CodeChallenge       string `protobuf:"bytes,19,opt,name=code_challenge,proto3" json:"code_challenge,omitempty"`
 	CodeChallengeMethod string `protobuf:"bytes,20,opt,name=code_challenge_method,proto3" json:"code_challenge_method,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
-	Request       string `protobuf:"bytes,21,opt,name=request,proto3" json:"request,omitempty"`
-	RequestUri    string `protobuf:"bytes,22,opt,name=request_uri,proto3" json:"request_uri,omitempty"`
+	Request    string `protobuf:"bytes,21,opt,name=request,proto3" json:"request,omitempty"`
+	RequestUri string `protobuf:"bytes,22,opt,name=request_uri,proto3" json:"request_uri,omitempty"`
+	// custom parameter
+	IsPar         bool   `protobuf:"varint,50,opt,name=is_par,json=isPar,proto3" json:"is_par,omitempty"`
+	ParKey        string `protobuf:"bytes,51,opt,name=par_key,json=parKey,proto3" json:"par_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -261,11 +265,25 @@ func (x *AuthorizationParameters) GetRequestUri() string {
 	return ""
 }
 
+func (x *AuthorizationParameters) GetIsPar() bool {
+	if x != nil {
+		return x.IsPar
+	}
+	return false
+}
+
+func (x *AuthorizationParameters) GetParKey() string {
+	if x != nil {
+		return x.ParKey
+	}
+	return ""
+}
+
 var File_oppb_v1_authorization_parameters_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\n" +
-	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xfb\x05\n" +
+	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xab\x06\n" +
 	"\x17AuthorizationParameters\x12\x16\n" +
 	"\x06scopes\x18\x01 \x03(\tR\x06scopes\x12$\n" +
 	"\rresponse_type\x18\x02 \x01(\tR\rresponse_type\x12\x1c\n" +
@@ -295,7 +313,9 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\x0ecode_challenge\x18\x13 \x01(\tR\x0ecode_challenge\x124\n" +
 	"\x15code_challenge_method\x18\x14 \x01(\tR\x15code_challenge_method\x12\x18\n" +
 	"\arequest\x18\x15 \x01(\tR\arequest\x12 \n" +
-	"\vrequest_uri\x18\x16 \x01(\tR\vrequest_uriB\xa2\x01\n" +
+	"\vrequest_uri\x18\x16 \x01(\tR\vrequest_uri\x12\x15\n" +
+	"\x06is_par\x182 \x01(\bR\x05isPar\x12\x17\n" +
+	"\apar_key\x183 \x01(\tR\x06parKeyB\xa2\x01\n" +
 	"\vcom.oppb.v1B\x1cAuthorizationParametersProtoP\x01Z8github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb\xa2\x02\x03OXX\xaa\x02\aOppb.V1\xca\x02\aOppb\\V1\xe2\x02\x13Oppb\\V1\\GPBMetadata\xea\x02\bOppb::V1b\x06proto3"
 
 var (
