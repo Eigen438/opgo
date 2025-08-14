@@ -99,7 +99,8 @@ type ClientAttribute struct {
 	IdTokenLifetimeSeconds           int32                  `protobuf:"varint,3,opt,name=id_token_lifetime_seconds,proto3" json:"id_token_lifetime_seconds,omitempty"`
 	RefreshTokenLifetimeSeconds      int32                  `protobuf:"varint,4,opt,name=refresh_token_lifetime_seconds,proto3" json:"refresh_token_lifetime_seconds,omitempty"`
 	RequestLifetimeSeconds           int32                  `protobuf:"varint,5,opt,name=request_lifetime_seconds,proto3" json:"request_lifetime_seconds,omitempty"`
-	SessionGroupId                   string                 `protobuf:"bytes,6,opt,name=session_group_id,proto3" json:"session_group_id,omitempty"`
+	JwtResponseLifetimeSeconds       int32                  `protobuf:"varint,6,opt,name=jwt_response_lifetime_seconds,proto3" json:"jwt_response_lifetime_seconds,omitempty"`
+	SessionGroupId                   string                 `protobuf:"bytes,10,opt,name=session_group_id,proto3" json:"session_group_id,omitempty"`
 	unknownFields                    protoimpl.UnknownFields
 	sizeCache                        protoimpl.SizeCache
 }
@@ -165,6 +166,13 @@ func (x *ClientAttribute) GetRefreshTokenLifetimeSeconds() int32 {
 func (x *ClientAttribute) GetRequestLifetimeSeconds() int32 {
 	if x != nil {
 		return x.RequestLifetimeSeconds
+	}
+	return 0
+}
+
+func (x *ClientAttribute) GetJwtResponseLifetimeSeconds() int32 {
+	if x != nil {
+		return x.JwtResponseLifetimeSeconds
 	}
 	return 0
 }
@@ -308,14 +316,16 @@ var File_oppb_v1_client_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_client_proto_rawDesc = "" +
 	"\n" +
-	"\x14oppb/v1/client.proto\x12\aoppb.v1\x1a\x19oppb/v1/client_meta.proto\x1a\x14oppb/v1/common.proto\"\x97\x03\n" +
+	"\x14oppb/v1/client.proto\x12\aoppb.v1\x1a\x19oppb/v1/client_meta.proto\x1a\x14oppb/v1/common.proto\"\xdd\x03\n" +
 	"\x0fClientAttribute\x12D\n" +
 	"\x1daccess_token_lifetime_seconds\x18\x01 \x01(\x05R\x1daccess_token_lifetime_seconds\x12P\n" +
 	"#authorization_code_lifetime_seconds\x18\x02 \x01(\x05R#authorization_code_lifetime_seconds\x12<\n" +
 	"\x19id_token_lifetime_seconds\x18\x03 \x01(\x05R\x19id_token_lifetime_seconds\x12F\n" +
 	"\x1erefresh_token_lifetime_seconds\x18\x04 \x01(\x05R\x1erefresh_token_lifetime_seconds\x12:\n" +
-	"\x18request_lifetime_seconds\x18\x05 \x01(\x05R\x18request_lifetime_seconds\x12*\n" +
-	"\x10session_group_id\x18\x06 \x01(\tR\x10session_group_id\"\x82\x01\n" +
+	"\x18request_lifetime_seconds\x18\x05 \x01(\x05R\x18request_lifetime_seconds\x12D\n" +
+	"\x1djwt_response_lifetime_seconds\x18\x06 \x01(\x05R\x1djwt_response_lifetime_seconds\x12*\n" +
+	"\x10session_group_id\x18\n" +
+	" \x01(\tR\x10session_group_id\"\x82\x01\n" +
 	"\x10ClientExtensions\x124\n" +
 	"\aprofile\x18\x01 \x01(\x0e2\x1a.oppb.v1.EnumClientProfileR\aprofile\x128\n" +
 	"\x17tls_client_certificates\x18\x02 \x03(\tR\x17tls_client_certificates\"\x85\x02\n" +

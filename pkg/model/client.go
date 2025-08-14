@@ -133,6 +133,7 @@ func MakeDefaultClient(iss *Issuer, clientId string, sessionGroupId string, now 
 			IdTokenLifetimeSeconds:           3600,
 			RefreshTokenLifetimeSeconds:      7200,
 			RequestLifetimeSeconds:           86400,
+			JwtResponseLifetimeSeconds:       600,
 			SessionGroupId:                   sessionGroupId,
 		},
 		Extensions: &oppb.ClientExtensions{

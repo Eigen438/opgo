@@ -97,7 +97,7 @@ func (b *RedirectBuilder) Build(ctx context.Context, now time.Time) (string, err
 		}
 		claims["aud"] = b.client.Identity.ClientId
 		claims["iss"] = b.issuer.Meta.Issuer
-		claims["exp"] = now.Add(10 * time.Minute).Unix() // TODO:
+		claims["exp"] = now.Add(time.Duration(b.client.Attribute.JwtResponseLifetimeSeconds) * time.Second).Unix()
 
 		response, err := makeJwt(ctx, b.issuer, claims, b.client.Meta.AuthorizationSignedResponseAlg)
 		if err != nil {

@@ -41,7 +41,8 @@ message ClientAttribute {
   int32 id_token_lifetime_seconds = 3 [json_name = "id_token_lifetime_seconds"];
   int32 refresh_token_lifetime_seconds = 4 [json_name = "refresh_token_lifetime_seconds"];
   int32 request_lifetime_seconds = 5 [json_name = "request_lifetime_seconds"];
-  string session_group_id = 6 [json_name = "session_group_id"];
+  int32 jwt_response_lifetime_seconds = 6 [json_name = "jwt_response_lifetime_seconds"];
+  string session_group_id = 10 [json_name = "session_group_id"];
 }
 
 message ClientExtensions {

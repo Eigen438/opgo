@@ -50,11 +50,13 @@ func (i *innerSdk) ClientCreate(ctx context.Context, param ClientParam) error {
 		if param.Attribute == nil {
 			param.Attribute = &oppb.ClientAttribute{
 				AccessTokenLifetimeSeconds:       3600,
+				AuthorizationCodeLifetimeSeconds: 60,
 				IdTokenLifetimeSeconds:           3600,
 				RefreshTokenLifetimeSeconds:      7200,
-				AuthorizationCodeLifetimeSeconds: 60,
 				RequestLifetimeSeconds:           86400,
-				SessionGroupId:                   param.ClientId,
+				JwtResponseLifetimeSeconds:       600,
+
+				SessionGroupId: param.ClientId,
 			}
 		}
 		if param.Extensions == nil {
