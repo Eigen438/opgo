@@ -247,6 +247,16 @@ func authorization(ctx context.Context,
 	sessions map[string]string,
 ) (*connect.Response[oppb.AuthorizationResponse], error) {
 
+	// set default value, if value was empty
+	if len(params.AcrValues) == 0 {
+		params.AcrValues = client.Meta.DefaultAcrValues
+	}
+	if len(params.MaxAge) == 0 {
+		if client.Meta.DefaultMaxAge >= 0 {
+			params.MaxAge = fmt.Sprintf("%d", client.Meta.DefaultMaxAge)
+		}
+	}
+
 	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
 		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#authorization-server
 		// FAPIではrequest/request_uriを使用しなければならない
