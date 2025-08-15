@@ -43,7 +43,7 @@ message AuthorizationParameters {
   string login_hint = 13 [json_name = "login_hint"];
   repeated string acr_values = 14 [json_name = "acr_values"];
   // https://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts
-  string claims_locales = 15 [json_name = "claims_locales"];
+  repeated string claims_locales = 15 [json_name = "claims_locales"];
   // https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
   string claims = 16 [json_name = "claims"];
   // https://datatracker.ietf.org/doc/html/rfc7636#section-4.3

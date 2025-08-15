@@ -72,7 +72,7 @@ type ClientMeta struct {
 	RequestObjectEncryptionEnc   string   `protobuf:"bytes,123,opt,name=request_object_encryption_enc,proto3" json:"request_object_encryption_enc,omitempty"`
 	TokenEndpointAuthMethod      string   `protobuf:"bytes,124,opt,name=token_endpoint_auth_method,proto3" json:"token_endpoint_auth_method,omitempty"`
 	TokenEndpointAuthSigningAlg  string   `protobuf:"bytes,125,opt,name=token_endpoint_auth_signing_alg,proto3" json:"token_endpoint_auth_signing_alg,omitempty"`
-	DefaultMaxAge                string   `protobuf:"bytes,126,opt,name=default_max_age,proto3" json:"default_max_age,omitempty"`
+	DefaultMaxAge                int32    `protobuf:"varint,126,opt,name=default_max_age,proto3" json:"default_max_age,omitempty"`
 	RequireAuthTime              bool     `protobuf:"varint,127,opt,name=require_auth_time,proto3" json:"require_auth_time,omitempty"`
 	DefaultAcrValues             []string `protobuf:"bytes,128,rep,name=default_acr_values,proto3" json:"default_acr_values,omitempty"`
 	InitiateLoginUri             string   `protobuf:"bytes,129,opt,name=initiate_login_uri,proto3" json:"initiate_login_uri,omitempty"`
@@ -296,11 +296,11 @@ func (x *ClientMeta) GetTokenEndpointAuthSigningAlg() string {
 	return ""
 }
 
-func (x *ClientMeta) GetDefaultMaxAge() string {
+func (x *ClientMeta) GetDefaultMaxAge() int32 {
 	if x != nil {
 		return x.DefaultMaxAge
 	}
-	return ""
+	return 0
 }
 
 func (x *ClientMeta) GetRequireAuthTime() bool {
@@ -494,7 +494,7 @@ const file_oppb_v1_client_meta_proto_rawDesc = "" +
 	"\x1drequest_object_encryption_enc\x18{ \x01(\tR\x1drequest_object_encryption_enc\x12>\n" +
 	"\x1atoken_endpoint_auth_method\x18| \x01(\tR\x1atoken_endpoint_auth_method\x12H\n" +
 	"\x1ftoken_endpoint_auth_signing_alg\x18} \x01(\tR\x1ftoken_endpoint_auth_signing_alg\x12(\n" +
-	"\x0fdefault_max_age\x18~ \x01(\tR\x0fdefault_max_age\x12,\n" +
+	"\x0fdefault_max_age\x18~ \x01(\x05R\x0fdefault_max_age\x12,\n" +
 	"\x11require_auth_time\x18\x7f \x01(\bR\x11require_auth_time\x12/\n" +
 	"\x12default_acr_values\x18\x80\x01 \x03(\tR\x12default_acr_values\x12/\n" +
 	"\x12initiate_login_uri\x18\x81\x01 \x01(\tR\x12initiate_login_uri\x12#\n" +

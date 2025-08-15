@@ -215,7 +215,7 @@ func parseParams(parseTarget string) *oppb.AuthorizationParameters {
 		IdTokenHint:         vals.Get("id_token_hint"),
 		LoginHint:           vals.Get("login_hint"),
 		AcrValues:           []string{},
-		ClaimsLocales:       vals.Get("claims_locales"),
+		ClaimsLocales:       []string{},
 		Claims:              vals.Get("claims"),
 		CodeChallenge:       vals.Get("code_challenge"),
 		CodeChallengeMethod: vals.Get("code_challenge_method"),
@@ -233,6 +233,9 @@ func parseParams(parseTarget string) *oppb.AuthorizationParameters {
 	}
 	if len(vals.Get("acr_values")) > 0 {
 		params.AcrValues = strings.Split(vals.Get("acr_values"), " ")
+	}
+	if len(vals.Get("claims_locales")) > 0 {
+		params.ClaimsLocales = strings.Split(vals.Get("claims_locales"), " ")
 	}
 	return params
 }

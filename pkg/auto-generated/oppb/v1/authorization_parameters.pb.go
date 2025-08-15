@@ -61,7 +61,7 @@ type AuthorizationParameters struct {
 	LoginHint    string   `protobuf:"bytes,13,opt,name=login_hint,proto3" json:"login_hint,omitempty"`
 	AcrValues    []string `protobuf:"bytes,14,rep,name=acr_values,proto3" json:"acr_values,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts
-	ClaimsLocales string `protobuf:"bytes,15,opt,name=claims_locales,proto3" json:"claims_locales,omitempty"`
+	ClaimsLocales []string `protobuf:"bytes,15,rep,name=claims_locales,proto3" json:"claims_locales,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
 	Claims string `protobuf:"bytes,16,opt,name=claims,proto3" json:"claims,omitempty"`
 	// https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
@@ -205,11 +205,11 @@ func (x *AuthorizationParameters) GetAcrValues() []string {
 	return nil
 }
 
-func (x *AuthorizationParameters) GetClaimsLocales() string {
+func (x *AuthorizationParameters) GetClaimsLocales() []string {
 	if x != nil {
 		return x.ClaimsLocales
 	}
-	return ""
+	return nil
 }
 
 func (x *AuthorizationParameters) GetClaims() string {
@@ -288,7 +288,7 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\n" +
 	"acr_values\x18\x0e \x03(\tR\n" +
 	"acr_values\x12&\n" +
-	"\x0eclaims_locales\x18\x0f \x01(\tR\x0eclaims_locales\x12\x16\n" +
+	"\x0eclaims_locales\x18\x0f \x03(\tR\x0eclaims_locales\x12\x16\n" +
 	"\x06claims\x18\x10 \x01(\tR\x06claims\x12&\n" +
 	"\x0ecode_challenge\x18\x13 \x01(\tR\x0ecode_challenge\x124\n" +
 	"\x15code_challenge_method\x18\x14 \x01(\tR\x15code_challenge_method\x12\x18\n" +
