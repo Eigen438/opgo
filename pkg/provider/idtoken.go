@@ -24,10 +24,10 @@ package provider
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"hash"
 	"time"
 
 	"github.com/Eigen438/opgo/internal/keyutil"
@@ -84,26 +84,33 @@ func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now
 		claims["nonce"] = identifier.Details.Authorized.Request.AuthParams.Nonce // Conditionally required
 	}
 
+	signedAlg := identifier.Details.Authorized.Request.Client.Meta.IdTokenSignedResponseAlg
 	if len(code) > 0 {
-		// https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#HybridIDToken
-		// TODO: Review the c_hash generation algorithm
-		hash := sha256.Sum256([]byte(code))
-		claims["c_hash"] = base64.RawURLEncoding.EncodeToString(hash[:16]) // Conditionally required
+		// https://openid.net/specs/openid-connect-core-1_0.html#HybridIDToken
+		// If the ID Token is issued from the Authorization Endpoint with a code,
+		// which is the case for the response_type values code id_token and code id_token token, this is REQUIRED;
+		cHash := createHash(signedAlg, code)
+		if cHash != nil {
+			claims["c_hash"] = base64.RawURLEncoding.EncodeToString(cHash[:16]) // Conditionally required
+		}
 	}
 	if len(accessToken) > 0 {
 		// https://openid.net/specs/openid-connect-core-1_0.html#ImplicitIDToken
-		// TODO: Review the at_hash generation algorithm
 		// If the ID Token is issued from the Authorization Endpoint with an access_token value,
 		// which is the case for the response_type value id_token token, this is REQUIRED;
-		hash := sha256.Sum256([]byte(accessToken))
-		claims["at_hash"] = base64.RawURLEncoding.EncodeToString(hash[:16]) // Conditionally required
+		atHash := createHash(signedAlg, accessToken)
+		if atHash != nil {
+			claims["at_hash"] = base64.RawURLEncoding.EncodeToString(atHash[:16]) // Conditionally required
+		}
 	}
 	if len(state) > 0 {
 		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#id-token-as-detached-signature
-		// TODO: Review the s_hash generation algorithm
-		// state値が入力されたらs_hashを作成する
-		hash := sha256.Sum256([]byte(state))
-		claims["s_hash"] = base64.RawURLEncoding.EncodeToString(hash[:16]) // Conditionally required
+		// State hash value.
+		// Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the state
+		sHash := createHash(signedAlg, state)
+		if sHash != nil {
+			claims["s_hash"] = base64.RawURLEncoding.EncodeToString(sHash[:16]) // Conditionally required
+		}
 	}
 	claims["jti"] = identifier.Details.Identifier
 
@@ -178,4 +185,32 @@ func VerifyIdToken(ctx context.Context, iss *model.Issuer, idTokenString string)
 		return nil, fmt.Errorf("unknown issuer")
 	}
 	return out, nil
+}
+
+func createHash(signedAlg, target string) []byte {
+	var h hash.Hash
+	switch signedAlg {
+	case jwt.SigningMethodRS256.Alg():
+		h = jwt.SigningMethodRS256.Hash.New()
+	case jwt.SigningMethodRS384.Alg():
+		h = jwt.SigningMethodRS384.Hash.New()
+	case jwt.SigningMethodRS512.Alg():
+		h = jwt.SigningMethodRS512.Hash.New()
+	case jwt.SigningMethodPS256.Alg():
+		h = jwt.SigningMethodPS256.Hash.New()
+	case jwt.SigningMethodPS384.Alg():
+		h = jwt.SigningMethodPS384.Hash.New()
+	case jwt.SigningMethodPS512.Alg():
+		h = jwt.SigningMethodPS512.Hash.New()
+	case jwt.SigningMethodES256.Alg():
+		h = jwt.SigningMethodES256.Hash.New()
+	case jwt.SigningMethodES384.Alg():
+		h = jwt.SigningMethodES384.Hash.New()
+	case jwt.SigningMethodES512.Alg():
+		h = jwt.SigningMethodES512.Hash.New()
+	}
+	if h == nil {
+		return nil
+	}
+	return h.Sum([]byte(target))
 }
