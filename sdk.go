@@ -67,7 +67,8 @@ type SdkCallbacks interface {
 // It provides methods for handling OpenID Connect endpoints, as well as other
 // management tasks.
 type Sdk interface {
-	// DiscoveryEndpoint handles the OpenID Connect discovery endpoint.
+	// DiscoveryEndpoint handles the OpenID Connect discovery endpoint,
+	// which provides OpenID Provider configuration information to clients.
 	DiscoveryEndpoint(w http.ResponseWriter, r *http.Request)
 	// JwksEndpoint handles the JWKS endpoint.
 	JwksEndpoint(w http.ResponseWriter, r *http.Request)

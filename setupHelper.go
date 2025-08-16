@@ -34,23 +34,23 @@ const (
 	DEFAULT_PUSHED_AUTHORIZATION_PATH = "/par"
 )
 
+// SetupHelper is a helper for setting up the OpenID Connect server.
+// It provides a convenient way to configure the paths for the different endpoints.
 type SetupHelper struct {
-	UseDiscovery            bool
-	AuthorizationPath       string
-	TokenPath               string
-	UserinfoPath            string
-	JwksPath                string
-	RegistrationPath        string
+	// UseDiscovery specifies whether to use the discovery endpoint.
+	UseDiscovery bool
+	// AuthorizationPath is the path for the authorization endpoint.
+	AuthorizationPath string
+	// TokenPath is the path for the token endpoint.
+	TokenPath string
+	// UserinfoPath is the path for the userinfo endpoint.
+	UserinfoPath string
+	// JwksPath is the path for the JWKS endpoint.
+	JwksPath string
+	// RegistrationPath is the path for the registration endpoint.
+	RegistrationPath string
+	// PushedAuthorizationPath is the path for the pushed authorization endpoint.
 	PushedAuthorizationPath string
-}
-
-func DefaultPaths() *SetupHelper {
-	return &SetupHelper{
-		UseDiscovery:      false,
-		AuthorizationPath: DEFAULT_AUTHORIZATION_PATH,
-		TokenPath:         DEFAULT_TOKEN_PATH,
-		UserinfoPath:      DEFAULT_USERINFO_PATH,
-	}
 }
 
 func (helper SetupHelper) useDiscovery() bool {
@@ -87,6 +87,8 @@ func (helper SetupHelper) pushedAuthorizationPath() string {
 	return helper.PushedAuthorizationPath
 }
 
+// NewServeMux creates a new http.ServeMux and registers the handlers for the configured paths.
+// It takes an Sdk interface and returns a new *http.ServeMux.
 func (p *SetupHelper) NewServeMux(sdk Sdk) *http.ServeMux {
 	mux := http.NewServeMux()
 	if p.useDiscovery() {
@@ -107,4 +109,20 @@ func (p *SetupHelper) NewServeMux(sdk Sdk) *http.ServeMux {
 		mux.HandleFunc(p.pushedAuthorizationPath(), sdk.PushedAuthorizationEndpoint)
 	}
 	return mux
+}
+
+// DefaultSetupHelper creates a new SetupHelper with the default paths configured.
+// It is a convenience function for getting started quickly.
+// The default paths are:
+// - AuthorizationPath: /authorize
+// - TokenPath: /token
+// - UserinfoPath: /userinfo
+// The other paths are left empty and can be configured manually.
+func DefaultSetupHelper() *SetupHelper {
+	return &SetupHelper{
+		UseDiscovery:      false,
+		AuthorizationPath: DEFAULT_AUTHORIZATION_PATH,
+		TokenPath:         DEFAULT_TOKEN_PATH,
+		UserinfoPath:      DEFAULT_USERINFO_PATH,
+	}
 }
