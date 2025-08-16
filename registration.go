@@ -40,7 +40,7 @@ func (i *innerSdk) RegistrationEndpoint(w http.ResponseWriter, r *http.Request) 
 		ctx := r.Context()
 		switch r.Method {
 		case http.MethodPost:
-			reqBody := &oppb.RegistrationCreateRequest{}
+			reqBody := &oppb.RegistrationCreateRequest{DefaultMaxAge: -1}
 			defer r.Body.Close()
 			if r.Body == nil {
 				return fmt.Errorf("request body not found")
