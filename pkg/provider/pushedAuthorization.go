@@ -81,32 +81,13 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 			}), nil
 		}
 
-		params := parseParams(req.Msg.Form)
-
-		// Reject if request_uri is present in the request.
-		// https://www.rfc-editor.org/rfc/rfc9126.html#section-2.1
-		if len(params.RequestUri) > 0 {
-			return connect.NewResponse(&oppb.PushedAuthorizationResponse{
-				PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
-					Fail: &oppb.PushedAuthorizationFailResponse{
-						StatusCode: http.StatusBadRequest,
-						Error: &oppb.OauthError{
-							Error:            oauth.TokenErrorInvalidRequest,
-							ErrorDescription: "Denied request_uri parameter:" + params.RequestUri,
-						},
-					},
-				},
-			}), nil
-		}
-
 		vals := query.Parse(req.Msg.Form)
+		clientId := vals.Get("client_id")
 		clientAssertion := vals.Get("client_assertion")
 
 		// Identify client_id
-		clientId := ""
-		if len(params.ClientId) > 0 {
-			// Use client_id if present
-			clientId = params.ClientId
+		if len(clientId) > 0 {
+			// use clientId
 		} else if len(clientAssertion) > 0 {
 			// Get from client_assertion
 			rc := &jwt.RegisteredClaims{}
@@ -162,6 +143,24 @@ func (p *Provider) PushedAuthorization(ctx context.Context,
 				}), nil
 			}
 			return nil, err
+		}
+
+		params := parseParams(client, req.Msg.Form)
+
+		// Reject if request_uri is present in the request.
+		// https://www.rfc-editor.org/rfc/rfc9126.html#section-2.1
+		if len(params.RequestUri) > 0 {
+			return connect.NewResponse(&oppb.PushedAuthorizationResponse{
+				PushedAuthorizationResponseOneof: &oppb.PushedAuthorizationResponse_Fail{
+					Fail: &oppb.PushedAuthorizationFailResponse{
+						StatusCode: http.StatusBadRequest,
+						Error: &oppb.OauthError{
+							Error:            oauth.TokenErrorInvalidRequest,
+							ErrorDescription: "Denied request_uri parameter:" + params.RequestUri,
+						},
+					},
+				},
+			}), nil
 		}
 
 		// Endpoint authentication check

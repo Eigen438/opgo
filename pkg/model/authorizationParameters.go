@@ -36,7 +36,7 @@ type AuthorizationParametersInterface interface {
 	GetNonce() string
 	GetDisplay() string
 	GetPrompts() []string
-	GetMaxAge() string
+	GetMaxAge() int32
 	GetUiLocales() []string
 	GetIdTokenHint() string
 	GetLoginHint() string
@@ -51,33 +51,41 @@ type AuthorizationParametersInterface interface {
 	GetParKey() string
 }
 
+func ClearAuthorizationParameters(meta *oppb.ClientMeta, dst *oppb.AuthorizationParameters) {
+	dst.Scopes = []string{}
+	dst.ResponseType = ""
+	dst.ClientId = ""
+	dst.RedirectUri = ""
+	dst.State = ""
+	dst.ResponseMode = ""
+	dst.Nonce = ""
+	dst.Display = ""
+	dst.Prompts = []string{}
+	dst.MaxAge = meta.DefaultMaxAge
+	dst.UiLocales = []string{}
+	dst.IdTokenHint = ""
+	dst.LoginHint = ""
+	if len(meta.GetDefaultAcrValues()) > 0 {
+		dst.AcrValues = meta.GetDefaultAcrValues()
+	} else {
+		dst.AcrValues = []string{}
+	}
+	dst.ClaimsLocales = []string{}
+	dst.Claims = ""
+	dst.CodeChallenge = ""
+	dst.CodeChallengeMethod = ""
+	dst.Request = ""
+	dst.RequestUri = ""
+}
+
 func OverrideAuthorizationParameters(
-	extentions *oppb.ClientExtensions,
+	client *Client,
 	dst *oppb.AuthorizationParameters,
 	src AuthorizationParametersInterface) {
-	if extentions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
+	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
 		// https://openid.net/specs/openid-financial-api-part-2-1_0-final.html#authorization-server
 		// 10. shall only use the parameters included in the signed request object passed via the request or request_uri parameter;
-		dst.Scopes = []string{}
-		dst.ResponseType = ""
-		dst.ClientId = ""
-		dst.RedirectUri = ""
-		dst.State = ""
-		dst.ResponseMode = ""
-		dst.Nonce = ""
-		dst.Display = ""
-		dst.Prompts = []string{}
-		dst.MaxAge = ""
-		dst.UiLocales = []string{}
-		dst.IdTokenHint = ""
-		dst.LoginHint = ""
-		dst.AcrValues = []string{}
-		dst.ClaimsLocales = []string{}
-		dst.Claims = ""
-		dst.CodeChallenge = ""
-		dst.CodeChallengeMethod = ""
-		dst.Request = ""
-		dst.RequestUri = ""
+		ClearAuthorizationParameters(client.Meta, dst)
 	}
 
 	if len(src.GetScopes()) > 0 {
@@ -107,7 +115,7 @@ func OverrideAuthorizationParameters(
 	if len(src.GetPrompts()) > 0 {
 		dst.Prompts = src.GetPrompts()
 	}
-	if len(src.GetMaxAge()) > 0 {
+	if src.GetMaxAge() >= 0 {
 		dst.MaxAge = src.GetMaxAge()
 	}
 	if len(src.GetUiLocales()) > 0 {

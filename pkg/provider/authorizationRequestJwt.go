@@ -113,12 +113,8 @@ func (a authorizationRequestParamFromJwt) GetPrompts() []string {
 	}
 }
 
-func (a authorizationRequestParamFromJwt) GetMaxAge() string {
-	if a.MaxAge == -1 {
-		return ""
-	} else {
-		return fmt.Sprintf("%d", a.MaxAge)
-	}
+func (a authorizationRequestParamFromJwt) GetMaxAge() int32 {
+	return a.MaxAge
 }
 
 func (a authorizationRequestParamFromJwt) GetUiLocales() []string {
@@ -200,7 +196,7 @@ func analyzeAuthorizationRequestJwt(
 		return failAuthorizationInvalidRequestObject("request object parse error")
 	}
 
-	model.OverrideAuthorizationParameters(client.Extensions, authParam, arp)
+	model.OverrideAuthorizationParameters(client, authParam, arp)
 
 	// https://openid.net/specs/openid-financial-api-part-2-1_0.html#algorithm-considerations
 	// FAPIではクライアントjwtの署名アルゴリズムは制限がある

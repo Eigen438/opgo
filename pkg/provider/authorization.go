@@ -82,13 +82,12 @@ func (p *Provider) Authorization(ctx context.Context,
 			}), nil
 		}
 
-		// parse query
-		params := parseParams(parseTarget)
-
 		// check required
 		// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
 		// client_id
-		if len(params.ClientId) == 0 {
+		vals := query.Parse(parseTarget)
+		clientId := vals.Get("client_id")
+		if len(clientId) == 0 {
 			return connect.NewResponse(&oppb.AuthorizationResponse{
 				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
 					Fail: failAuthorizationInvalidRequest("client_id is required"),
@@ -97,7 +96,7 @@ func (p *Provider) Authorization(ctx context.Context,
 		}
 		client := &model.Client{
 			Identity: &oppb.ClientIdentity{
-				ClientId: params.ClientId,
+				ClientId: clientId,
 			},
 			Issuer: iss.Key,
 		}
@@ -111,6 +110,9 @@ func (p *Provider) Authorization(ctx context.Context,
 			}
 			return nil, err
 		}
+
+		// parse query
+		params := parseParams(client, parseTarget)
 
 		res, err := authorization(ctx, iss, params, client, req.Msg.Sessions)
 		if err != nil {
@@ -198,45 +200,46 @@ func makeFailResponse(
 	}
 }
 
-func parseParams(parseTarget string) *oppb.AuthorizationParameters {
+func parseParams(client *model.Client, parseTarget string) *oppb.AuthorizationParameters {
 	vals := query.Parse(parseTarget)
-	params := &oppb.AuthorizationParameters{
-		Scopes:              []string{},
-		ResponseType:        vals.Get("response_type"),
-		ClientId:            vals.Get("client_id"),
-		RedirectUri:         vals.Get("redirect_uri"),
-		State:               vals.Get("state"),
-		ResponseMode:        vals.Get("response_mode"),
-		Nonce:               vals.Get("nonce"),
-		Display:             vals.Get("display"),
-		Prompts:             []string{},
-		MaxAge:              vals.Get("max_age"),
-		UiLocales:           []string{},
-		IdTokenHint:         vals.Get("id_token_hint"),
-		LoginHint:           vals.Get("login_hint"),
-		AcrValues:           []string{},
-		ClaimsLocales:       []string{},
-		Claims:              vals.Get("claims"),
-		CodeChallenge:       vals.Get("code_challenge"),
-		CodeChallengeMethod: vals.Get("code_challenge_method"),
-		Request:             vals.Get("request"),
-		RequestUri:          vals.Get("request_uri"),
-	}
+	params := &oppb.AuthorizationParameters{}
+	model.ClearAuthorizationParameters(client.Meta, params)
 	if len(vals.Get("scope")) > 0 {
 		params.Scopes = strings.Split(vals.Get("scope"), " ")
 	}
+	params.ResponseType = vals.Get("response_type")
+	params.ClientId = vals.Get("client_id")
+	params.RedirectUri = vals.Get("redirect_uri")
+	params.State = vals.Get("state")
+	params.ResponseMode = vals.Get("response_mode")
+	params.Nonce = vals.Get("nonce")
+	params.Display = vals.Get("display")
 	if len(vals.Get("prompt")) > 0 {
 		params.Prompts = strings.Split(vals.Get("prompt"), " ")
+	}
+	if len(vals.Get("max_age")) > 0 {
+		maxAge, err := strconv.Atoi(vals.Get("max_age"))
+		if err != nil {
+			params.MaxAge = int32(maxAge)
+		}
 	}
 	if len(vals.Get("ui_locales")) > 0 {
 		params.UiLocales = strings.Split(vals.Get("ui_locales"), " ")
 	}
+	params.IdTokenHint = vals.Get("id_token_hint")
+	params.LoginHint = vals.Get("login_hint")
+
 	if len(vals.Get("acr_values")) > 0 {
 		params.AcrValues = strings.Split(vals.Get("acr_values"), " ")
 	}
 	if len(vals.Get("claims_locales")) > 0 {
 		params.ClaimsLocales = strings.Split(vals.Get("claims_locales"), " ")
 	}
+	params.Claims = vals.Get("claims")
+	params.CodeChallenge = vals.Get("code_challenge")
+	params.CodeChallengeMethod = vals.Get("code_challenge_method")
+	params.Request = vals.Get("request")
+	params.RequestUri = vals.Get("request_uri")
 	return params
 }
 
@@ -246,17 +249,6 @@ func authorization(ctx context.Context,
 	client *model.Client,
 	sessions map[string]string,
 ) (*connect.Response[oppb.AuthorizationResponse], error) {
-
-	// set default value, if value was empty
-	if len(params.AcrValues) == 0 {
-		params.AcrValues = client.Meta.DefaultAcrValues
-	}
-	if len(params.MaxAge) == 0 {
-		if client.Meta.DefaultMaxAge >= 0 {
-			params.MaxAge = fmt.Sprintf("%d", client.Meta.DefaultMaxAge)
-		}
-	}
-
 	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
 		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#authorization-server
 		// FAPIではrequest/request_uriを使用しなければならない
@@ -308,7 +300,7 @@ func authorization(ctx context.Context,
 				}), nil
 			}
 			// override to PushedAuthorizationRequest
-			model.OverrideAuthorizationParameters(client.Extensions, params, par.Params)
+			model.OverrideAuthorizationParameters(client, params, par.Params)
 
 		} else {
 			// get authrorization request
@@ -583,9 +575,8 @@ func authorization(ctx context.Context,
 			if ses.Details.SessionGroup.Key.Id == sg.Key.Id {
 				age := time.Now().Unix() - ses.CreateAt.Unix()
 				// maxageパラメータが存在する場合は認証期間のチェックを行う
-				if len(params.MaxAge) > 0 {
-					maxAge, _ := strconv.Atoi(params.MaxAge)
-					if age > int64(maxAge) {
+				if params.MaxAge >= 0 {
+					if age > int64(params.MaxAge) {
 						// 認証情報が古すぎる
 						ses.Details.Key.Id = ""
 					}

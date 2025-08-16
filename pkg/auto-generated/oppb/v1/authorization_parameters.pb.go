@@ -55,7 +55,7 @@ type AuthorizationParameters struct {
 	Nonce        string   `protobuf:"bytes,7,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	Display      string   `protobuf:"bytes,8,opt,name=display,proto3" json:"display,omitempty"`
 	Prompts      []string `protobuf:"bytes,9,rep,name=prompts,proto3" json:"prompts,omitempty"`
-	MaxAge       string   `protobuf:"bytes,10,opt,name=max_age,proto3" json:"max_age,omitempty"`
+	MaxAge       int32    `protobuf:"varint,10,opt,name=max_age,proto3" json:"max_age,omitempty"`
 	UiLocales    []string `protobuf:"bytes,11,rep,name=ui_locales,proto3" json:"ui_locales,omitempty"`
 	IdTokenHint  string   `protobuf:"bytes,12,opt,name=id_token_hint,proto3" json:"id_token_hint,omitempty"`
 	LoginHint    string   `protobuf:"bytes,13,opt,name=login_hint,proto3" json:"login_hint,omitempty"`
@@ -170,11 +170,11 @@ func (x *AuthorizationParameters) GetPrompts() []string {
 	return nil
 }
 
-func (x *AuthorizationParameters) GetMaxAge() string {
+func (x *AuthorizationParameters) GetMaxAge() int32 {
 	if x != nil {
 		return x.MaxAge
 	}
-	return ""
+	return 0
 }
 
 func (x *AuthorizationParameters) GetUiLocales() []string {
@@ -277,7 +277,7 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\adisplay\x18\b \x01(\tR\adisplay\x12\x18\n" +
 	"\aprompts\x18\t \x03(\tR\aprompts\x12\x18\n" +
 	"\amax_age\x18\n" +
-	" \x01(\tR\amax_age\x12\x1e\n" +
+	" \x01(\x05R\amax_age\x12\x1e\n" +
 	"\n" +
 	"ui_locales\x18\v \x03(\tR\n" +
 	"ui_locales\x12$\n" +

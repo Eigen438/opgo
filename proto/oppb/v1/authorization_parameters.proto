@@ -37,7 +37,7 @@ message AuthorizationParameters {
   string nonce = 7 [json_name = "nonce"];
   string display = 8 [json_name = "display"];
   repeated string prompts = 9 [json_name = "prompts"];
-  string max_age = 10 [json_name = "max_age"];
+  int32 max_age = 10 [json_name = "max_age"];
   repeated string ui_locales = 11 [json_name = "ui_locales"];
   string id_token_hint = 12 [json_name = "id_token_hint"];
   string login_hint = 13 [json_name = "login_hint"];
