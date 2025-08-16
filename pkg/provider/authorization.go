@@ -219,7 +219,7 @@ func parseParams(client *model.Client, parseTarget string) *oppb.AuthorizationPa
 	}
 	if len(vals.Get("max_age")) > 0 {
 		maxAge, err := strconv.Atoi(vals.Get("max_age"))
-		if err != nil {
+		if err == nil {
 			params.MaxAge = int32(maxAge)
 		}
 	}
