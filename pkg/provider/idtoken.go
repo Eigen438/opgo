@@ -24,10 +24,11 @@ package provider
 
 import (
 	"context"
+	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"hash"
 	"time"
 
 	"github.com/Eigen438/opgo/internal/keyutil"
@@ -188,29 +189,16 @@ func VerifyIdToken(ctx context.Context, iss *model.Issuer, idTokenString string)
 }
 
 func createHash(signedAlg, target string) []byte {
-	var h hash.Hash
 	switch signedAlg {
-	case jwt.SigningMethodRS256.Alg():
-		h = jwt.SigningMethodRS256.Hash.New()
-	case jwt.SigningMethodRS384.Alg():
-		h = jwt.SigningMethodRS384.Hash.New()
-	case jwt.SigningMethodRS512.Alg():
-		h = jwt.SigningMethodRS512.Hash.New()
-	case jwt.SigningMethodPS256.Alg():
-		h = jwt.SigningMethodPS256.Hash.New()
-	case jwt.SigningMethodPS384.Alg():
-		h = jwt.SigningMethodPS384.Hash.New()
-	case jwt.SigningMethodPS512.Alg():
-		h = jwt.SigningMethodPS512.Hash.New()
-	case jwt.SigningMethodES256.Alg():
-		h = jwt.SigningMethodES256.Hash.New()
-	case jwt.SigningMethodES384.Alg():
-		h = jwt.SigningMethodES384.Hash.New()
-	case jwt.SigningMethodES512.Alg():
-		h = jwt.SigningMethodES512.Hash.New()
+	case jwt.SigningMethodRS256.Alg(), jwt.SigningMethodPS256.Alg(), jwt.SigningMethodES256.Alg():
+		hash := sha256.Sum256([]byte(target))
+		return hash[:16]
+	case jwt.SigningMethodRS384.Alg(), jwt.SigningMethodPS384.Alg(), jwt.SigningMethodES384.Alg():
+		hash := sha512.Sum384([]byte(target))
+		return hash[:16]
+	case jwt.SigningMethodRS512.Alg(), jwt.SigningMethodPS512.Alg(), jwt.SigningMethodES512.Alg():
+		hash := sha512.Sum512([]byte(target))
+		return hash[:16]
 	}
-	if h == nil {
-		return nil
-	}
-	return h.Sum([]byte(target))
+	return nil
 }
