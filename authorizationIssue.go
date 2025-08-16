@@ -23,11 +23,12 @@
 package opgo
 
 import (
-	"context"
+	"net/http"
 
 	"connectrpc.com/connect"
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
 type IssueRequest struct {
@@ -36,21 +37,49 @@ type IssueRequest struct {
 	Subject   string
 }
 
-func (i *innerSdk) AuthorizationIssue(ctx context.Context, param *IssueRequest) (*oppb.AuthorizationIssueResponse, error) {
-	claims, err := i.config.Callbacks.GetUserClaimsCallback(ctx, param.Subject)
+func (i *innerSdk) AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string) {
+	err := i.authorizationIssue(w, r, requestId, "", subject)
 	if err != nil {
-		return nil, err
+		writeError(w, err)
+		return
 	}
+}
+
+func (i *innerSdk) authorizationIssue(w http.ResponseWriter, r *http.Request, requestId, sessionId, subject string) error {
+	ctx := r.Context()
+
+	claims, err := i.config.Callbacks.GetUserClaimsCallback(ctx, subject)
+	if err != nil {
+		return err
+	}
+
+	if sessionId == "" {
+		// Session create
+		sessionId, err = i.startSession(w, r, requestId, subject)
+		if err != nil {
+			return err
+		}
+	}
+
 	req := connect.NewRequest(&oppb.AuthorizationIssueRequest{
-		RequestId: param.RequestId,
-		SessionId: param.SessionId,
-		Subject:   param.Subject,
+		RequestId: requestId,
+		SessionId: sessionId,
+		Subject:   subject,
 		Claims:    claims,
 	})
 	auth.SetAuth(req, i)
 	res, err := i.provider.AuthorizationIssue(ctx, req)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return res.Msg, nil
+	if out := res.Msg.GetRedirect(); out != nil {
+		http.Redirect(w, r, out.Url, http.StatusFound)
+	} else if out := res.Msg.GetHtml(); out != nil {
+		for k, v := range httphelper.DefaultHtmlHeader() {
+			w.Header().Set(k, v)
+		}
+		w.Write([]byte(out.Content))
+	}
+
+	return nil
 }

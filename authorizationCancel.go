@@ -23,21 +23,36 @@
 package opgo
 
 import (
-	"context"
+	"net/http"
 
 	"connectrpc.com/connect"
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func (i *innerSdk) AuthorizationCancel(ctx context.Context, requestId string) (*oppb.AuthorizationCancelResponse, error) {
-	req := connect.NewRequest(&oppb.AuthorizationCancelRequest{
-		RequestId: requestId,
-	})
-	auth.SetAuth(req, i)
-	res, err := i.provider.AuthorizationCancel(ctx, req)
-	if err != nil {
-		return nil, err
+func (i *innerSdk) AuthorizationCancel(w http.ResponseWriter, r *http.Request, requestId string) {
+	if err := func() error {
+		ctx := r.Context()
+		req := connect.NewRequest(&oppb.AuthorizationCancelRequest{
+			RequestId: requestId,
+		})
+		auth.SetAuth(req, i)
+		res, err := i.provider.AuthorizationCancel(ctx, req)
+		if err != nil {
+			return err
+		}
+		if out := res.Msg.GetRedirect(); out != nil {
+			http.Redirect(w, r, out.Url, http.StatusFound)
+		} else if out := res.Msg.GetHtml(); out != nil {
+			for k, v := range httphelper.DefaultHtmlHeader() {
+				w.Header().Set(k, v)
+			}
+			_, _ = w.Write([]byte(out.Content))
+		}
+		return nil
+	}(); err != nil {
+		writeError(w, err)
+		return
 	}
-	return res.Msg, nil
 }

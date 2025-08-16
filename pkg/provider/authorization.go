@@ -34,7 +34,6 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/oauth"
@@ -51,11 +50,12 @@ import (
 
 func (p *Provider) Authorization(ctx context.Context,
 	req *connect.Request[oppb.AuthorizationRequest]) (*connect.Response[oppb.AuthorizationResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(Authorization)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		var parseTarget string
-		if req.Msg.Method == http.MethodGet {
+		switch req.Msg.Method {
+		case http.MethodGet:
 			// parse url and get raw query
 			u, err := url.Parse(req.Msg.Url)
 			if err != nil {
@@ -63,7 +63,7 @@ func (p *Provider) Authorization(ctx context.Context,
 			}
 			parseTarget = u.RawQuery
 
-		} else if req.Msg.Method == http.MethodPost {
+		case http.MethodPost:
 			// check content-type and get post data
 			if ct := req.Msg.ContentType; !strings.HasPrefix(ct, httphelper.MimeTypeWwwFormUnlencoded) {
 				return connect.NewResponse(&oppb.AuthorizationResponse{
@@ -74,7 +74,7 @@ func (p *Provider) Authorization(ctx context.Context,
 			}
 			parseTarget = req.Msg.Form
 
-		} else {
+		default:
 			return connect.NewResponse(&oppb.AuthorizationResponse{
 				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
 					Fail: failAuthorizationInvalidRequest("Must use the GET or POST method to call the Authorization Endpoint"),
@@ -82,34 +82,12 @@ func (p *Provider) Authorization(ctx context.Context,
 			}), nil
 		}
 
-		// parse query
-		params := parseParams(parseTarget)
-
 		// check required
 		// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
-		// scope, response_type, client_id, redirect_uri
-		if len(params.Scopes) == 0 {
-			return connect.NewResponse(&oppb.AuthorizationResponse{
-				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
-					Fail: failAuthorizationInvalidRequest("scope is required"),
-				},
-			}), nil
-		}
-		if len(params.ResponseType) == 0 {
-			return connect.NewResponse(&oppb.AuthorizationResponse{
-				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
-					Fail: failAuthorizationInvalidRequest("response_type is required"),
-				},
-			}), nil
-		}
-		if !slices.Contains(oauth.ResponseTypesSupported(), params.ResponseType) {
-			return connect.NewResponse(&oppb.AuthorizationResponse{
-				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
-					Fail: failAuthorizationInvalidRequest(fmt.Sprintf("response_type(%s) is unsupported", params.ResponseType)),
-				},
-			}), nil
-		}
-		if len(params.ClientId) == 0 {
+		// client_id
+		vals := query.Parse(parseTarget)
+		clientId := vals.Get("client_id")
+		if len(clientId) == 0 {
 			return connect.NewResponse(&oppb.AuthorizationResponse{
 				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
 					Fail: failAuthorizationInvalidRequest("client_id is required"),
@@ -118,7 +96,7 @@ func (p *Provider) Authorization(ctx context.Context,
 		}
 		client := &model.Client{
 			Identity: &oppb.ClientIdentity{
-				ClientId: params.ClientId,
+				ClientId: clientId,
 			},
 			Issuer: iss.Key,
 		}
@@ -132,26 +110,28 @@ func (p *Provider) Authorization(ctx context.Context,
 			}
 			return nil, err
 		}
-		if len(params.RedirectUri) == 0 {
-			return connect.NewResponse(&oppb.AuthorizationResponse{
-				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
-					Fail: failAuthorizationInvalidRequest("redirect_uri is required"),
-				},
-			}), nil
+
+		// parse query
+		params := parseParams(client, parseTarget)
+
+		res, err := authorization(ctx, iss, params, client, req.Msg.Sessions)
+		if err != nil {
+			return nil, err
 		}
-		if len(client.Meta.RedirectUris) > 0 {
+
+		if fail := res.Msg.GetFail(); fail != nil {
+			log.Printf("authorization fail: %#v", fail.Error)
+		}
+
+		if len(client.Meta.RedirectUris) > 0 && !params.IsPar {
 			if !slices.Contains(client.Meta.RedirectUris, params.RedirectUri) {
+				log.Printf("params: %#v", params)
 				return connect.NewResponse(&oppb.AuthorizationResponse{
 					AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
 						Fail: failAuthorizationInvalidRequest("redirect_uri not match"),
 					},
 				}), nil
 			}
-		}
-
-		res, err := authorization(ctx, iss, params, client, req.Msg.Sessions)
-		if err != nil {
-			return nil, err
 		}
 
 		if fail := res.Msg.GetFail(); fail != nil {
@@ -220,44 +200,46 @@ func makeFailResponse(
 	}
 }
 
-func parseParams(parseTarget string) *oppb.AuthorizationParameters {
+func parseParams(client *model.Client, parseTarget string) *oppb.AuthorizationParameters {
 	vals := query.Parse(parseTarget)
-	params := &oppb.AuthorizationParameters{
-		Scopes:              []string{},
-		ResponseType:        vals.Get("response_type"),
-		ClientId:            vals.Get("client_id"),
-		RedirectUri:         vals.Get("redirect_uri"),
-		State:               vals.Get("state"),
-		ResponseMode:        vals.Get("response_mode"),
-		Nonce:               vals.Get("nonce"),
-		Display:             vals.Get("display"),
-		Prompts:             []string{},
-		MaxAge:              vals.Get("max_age"),
-		UiLocales:           []string{},
-		IdTokenHint:         vals.Get("id_token_hint"),
-		LoginHint:           vals.Get("login_hint"),
-		AcrValues:           []string{},
-		ClaimsLocales:       vals.Get("claims_locales"),
-		Claims:              vals.Get("claims"),
-		ClientAssertionType: vals.Get("client_assertion_type"),
-		ClientAssertion:     vals.Get("client_assertion"),
-		CodeChallenge:       vals.Get("code_challenge"),
-		CodeChallengeMethod: vals.Get("code_challenge_method"),
-		Request:             vals.Get("request"),
-		RequestUri:          vals.Get("request_uri"),
-	}
+	params := &oppb.AuthorizationParameters{}
+	model.ClearAuthorizationParameters(client.Meta, params)
 	if len(vals.Get("scope")) > 0 {
 		params.Scopes = strings.Split(vals.Get("scope"), " ")
 	}
+	params.ResponseType = vals.Get("response_type")
+	params.ClientId = vals.Get("client_id")
+	params.RedirectUri = vals.Get("redirect_uri")
+	params.State = vals.Get("state")
+	params.ResponseMode = vals.Get("response_mode")
+	params.Nonce = vals.Get("nonce")
+	params.Display = vals.Get("display")
 	if len(vals.Get("prompt")) > 0 {
 		params.Prompts = strings.Split(vals.Get("prompt"), " ")
+	}
+	if len(vals.Get("max_age")) > 0 {
+		maxAge, err := strconv.Atoi(vals.Get("max_age"))
+		if err == nil {
+			params.MaxAge = int32(maxAge)
+		}
 	}
 	if len(vals.Get("ui_locales")) > 0 {
 		params.UiLocales = strings.Split(vals.Get("ui_locales"), " ")
 	}
+	params.IdTokenHint = vals.Get("id_token_hint")
+	params.LoginHint = vals.Get("login_hint")
+
 	if len(vals.Get("acr_values")) > 0 {
 		params.AcrValues = strings.Split(vals.Get("acr_values"), " ")
 	}
+	if len(vals.Get("claims_locales")) > 0 {
+		params.ClaimsLocales = strings.Split(vals.Get("claims_locales"), " ")
+	}
+	params.Claims = vals.Get("claims")
+	params.CodeChallenge = vals.Get("code_challenge")
+	params.CodeChallengeMethod = vals.Get("code_challenge_method")
+	params.Request = vals.Get("request")
+	params.RequestUri = vals.Get("request_uri")
 	return params
 }
 
@@ -267,9 +249,19 @@ func authorization(ctx context.Context,
 	client *model.Client,
 	sessions map[string]string,
 ) (*connect.Response[oppb.AuthorizationResponse], error) {
+	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
+		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#authorization-server
+		// FAPIではrequest/request_uriを使用しなければならない
+		if params.Request == "" && params.RequestUri == "" {
+			return connect.NewResponse(&oppb.AuthorizationResponse{
+				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
+					Fail: failAuthorizationInvalidRequest("FAPI needs request or request_uri"),
+				},
+			}), nil
+		}
+	}
 
 	requestUri := params.RequestUri
-	isPar := false
 	if len(requestUri) > 0 {
 		if !iss.Meta.RequestUriParameterSupported {
 			return connect.NewResponse(&oppb.AuthorizationResponse{
@@ -281,12 +273,11 @@ func authorization(ctx context.Context,
 
 		pushedId, ok := strings.CutPrefix(requestUri, oauth.SchemeRequestURI)
 		if ok {
-			isPar = true
 			// Use PushedAuthorizationRequest(PAR)
 			// PushedAuthorization read
 			par := &model.PushedAuthorization{
-				Key: &oppb.CommonKey{
-					Id: pushedId,
+				Params: &oppb.AuthorizationParameters{
+					ParKey: pushedId,
 				},
 				Client: client,
 			}
@@ -309,11 +300,7 @@ func authorization(ctx context.Context,
 				}), nil
 			}
 			// override to PushedAuthorizationRequest
-			params = par.Params
-			// https://www.rfc-editor.org/rfc/rfc9126.html#section-7.3
-			// An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with
-			// such attacks, the authorization server SHOULD make the request URIs one-time use.
-			_ = dataprovider.Delete(ctx, par)
+			model.OverrideAuthorizationParameters(client, params, par.Params)
 
 		} else {
 			// get authrorization request
@@ -422,17 +409,40 @@ func authorization(ctx context.Context,
 		}
 	}
 
-	if client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
-		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#authorization-server
-		// FAPIではrequest/request_uriを使用しなければならない
-		if request == "" && requestUri == "" {
-			return connect.NewResponse(&oppb.AuthorizationResponse{
-				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
-					Fail: failAuthorizationInvalidRequest("FAPI needs request or request_uri"),
-				},
-			}), nil
-		}
+	// check required
+	// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
+	// scope, response_type, redirect_uri
+	if len(params.Scopes) == 0 {
+		return connect.NewResponse(&oppb.AuthorizationResponse{
+			AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
+				Fail: failAuthorizationInvalidRequest("scope is required"),
+			},
+		}), nil
+	}
+	if len(params.ResponseType) == 0 {
+		return connect.NewResponse(&oppb.AuthorizationResponse{
+			AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
+				Fail: failAuthorizationInvalidRequest("response_type is required"),
+			},
+		}), nil
+	}
+	if !slices.Contains(oauth.ResponseTypesSupported(), params.ResponseType) {
+		return connect.NewResponse(&oppb.AuthorizationResponse{
+			AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
+				Fail: failAuthorizationInvalidRequest(fmt.Sprintf("response_type(%s) is unsupported", params.ResponseType)),
+			},
+		}), nil
+	}
+	if len(params.RedirectUri) == 0 {
+		return connect.NewResponse(&oppb.AuthorizationResponse{
+			AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
+				Fail: failAuthorizationInvalidRequest("redirect_uri is required"),
+			},
+		}), nil
+	}
 
+	switch client.Extensions.Profile {
+	case oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0:
 		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#authorization-server
 		// FAPIではresponse_type:"code id_token" もしくは response_type:"code" + response_mode:"jwt" or 指定無し以外は許容しない
 		if !(params.ResponseType == "code id_token") && !(params.ResponseType == "code" && params.ResponseMode == "jwt") {
@@ -465,7 +475,7 @@ func authorization(ctx context.Context,
 
 		// https://openid.net/specs/openid-financial-api-part-2-1_0-final.html#rfc.section.5.2.2
 		// FAPIではPARを用いる場合、PKCE(256)を要求する
-		if isPar {
+		if params.IsPar {
 			if !(len(params.CodeChallenge) > 0) || !(params.CodeChallengeMethod == oauth.PkceAlgorithmS256) {
 				return connect.NewResponse(&oppb.AuthorizationResponse{
 					AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
@@ -475,10 +485,10 @@ func authorization(ctx context.Context,
 			}
 		}
 
-	} else if client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
+	case oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0:
 		// https://openid.net/specs/fapi-2_0-security-profile.html#section-5.3.1.2
 		// FAPIではPARを使用しなければならない
-		if requestUri == "" {
+		if !params.IsPar {
 			return connect.NewResponse(&oppb.AuthorizationResponse{
 				AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
 					Fail: failAuthorizationInvalidRequest("FAPI needs request_uri"),
@@ -565,9 +575,8 @@ func authorization(ctx context.Context,
 			if ses.Details.SessionGroup.Key.Id == sg.Key.Id {
 				age := time.Now().Unix() - ses.CreateAt.Unix()
 				// maxageパラメータが存在する場合は認証期間のチェックを行う
-				if len(params.MaxAge) > 0 {
-					maxAge, _ := strconv.Atoi(params.MaxAge)
-					if age > int64(maxAge) {
+				if params.MaxAge >= 0 {
+					if age > int64(params.MaxAge) {
 						// 認証情報が古すぎる
 						ses.Details.Key.Id = ""
 					}

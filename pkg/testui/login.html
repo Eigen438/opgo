@@ -101,11 +101,11 @@
         <div><input type="text" name="username" placeholder="Username" /></div>
         <label for="password">Password</label>
         <div><input type="password" name="password" placeholder="Password" /></div>
-        <div><input type="hidden" name="request_id" value="{{.Param.RequestId}}" /></div>
+        <div><input type="hidden" name="request_id" value="{{.RequestInfo.RequestId}}" /></div>
   
-        <p>Please login if you agree to grant the application({{.Param.Client.ClientName}}) the following scopes.</p>
+        <p>Please login if you agree to grant the application({{.RequestInfo.Client.ClientName}}) the following scopes.</p>
         <ul>
-          {{range .Param.AuthParams.Scopes}}
+          {{range .RequestInfo.AuthParams.Scopes}}
           <li>{{.}}</li>
           {{end}}  
         </ul>
@@ -113,7 +113,7 @@
         <button type="submit" id="login-button">Login</button>
       </form>
       <form class="form" action="/cancel" method="post">
-        <input type="hidden" name="request_id" value="{{.Param.RequestId}}" />
+        <input type="hidden" name="request_id" value="{{.RequestInfo.RequestId}}" />
         <button type="submit" id="cancel-button">Cancel</button>
       </form>
       

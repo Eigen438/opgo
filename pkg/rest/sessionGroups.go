@@ -25,7 +25,6 @@ package rest
 import (
 	"context"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/pkg/auth"
@@ -35,8 +34,8 @@ import (
 
 func (rest *Rest) SessionGroupCreate(ctx context.Context,
 	req *connect.Request[oppb.SessionGroupCreateRequest]) (*connect.Response[oppb.SessionGroupCreateResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(SessionGroupCreate)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		sg := &model.SessionGroup{
 			Key:       req.Msg.Key,

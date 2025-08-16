@@ -31,7 +31,6 @@ import (
 )
 
 type PushedAuthorization struct {
-	Key      *oppb.CommonKey
 	Client   *Client
 	Params   *oppb.AuthorizationParameters
 	CreateAt time.Time
@@ -43,5 +42,5 @@ func GetPushedAuthorizationCollectionName(issuerId, clientId string) string {
 }
 
 func (i *PushedAuthorization) Path(_ context.Context) string {
-	return GetPushedAuthorizationCollectionName(i.Client.Issuer.Id, i.Client.Identity.ClientId) + "/" + i.Key.Id
+	return GetPushedAuthorizationCollectionName(i.Client.Issuer.Id, i.Client.Identity.ClientId) + "/" + i.Params.ParKey
 }

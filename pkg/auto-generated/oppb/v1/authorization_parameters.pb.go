@@ -55,24 +55,24 @@ type AuthorizationParameters struct {
 	Nonce        string   `protobuf:"bytes,7,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	Display      string   `protobuf:"bytes,8,opt,name=display,proto3" json:"display,omitempty"`
 	Prompts      []string `protobuf:"bytes,9,rep,name=prompts,proto3" json:"prompts,omitempty"`
-	MaxAge       string   `protobuf:"bytes,10,opt,name=max_age,proto3" json:"max_age,omitempty"`
+	MaxAge       int32    `protobuf:"varint,10,opt,name=max_age,proto3" json:"max_age,omitempty"`
 	UiLocales    []string `protobuf:"bytes,11,rep,name=ui_locales,proto3" json:"ui_locales,omitempty"`
 	IdTokenHint  string   `protobuf:"bytes,12,opt,name=id_token_hint,proto3" json:"id_token_hint,omitempty"`
 	LoginHint    string   `protobuf:"bytes,13,opt,name=login_hint,proto3" json:"login_hint,omitempty"`
 	AcrValues    []string `protobuf:"bytes,14,rep,name=acr_values,proto3" json:"acr_values,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts
-	ClaimsLocales string `protobuf:"bytes,15,opt,name=claims_locales,proto3" json:"claims_locales,omitempty"`
+	ClaimsLocales []string `protobuf:"bytes,15,rep,name=claims_locales,proto3" json:"claims_locales,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
 	Claims string `protobuf:"bytes,16,opt,name=claims,proto3" json:"claims,omitempty"`
-	// https://www.rfc-editor.org/rfc/rfc7521.html#section-4.2
-	ClientAssertionType string `protobuf:"bytes,17,opt,name=client_assertion_type,proto3" json:"client_assertion_type,omitempty"`
-	ClientAssertion     string `protobuf:"bytes,18,opt,name=client_assertion,proto3" json:"client_assertion,omitempty"`
 	// https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
 	CodeChallenge       string `protobuf:"bytes,19,opt,name=code_challenge,proto3" json:"code_challenge,omitempty"`
 	CodeChallengeMethod string `protobuf:"bytes,20,opt,name=code_challenge_method,proto3" json:"code_challenge_method,omitempty"`
 	// https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
-	Request       string `protobuf:"bytes,21,opt,name=request,proto3" json:"request,omitempty"`
-	RequestUri    string `protobuf:"bytes,22,opt,name=request_uri,proto3" json:"request_uri,omitempty"`
+	Request    string `protobuf:"bytes,21,opt,name=request,proto3" json:"request,omitempty"`
+	RequestUri string `protobuf:"bytes,22,opt,name=request_uri,proto3" json:"request_uri,omitempty"`
+	// custom parameter
+	IsPar         bool   `protobuf:"varint,50,opt,name=is_par,json=isPar,proto3" json:"is_par,omitempty"`
+	ParKey        string `protobuf:"bytes,51,opt,name=par_key,json=parKey,proto3" json:"par_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -170,11 +170,11 @@ func (x *AuthorizationParameters) GetPrompts() []string {
 	return nil
 }
 
-func (x *AuthorizationParameters) GetMaxAge() string {
+func (x *AuthorizationParameters) GetMaxAge() int32 {
 	if x != nil {
 		return x.MaxAge
 	}
-	return ""
+	return 0
 }
 
 func (x *AuthorizationParameters) GetUiLocales() []string {
@@ -205,30 +205,16 @@ func (x *AuthorizationParameters) GetAcrValues() []string {
 	return nil
 }
 
-func (x *AuthorizationParameters) GetClaimsLocales() string {
+func (x *AuthorizationParameters) GetClaimsLocales() []string {
 	if x != nil {
 		return x.ClaimsLocales
 	}
-	return ""
+	return nil
 }
 
 func (x *AuthorizationParameters) GetClaims() string {
 	if x != nil {
 		return x.Claims
-	}
-	return ""
-}
-
-func (x *AuthorizationParameters) GetClientAssertionType() string {
-	if x != nil {
-		return x.ClientAssertionType
-	}
-	return ""
-}
-
-func (x *AuthorizationParameters) GetClientAssertion() string {
-	if x != nil {
-		return x.ClientAssertion
 	}
 	return ""
 }
@@ -261,11 +247,25 @@ func (x *AuthorizationParameters) GetRequestUri() string {
 	return ""
 }
 
+func (x *AuthorizationParameters) GetIsPar() bool {
+	if x != nil {
+		return x.IsPar
+	}
+	return false
+}
+
+func (x *AuthorizationParameters) GetParKey() string {
+	if x != nil {
+		return x.ParKey
+	}
+	return ""
+}
+
 var File_oppb_v1_authorization_parameters_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\n" +
-	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xfb\x05\n" +
+	"&oppb/v1/authorization_parameters.proto\x12\aoppb.v1\"\xc9\x05\n" +
 	"\x17AuthorizationParameters\x12\x16\n" +
 	"\x06scopes\x18\x01 \x03(\tR\x06scopes\x12$\n" +
 	"\rresponse_type\x18\x02 \x01(\tR\rresponse_type\x12\x1c\n" +
@@ -277,7 +277,7 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\adisplay\x18\b \x01(\tR\adisplay\x12\x18\n" +
 	"\aprompts\x18\t \x03(\tR\aprompts\x12\x18\n" +
 	"\amax_age\x18\n" +
-	" \x01(\tR\amax_age\x12\x1e\n" +
+	" \x01(\x05R\amax_age\x12\x1e\n" +
 	"\n" +
 	"ui_locales\x18\v \x03(\tR\n" +
 	"ui_locales\x12$\n" +
@@ -288,14 +288,14 @@ const file_oppb_v1_authorization_parameters_proto_rawDesc = "" +
 	"\n" +
 	"acr_values\x18\x0e \x03(\tR\n" +
 	"acr_values\x12&\n" +
-	"\x0eclaims_locales\x18\x0f \x01(\tR\x0eclaims_locales\x12\x16\n" +
-	"\x06claims\x18\x10 \x01(\tR\x06claims\x124\n" +
-	"\x15client_assertion_type\x18\x11 \x01(\tR\x15client_assertion_type\x12*\n" +
-	"\x10client_assertion\x18\x12 \x01(\tR\x10client_assertion\x12&\n" +
+	"\x0eclaims_locales\x18\x0f \x03(\tR\x0eclaims_locales\x12\x16\n" +
+	"\x06claims\x18\x10 \x01(\tR\x06claims\x12&\n" +
 	"\x0ecode_challenge\x18\x13 \x01(\tR\x0ecode_challenge\x124\n" +
 	"\x15code_challenge_method\x18\x14 \x01(\tR\x15code_challenge_method\x12\x18\n" +
 	"\arequest\x18\x15 \x01(\tR\arequest\x12 \n" +
-	"\vrequest_uri\x18\x16 \x01(\tR\vrequest_uriB\xa2\x01\n" +
+	"\vrequest_uri\x18\x16 \x01(\tR\vrequest_uri\x12\x15\n" +
+	"\x06is_par\x182 \x01(\bR\x05isPar\x12\x17\n" +
+	"\apar_key\x183 \x01(\tR\x06parKeyB\xa2\x01\n" +
 	"\vcom.oppb.v1B\x1cAuthorizationParametersProtoP\x01Z8github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1;oppb\xa2\x02\x03OXX\xaa\x02\aOppb.V1\xca\x02\aOppb\\V1\xe2\x02\x13Oppb\\V1\\GPBMetadata\xea\x02\bOppb::V1b\x06proto3"
 
 var (

@@ -20,43 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package provider
+package model
 
-import (
-	"context"
+import "context"
 
-	"connectrpc.com/connect"
-	"github.com/Eigen438/dataprovider"
-	"github.com/Eigen438/opgo/internal/retryhelper"
-	"github.com/Eigen438/opgo/pkg/auth"
-	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
-	"github.com/Eigen438/opgo/pkg/model"
-)
-
-func (p *Provider) Request(ctx context.Context,
-	req *connect.Request[oppb.RequestRequest]) (*connect.Response[oppb.RequestResponse], error) {
-	if iss, err := auth.GetIssuer(ctx, req); err != nil {
-		return nil, err
-	} else {
-		// リクエスト情報を取り出す
-		r := &model.Request{
-			Details: model.RequestDetails{
-				Client: &model.Client{
-					Issuer: iss.Key,
-				},
-				Key: &oppb.CommonKey{
-					Id: req.Msg.RequestId,
-				},
-			},
-		}
-		if err := retryhelper.RetryIfError(ctx, retryCount, func(ctx context.Context) error {
-			return dataprovider.Get(ctx, r)
-		}); err != nil {
-			return nil, err
-		}
-		return connect.NewResponse(&oppb.RequestResponse{
-			Client:     r.Details.Client.Meta,
-			AuthParams: r.Details.AuthParams,
-		}), nil
-	}
+type ProviderCallbacks interface {
+	DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error
+	DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error
 }

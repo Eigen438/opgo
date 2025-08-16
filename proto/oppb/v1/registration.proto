@@ -56,7 +56,7 @@ message RegistrationCreateRequest {
   string request_object_encryption_enc = 123 [json_name = "request_object_encryption_enc"];
   string token_endpoint_auth_method = 124 [json_name = "token_endpoint_auth_method"];
   string token_endpoint_auth_signing_alg = 125 [json_name = "token_endpoint_auth_signing_alg"];
-  string default_max_age = 126 [json_name = "default_max_age"];
+  int32 default_max_age = 126 [json_name = "default_max_age"];
   bool require_auth_time = 127 [json_name = "require_auth_time"];
   repeated string default_acr_values = 128 [json_name = "default_acr_values"];
   string initiate_login_uri = 129 [json_name = "initiate_login_uri"];
@@ -140,7 +140,7 @@ message RegistrationCreateSuccessResponse {
   string request_object_encryption_enc = 123 [json_name = "request_object_encryption_enc"];
   string token_endpoint_auth_method = 124 [json_name = "token_endpoint_auth_method"];
   string token_endpoint_auth_signing_alg = 125 [json_name = "token_endpoint_auth_signing_alg"];
-  string default_max_age = 126 [json_name = "default_max_age"];
+  int32 default_max_age = 126 [json_name = "default_max_age"];
   bool require_auth_time = 127 [json_name = "require_auth_time"];
   repeated string default_acr_values = 128 [json_name = "default_acr_values"];
   string initiate_login_uri = 129 [json_name = "initiate_login_uri"];
@@ -193,7 +193,7 @@ message RegistrationGetSuccessResponse {
   string request_object_encryption_enc = 123 [json_name = "request_object_encryption_enc"];
   string token_endpoint_auth_method = 124 [json_name = "token_endpoint_auth_method"];
   string token_endpoint_auth_signing_alg = 125 [json_name = "token_endpoint_auth_signing_alg"];
-  string default_max_age = 126 [json_name = "default_max_age"];
+  int32 default_max_age = 126 [json_name = "default_max_age"];
   bool require_auth_time = 127 [json_name = "require_auth_time"];
   repeated string default_acr_values = 128 [json_name = "default_acr_values"];
   string initiate_login_uri = 129 [json_name = "initiate_login_uri"];

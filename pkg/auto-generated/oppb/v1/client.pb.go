@@ -99,9 +99,8 @@ type ClientAttribute struct {
 	IdTokenLifetimeSeconds           int32                  `protobuf:"varint,3,opt,name=id_token_lifetime_seconds,proto3" json:"id_token_lifetime_seconds,omitempty"`
 	RefreshTokenLifetimeSeconds      int32                  `protobuf:"varint,4,opt,name=refresh_token_lifetime_seconds,proto3" json:"refresh_token_lifetime_seconds,omitempty"`
 	RequestLifetimeSeconds           int32                  `protobuf:"varint,5,opt,name=request_lifetime_seconds,proto3" json:"request_lifetime_seconds,omitempty"`
-	SessionGroupId                   string                 `protobuf:"bytes,6,opt,name=session_group_id,proto3" json:"session_group_id,omitempty"`
-	Profile                          EnumClientProfile      `protobuf:"varint,11,opt,name=profile,proto3,enum=oppb.v1.EnumClientProfile" json:"profile,omitempty"`
-	TlsClientCertificates            []string               `protobuf:"bytes,12,rep,name=tls_client_certificates,proto3" json:"tls_client_certificates,omitempty"`
+	JwtResponseLifetimeSeconds       int32                  `protobuf:"varint,6,opt,name=jwt_response_lifetime_seconds,proto3" json:"jwt_response_lifetime_seconds,omitempty"`
+	SessionGroupId                   string                 `protobuf:"bytes,10,opt,name=session_group_id,proto3" json:"session_group_id,omitempty"`
 	unknownFields                    protoimpl.UnknownFields
 	sizeCache                        protoimpl.SizeCache
 }
@@ -171,6 +170,13 @@ func (x *ClientAttribute) GetRequestLifetimeSeconds() int32 {
 	return 0
 }
 
+func (x *ClientAttribute) GetJwtResponseLifetimeSeconds() int32 {
+	if x != nil {
+		return x.JwtResponseLifetimeSeconds
+	}
+	return 0
+}
+
 func (x *ClientAttribute) GetSessionGroupId() string {
 	if x != nil {
 		return x.SessionGroupId
@@ -178,14 +184,52 @@ func (x *ClientAttribute) GetSessionGroupId() string {
 	return ""
 }
 
-func (x *ClientAttribute) GetProfile() EnumClientProfile {
+type ClientExtensions struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Profile               EnumClientProfile      `protobuf:"varint,1,opt,name=profile,proto3,enum=oppb.v1.EnumClientProfile" json:"profile,omitempty"`
+	TlsClientCertificates []string               `protobuf:"bytes,2,rep,name=tls_client_certificates,proto3" json:"tls_client_certificates,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *ClientExtensions) Reset() {
+	*x = ClientExtensions{}
+	mi := &file_oppb_v1_client_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClientExtensions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientExtensions) ProtoMessage() {}
+
+func (x *ClientExtensions) ProtoReflect() protoreflect.Message {
+	mi := &file_oppb_v1_client_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientExtensions.ProtoReflect.Descriptor instead.
+func (*ClientExtensions) Descriptor() ([]byte, []int) {
+	return file_oppb_v1_client_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ClientExtensions) GetProfile() EnumClientProfile {
 	if x != nil {
 		return x.Profile
 	}
 	return EnumClientProfile_ENUM_CLIENT_PROFILE_UNSPECIFIED
 }
 
-func (x *ClientAttribute) GetTlsClientCertificates() []string {
+func (x *ClientExtensions) GetTlsClientCertificates() []string {
 	if x != nil {
 		return x.TlsClientCertificates
 	}
@@ -198,13 +242,14 @@ type Client struct {
 	Issuer        *CommonKey             `protobuf:"bytes,2,opt,name=issuer,proto3" json:"issuer,omitempty"`
 	Meta          *ClientMeta            `protobuf:"bytes,3,opt,name=meta,proto3" json:"meta,omitempty"`
 	Attribute     *ClientAttribute       `protobuf:"bytes,4,opt,name=attribute,proto3" json:"attribute,omitempty"`
+	Extensions    *ClientExtensions      `protobuf:"bytes,5,opt,name=extensions,proto3" json:"extensions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Client) Reset() {
 	*x = Client{}
-	mi := &file_oppb_v1_client_proto_msgTypes[1]
+	mi := &file_oppb_v1_client_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -216,7 +261,7 @@ func (x *Client) String() string {
 func (*Client) ProtoMessage() {}
 
 func (x *Client) ProtoReflect() protoreflect.Message {
-	mi := &file_oppb_v1_client_proto_msgTypes[1]
+	mi := &file_oppb_v1_client_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -229,7 +274,7 @@ func (x *Client) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Client.ProtoReflect.Descriptor instead.
 func (*Client) Descriptor() ([]byte, []int) {
-	return file_oppb_v1_client_proto_rawDescGZIP(), []int{1}
+	return file_oppb_v1_client_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Client) GetIdentity() *ClientIdentity {
@@ -260,25 +305,38 @@ func (x *Client) GetAttribute() *ClientAttribute {
 	return nil
 }
 
+func (x *Client) GetExtensions() *ClientExtensions {
+	if x != nil {
+		return x.Extensions
+	}
+	return nil
+}
+
 var File_oppb_v1_client_proto protoreflect.FileDescriptor
 
 const file_oppb_v1_client_proto_rawDesc = "" +
 	"\n" +
-	"\x14oppb/v1/client.proto\x12\aoppb.v1\x1a\x19oppb/v1/client_meta.proto\x1a\x14oppb/v1/common.proto\"\x87\x04\n" +
+	"\x14oppb/v1/client.proto\x12\aoppb.v1\x1a\x19oppb/v1/client_meta.proto\x1a\x14oppb/v1/common.proto\"\xdd\x03\n" +
 	"\x0fClientAttribute\x12D\n" +
 	"\x1daccess_token_lifetime_seconds\x18\x01 \x01(\x05R\x1daccess_token_lifetime_seconds\x12P\n" +
 	"#authorization_code_lifetime_seconds\x18\x02 \x01(\x05R#authorization_code_lifetime_seconds\x12<\n" +
 	"\x19id_token_lifetime_seconds\x18\x03 \x01(\x05R\x19id_token_lifetime_seconds\x12F\n" +
 	"\x1erefresh_token_lifetime_seconds\x18\x04 \x01(\x05R\x1erefresh_token_lifetime_seconds\x12:\n" +
-	"\x18request_lifetime_seconds\x18\x05 \x01(\x05R\x18request_lifetime_seconds\x12*\n" +
-	"\x10session_group_id\x18\x06 \x01(\tR\x10session_group_id\x124\n" +
-	"\aprofile\x18\v \x01(\x0e2\x1a.oppb.v1.EnumClientProfileR\aprofile\x128\n" +
-	"\x17tls_client_certificates\x18\f \x03(\tR\x17tls_client_certificates\"\xca\x01\n" +
+	"\x18request_lifetime_seconds\x18\x05 \x01(\x05R\x18request_lifetime_seconds\x12D\n" +
+	"\x1djwt_response_lifetime_seconds\x18\x06 \x01(\x05R\x1djwt_response_lifetime_seconds\x12*\n" +
+	"\x10session_group_id\x18\n" +
+	" \x01(\tR\x10session_group_id\"\x82\x01\n" +
+	"\x10ClientExtensions\x124\n" +
+	"\aprofile\x18\x01 \x01(\x0e2\x1a.oppb.v1.EnumClientProfileR\aprofile\x128\n" +
+	"\x17tls_client_certificates\x18\x02 \x03(\tR\x17tls_client_certificates\"\x85\x02\n" +
 	"\x06Client\x123\n" +
 	"\bidentity\x18\x01 \x01(\v2\x17.oppb.v1.ClientIdentityR\bidentity\x12*\n" +
 	"\x06issuer\x18\x02 \x01(\v2\x12.oppb.v1.CommonKeyR\x06issuer\x12'\n" +
 	"\x04meta\x18\x03 \x01(\v2\x13.oppb.v1.ClientMetaR\x04meta\x126\n" +
-	"\tattribute\x18\x04 \x01(\v2\x18.oppb.v1.ClientAttributeR\tattribute*|\n" +
+	"\tattribute\x18\x04 \x01(\v2\x18.oppb.v1.ClientAttributeR\tattribute\x129\n" +
+	"\n" +
+	"extensions\x18\x05 \x01(\v2\x19.oppb.v1.ClientExtensionsR\n" +
+	"extensions*|\n" +
 	"\x11EnumClientProfile\x12#\n" +
 	"\x1fENUM_CLIENT_PROFILE_UNSPECIFIED\x10\x00\x12 \n" +
 	"\x1cENUM_CLIENT_PROFILE_FAPI_1_0\x10\x01\x12 \n" +
@@ -298,26 +356,28 @@ func file_oppb_v1_client_proto_rawDescGZIP() []byte {
 }
 
 var file_oppb_v1_client_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_oppb_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_oppb_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_oppb_v1_client_proto_goTypes = []any{
-	(EnumClientProfile)(0),  // 0: oppb.v1.EnumClientProfile
-	(*ClientAttribute)(nil), // 1: oppb.v1.ClientAttribute
-	(*Client)(nil),          // 2: oppb.v1.Client
-	(*ClientIdentity)(nil),  // 3: oppb.v1.ClientIdentity
-	(*CommonKey)(nil),       // 4: oppb.v1.CommonKey
-	(*ClientMeta)(nil),      // 5: oppb.v1.ClientMeta
+	(EnumClientProfile)(0),   // 0: oppb.v1.EnumClientProfile
+	(*ClientAttribute)(nil),  // 1: oppb.v1.ClientAttribute
+	(*ClientExtensions)(nil), // 2: oppb.v1.ClientExtensions
+	(*Client)(nil),           // 3: oppb.v1.Client
+	(*ClientIdentity)(nil),   // 4: oppb.v1.ClientIdentity
+	(*CommonKey)(nil),        // 5: oppb.v1.CommonKey
+	(*ClientMeta)(nil),       // 6: oppb.v1.ClientMeta
 }
 var file_oppb_v1_client_proto_depIdxs = []int32{
-	0, // 0: oppb.v1.ClientAttribute.profile:type_name -> oppb.v1.EnumClientProfile
-	3, // 1: oppb.v1.Client.identity:type_name -> oppb.v1.ClientIdentity
-	4, // 2: oppb.v1.Client.issuer:type_name -> oppb.v1.CommonKey
-	5, // 3: oppb.v1.Client.meta:type_name -> oppb.v1.ClientMeta
+	0, // 0: oppb.v1.ClientExtensions.profile:type_name -> oppb.v1.EnumClientProfile
+	4, // 1: oppb.v1.Client.identity:type_name -> oppb.v1.ClientIdentity
+	5, // 2: oppb.v1.Client.issuer:type_name -> oppb.v1.CommonKey
+	6, // 3: oppb.v1.Client.meta:type_name -> oppb.v1.ClientMeta
 	1, // 4: oppb.v1.Client.attribute:type_name -> oppb.v1.ClientAttribute
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	2, // 5: oppb.v1.Client.extensions:type_name -> oppb.v1.ClientExtensions
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_client_proto_init() }
@@ -333,7 +393,7 @@ func file_oppb_v1_client_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_oppb_v1_client_proto_rawDesc), len(file_oppb_v1_client_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

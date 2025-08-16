@@ -25,6 +25,7 @@ package provider
 import (
 	"context"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -72,30 +73,47 @@ func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now
 	claims["aud"] = identifier.Details.Authorized.Request.Client.Identity.ClientId // REQUIRED
 	claims["exp"] = identifier.ExpireAt.Unix()                                     // REQUIRED
 	claims["iat"] = now.Unix()                                                     // REQUIRED
-	if identifier.Details.Authorized.Request.AuthParams.MaxAge != "" {
-		// 認証要求時にmax_ageパラメータが付与された場合に作成する
-		claims["auth_time"] = identifier.Details.Authorized.AuthTime.Unix() // 条件付きREQUIRED
+	if identifier.Details.Authorized.Request.AuthParams.MaxAge >= 0 || identifier.Details.Authorized.Request.Client.Meta.RequireAuthTime {
+		// https://openid.net/specs/openid-connect-core-1_0.html#IDToken
+		// When a max_age request is made or when auth_time is requested as an Essential Claim, then this Claim is REQUIRED;
+		claims["auth_time"] = identifier.Details.Authorized.AuthTime.Unix() // Conditionally required
 	}
 	if identifier.Details.Authorized.Request.AuthParams.Nonce != "" {
-		// nonceパラメータが存在する場合は作成する
-		claims["nonce"] = identifier.Details.Authorized.Request.AuthParams.Nonce // 条件付きREQUIRED
+		// https://openid.net/specs/openid-connect-core-1_0.html#IDToken
+		// If present in the Authentication Request,
+		// Authorization Servers MUST include a nonce Claim in the ID Token with the Claim Value being the nonce value sent in the Authentication Request.
+		claims["nonce"] = identifier.Details.Authorized.Request.AuthParams.Nonce // Conditionally required
 	}
-	claims["jti"] = identifier.Details.Identifier
+
+	signedAlg := identifier.Details.Authorized.Request.Client.Meta.IdTokenSignedResponseAlg
 	if len(code) > 0 {
-		// code値が入力されたらc_hashを作成する
-		hash := sha256.Sum256([]byte(code))
-		claims["c_hash"] = base64.RawURLEncoding.EncodeToString(hash[:16]) // 条件付きREQUIRED
+		// https://openid.net/specs/openid-connect-core-1_0.html#HybridIDToken
+		// If the ID Token is issued from the Authorization Endpoint with a code,
+		// which is the case for the response_type values code id_token and code id_token token, this is REQUIRED;
+		cHash := createHash(signedAlg, code)
+		if cHash != nil {
+			claims["c_hash"] = base64.RawURLEncoding.EncodeToString(cHash[:16]) // Conditionally required
+		}
 	}
 	if len(accessToken) > 0 {
-		// accessToken値が入力されたらat_hashを作成する
-		hash := sha256.Sum256([]byte(accessToken))
-		claims["at_hash"] = base64.RawURLEncoding.EncodeToString(hash[:16]) // 条件付きREQUIRED
+		// https://openid.net/specs/openid-connect-core-1_0.html#ImplicitIDToken
+		// If the ID Token is issued from the Authorization Endpoint with an access_token value,
+		// which is the case for the response_type value id_token token, this is REQUIRED;
+		atHash := createHash(signedAlg, accessToken)
+		if atHash != nil {
+			claims["at_hash"] = base64.RawURLEncoding.EncodeToString(atHash[:16]) // Conditionally required
+		}
 	}
 	if len(state) > 0 {
-		// state値が入力されたらs_hashを作成する
-		hash := sha256.Sum256([]byte(state))
-		claims["s_hash"] = base64.RawURLEncoding.EncodeToString(hash[:16]) // 条件付きREQUIRED
+		// https://openid.net/specs/openid-financial-api-part-2-1_0.html#id-token-as-detached-signature
+		// State hash value.
+		// Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the state
+		sHash := createHash(signedAlg, state)
+		if sHash != nil {
+			claims["s_hash"] = base64.RawURLEncoding.EncodeToString(sHash[:16]) // Conditionally required
+		}
 	}
+	claims["jti"] = identifier.Details.Identifier
 
 	if iss.Meta.BackchannelLogoutSessionSupported || iss.Meta.FrontchannelLogoutSessionSupported {
 		claims["sid"] = identifier.Details.Authorized.SessionId
@@ -168,4 +186,19 @@ func VerifyIdToken(ctx context.Context, iss *model.Issuer, idTokenString string)
 		return nil, fmt.Errorf("unknown issuer")
 	}
 	return out, nil
+}
+
+func createHash(signedAlg, target string) []byte {
+	switch signedAlg {
+	case jwt.SigningMethodRS256.Alg(), jwt.SigningMethodPS256.Alg(), jwt.SigningMethodES256.Alg():
+		hash := sha256.Sum256([]byte(target))
+		return hash[:16]
+	case jwt.SigningMethodRS384.Alg(), jwt.SigningMethodPS384.Alg(), jwt.SigningMethodES384.Alg():
+		hash := sha512.Sum384([]byte(target))
+		return hash[:16]
+	case jwt.SigningMethodRS512.Alg(), jwt.SigningMethodPS512.Alg(), jwt.SigningMethodES512.Alg():
+		hash := sha512.Sum512([]byte(target))
+		return hash[:16]
+	}
+	return nil
 }

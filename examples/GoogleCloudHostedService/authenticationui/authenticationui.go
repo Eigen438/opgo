@@ -30,14 +30,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	firebase "firebase.google.com/go"
 	"github.com/Eigen438/opgo"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-func SetupMux(mux *http.ServeMux) {
+func AppendHandlerFunc(mux *http.ServeMux, sdk opgo.Sdk) {
+	mux.HandleFunc("/api/login", loginHandler(sdk))
 	mux.HandleFunc("/web", indexHtmlHandler)
 	mux.HandleFunc("/api/config.json", configHandler)
 	mux.HandleFunc("/", webHandler)
@@ -46,14 +46,14 @@ func SetupMux(mux *http.ServeMux) {
 //go:embed web/index.html
 var indexHtml []byte
 
-//go:embed all:web
-var webFiles embed.FS
-
 func indexHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(httphelper.HeaderCacheControl, "no-cache, no-store, max-age=0, must-revalidate")
 	w.Header().Set(httphelper.HeaderContentType, httphelper.MimeTypeTextHtml+httphelper.DefaultCharSet)
 	w.Write(indexHtml)
 }
+
+//go:embed all:web
+var webFiles embed.FS
 
 func webHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(httphelper.HeaderCacheControl, "no-cache, no-store, max-age=0, must-revalidate")
@@ -67,10 +67,6 @@ func webHandler(w http.ResponseWriter, r *http.Request) {
 // Implement a handler to provide environment variables to the frontend
 // created as a single-page application.
 func configHandler(w http.ResponseWriter, r *http.Request) {
-	type config struct {
-		ApiKey     string `json:"apiKey"`
-		AuthDomain string `json:"authDomain"`
-	}
 	w.Header().Set(httphelper.HeaderCacheControl, "no-cache, no-store, max-age=0, must-revalidate")
 	w.Header().Set(httphelper.HeaderContentType, httphelper.MimeTypeJson+httphelper.DefaultCharSet)
 	apiKey := os.Getenv("FIREBASE_API_KEY")
@@ -82,41 +78,26 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	type config struct {
+		ApiKey     string `json:"apiKey"`
+		AuthDomain string `json:"authDomain"`
+	}
 	json.NewEncoder(w).Encode(config{
 		ApiKey:     apiKey,
 		AuthDomain: authDomain,
 	})
 }
 
-// LoginHandler
+// loginHandler
 //
 // Firebase handles authentication on the frontend,
 // and the authentication result (ID token) is used to construct the opgo flow.
-func LoginHandler(s opgo.Sdk) http.HandlerFunc {
+func loginHandler(s opgo.Sdk) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		accessToken := ""
-		authHeader := r.Header.Get("Authorization")
-		if authHeader != "" {
-			authHeaderStrings := strings.Split(authHeader, " ")
-			if len(authHeaderStrings) == 2 && strings.ToLower(authHeaderStrings[0]) == "bearer" {
-				// Authorizationヘッダから取得
-				accessToken = authHeaderStrings[1]
-			} else {
-				log.Println("Invalid Authorization header format")
-				http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
-				return
-			}
-		} else {
-			log.Println("Authorization header is missing")
-			http.Error(w, "Authorization header is missing", http.StatusUnauthorized)
-			return
-		}
-		type input struct {
-			RequestId string `json:"requestId"`
-		}
 		ctx := r.Context()
-		i := &input{}
-		json.NewDecoder(r.Body).Decode(i)
+
+		idToken := r.FormValue("id_token")
+		requestId := r.FormValue("request_id")
 
 		app, err := firebase.NewApp(ctx, nil)
 		if err != nil {
@@ -130,48 +111,24 @@ func LoginHandler(s opgo.Sdk) http.HandlerFunc {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		token, err := auth.VerifyIDToken(ctx, accessToken)
+		token, err := auth.VerifyIDToken(ctx, idToken)
 		if err != nil {
 			log.Printf("auth.VerifyIDToken error: %v", err)
 			http.Error(w, "Authentication failed", http.StatusUnauthorized)
 			return
 		}
 
-		issue := &opgo.IssueRequest{
-			RequestId: i.RequestId,
-			Subject:   token.Subject,
-		}
-		s.StartSession(issue).ServeHTTP(w, r)
-		res, err := s.AuthorizationIssue(ctx, issue)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if out := res.GetRedirect(); out != nil {
-			type redirect struct {
-				Url string `json:"url"`
-			}
-			json.NewEncoder(w).Encode(redirect{
-				Url: out.Url,
-			})
-			return
-		} else if out := res.GetHtml(); out != nil {
-			for k, v := range httphelper.DefaultHtmlHeader() {
-				w.Header().Set(k, v)
-			}
-			w.Write([]byte(out.Content))
-			return
-		}
+		s.AuthorizationIssue(w, r, requestId, token.Subject)
 	}
 }
 
 type Callbacks struct{}
 
-func (c Callbacks) WriteLoginHtmlCallback(param *opgo.WriteHtmlParam) http.HandlerFunc {
+func (c Callbacks) WriteLoginHtmlCallback(info *opgo.RequestInfo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		u := r.URL
 		q := u.Query()
-		q.Add("request_id", param.RequestId)
+		q.Add("request_id", info.RequestId)
 		http.Redirect(w, r, "/web?"+q.Encode(), http.StatusFound)
 	}
 }

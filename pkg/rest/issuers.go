@@ -24,7 +24,6 @@ package rest
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
@@ -32,11 +31,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/keyutil"
-	"github.com/Eigen438/opgo/internal/oauth"
 	"github.com/Eigen438/opgo/internal/randutil"
+	"github.com/Eigen438/opgo/internal/validate"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
-	"github.com/bufbuild/protovalidate-go"
 )
 
 func (rest *Rest) IssuerCreate(ctx context.Context,
@@ -52,23 +50,9 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 		return nil, authn.Errorf("invalid authorization(IssuerCreate)")
 	}
 
-	// Complete default values
-	if len(req.Msg.Meta.ResponseModesSupported) == 0 {
-		req.Msg.Meta.ResponseModesSupported = []string{
-			oauth.ResponseModeQuery,
-			oauth.ResponseModeFragment,
-		}
-	}
-	if len(req.Msg.Meta.GrantTypesSupported) == 0 {
-		req.Msg.Meta.GrantTypesSupported = []string{
-			oauth.GrantTypeAuthorizationCode,
-			oauth.GrantTypeImplicit,
-		}
-	}
-	if len(req.Msg.Meta.TokenEndpointAuthMethodsSupported) == 0 {
-		req.Msg.Meta.TokenEndpointAuthMethodsSupported = []string{
-			oauth.TokenEndpointAuthMethodClientSecretBasic,
-		}
+	// Validate request
+	if err := validate.IssuerMeta(req.Msg.Meta); err != nil {
+		return nil, err
 	}
 
 	issuerId := "default-issuer"
@@ -110,11 +94,6 @@ func (rest *Rest) IssuerCreate(ctx context.Context,
 	}
 	if req.Msg.Attribute != nil {
 		iss.Attribute = req.Msg.Attribute
-	}
-
-	if err := protovalidate.Validate(iss.Meta); err != nil {
-		log.Printf("IssuerCreate err:%v", err)
-		return nil, err
 	}
 
 	// Generate signing keys for the Issuer to use
@@ -189,8 +168,8 @@ func (rest *Rest) IssuerUpdate(ctx context.Context,
 	if iss := authn.GetInfo(ctx).(*model.Issuer); iss == nil {
 		return nil, authn.Errorf("invalid authorization(IssuerUpdate)")
 	} else {
-		if err := protovalidate.Validate(req.Msg); err != nil {
-			log.Printf("IssuerUpdate err:%v", err)
+		// Validate request
+		if err := validate.IssuerMeta(req.Msg.Meta); err != nil {
 			return nil, err
 		}
 

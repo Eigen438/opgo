@@ -31,12 +31,11 @@ import (
 	"github.com/Eigen438/inmemstore"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
-	"github.com/Eigen438/opgo/pkg/provider"
 )
 
 type InmemStore interface {
 	inmemstore.InmemStore
-	provider.ProviderCallbacks
+	model.ProviderCallbacks
 }
 
 func New(cleaningWindow time.Duration) InmemStore {

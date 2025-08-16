@@ -27,7 +27,6 @@ package oppb.v1;
 import "oppb/v1/authorization_parameters.proto";
 import "oppb/v1/client.proto";
 import "oppb/v1/client_meta.proto";
-import "oppb/v1/issuer_meta.proto";
 import "oppb/v1/jwks.proto";
 import "oppb/v1/registration.proto";
 
@@ -52,7 +51,7 @@ service ProviderService {
 message DiscoveryRequest {}
 
 message DiscoveryResponse {
-  IssuerMeta meta = 1;
+  string content = 1;
 }
 
 message JwksRequest {}

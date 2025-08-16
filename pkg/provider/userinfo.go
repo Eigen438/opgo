@@ -29,7 +29,6 @@ import (
 	"net/http"
 	"strings"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/query"
@@ -42,8 +41,8 @@ import (
 
 func (p *Provider) Userinfo(ctx context.Context,
 	req *connect.Request[oppb.UserinfoRequest]) (*connect.Response[oppb.UserinfoResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(Userinfo)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// アクセストークン取得
 		var accessToken = ""

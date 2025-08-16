@@ -29,7 +29,6 @@ import (
 	"log"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/randutil"
@@ -41,8 +40,8 @@ import (
 
 func (p *Provider) StartSession(ctx context.Context,
 	req *connect.Request[oppb.StartSessionRequest]) (*connect.Response[oppb.StartSessionResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(StartSession)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// Request情報取得
 		r := &model.Request{

@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/protohelper"
@@ -38,8 +37,8 @@ import (
 
 func (p *Provider) RegistrationGet(ctx context.Context,
 	req *connect.Request[oppb.RegistrationGetRequest]) (*connect.Response[oppb.RegistrationGetResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(RegistrationGet)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		c := &model.Client{
 			Identity: &oppb.ClientIdentity{

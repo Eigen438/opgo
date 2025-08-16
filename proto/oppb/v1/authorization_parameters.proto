@@ -37,22 +37,22 @@ message AuthorizationParameters {
   string nonce = 7 [json_name = "nonce"];
   string display = 8 [json_name = "display"];
   repeated string prompts = 9 [json_name = "prompts"];
-  string max_age = 10 [json_name = "max_age"];
+  int32 max_age = 10 [json_name = "max_age"];
   repeated string ui_locales = 11 [json_name = "ui_locales"];
   string id_token_hint = 12 [json_name = "id_token_hint"];
   string login_hint = 13 [json_name = "login_hint"];
   repeated string acr_values = 14 [json_name = "acr_values"];
   // https://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts
-  string claims_locales = 15 [json_name = "claims_locales"];
+  repeated string claims_locales = 15 [json_name = "claims_locales"];
   // https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
   string claims = 16 [json_name = "claims"];
-  // https://www.rfc-editor.org/rfc/rfc7521.html#section-4.2
-  string client_assertion_type = 17 [json_name = "client_assertion_type"];
-  string client_assertion = 18 [json_name = "client_assertion"];
   // https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
   string code_challenge = 19 [json_name = "code_challenge"];
   string code_challenge_method = 20 [json_name = "code_challenge_method"];
   // https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
   string request = 21 [json_name = "request"];
   string request_uri = 22 [json_name = "request_uri"];
+  // custom parameter
+  bool is_par = 50;
+  string par_key = 51;
 }

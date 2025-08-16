@@ -22,20 +22,15 @@
 
 package provider
 
-import "context"
+import "github.com/Eigen438/opgo/pkg/model"
 
 const retryCount = 10
 
-type ProviderCallbacks interface {
-	DeleteTokensWithRequetId(ctx context.Context, issuerId, requestId string) error
-	DeleteTokensWithSessionId(ctx context.Context, issuerId, sessionId string) error
-}
-
 type Provider struct {
-	callbacks ProviderCallbacks
+	callbacks model.ProviderCallbacks
 }
 
-func NewProvider(callbacks ProviderCallbacks) *Provider {
+func NewProvider(callbacks model.ProviderCallbacks) *Provider {
 	return &Provider{
 		callbacks: callbacks,
 	}

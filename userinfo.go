@@ -30,12 +30,10 @@ import (
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func (i *innerSdk) UserinfoEndpoint() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (i *innerSdk) UserinfoEndpoint(w http.ResponseWriter, r *http.Request) {
+	if err := func() error {
 		req := connect.NewRequest(&oppb.UserinfoRequest{
 			Authorization:        r.Header.Get(httphelper.HeaderAuthorization),
 			ContentType:          r.Header.Get(httphelper.HeaderContentType),
@@ -52,13 +50,7 @@ func (i *innerSdk) UserinfoEndpoint() http.HandlerFunc {
 		auth.SetAuth(req, i)
 		res, err := i.provider.Userinfo(r.Context(), req)
 		if err != nil {
-			if status.Code(err) == codes.Unauthenticated {
-				w.WriteHeader(http.StatusUnauthorized)
-			} else {
-				w.WriteHeader(http.StatusServiceUnavailable)
-			}
-			w.Write([]byte(err.Error()))
-			return
+			return err
 		}
 
 		for key, val := range res.Msg.Headers {
@@ -66,5 +58,9 @@ func (i *innerSdk) UserinfoEndpoint() http.HandlerFunc {
 		}
 		w.WriteHeader(int(res.Msg.StatusCode))
 		w.Write([]byte(res.Msg.Body))
+		return nil
+	}(); err != nil {
+		writeError(w, err)
+		return
 	}
 }

@@ -108,3 +108,13 @@ func failAuthorizationLoginRequired() *oppb.AuthorizationFailResponse {
 		},
 	}
 }
+
+func failAuthorizationAccessDenied() *oppb.AuthorizationFailResponse {
+	return &oppb.AuthorizationFailResponse{
+		StatusCode: http.StatusBadRequest,
+		Error: &oppb.AuthorizationErrorResponse{
+			Error:            oauth.AuthorizationErrorAccessDenied,
+			ErrorDescription: "login canceled",
+		},
+	}
+}

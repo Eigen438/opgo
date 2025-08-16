@@ -362,6 +362,7 @@ type ClientCreateRequest struct {
 	Identity      *ClientIdentity        `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
 	Meta          *ClientMeta            `protobuf:"bytes,2,opt,name=meta,json=mata,proto3" json:"meta,omitempty"`
 	Attribute     *ClientAttribute       `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`
+	Extensions    *ClientExtensions      `protobuf:"bytes,4,opt,name=extensions,proto3" json:"extensions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -417,11 +418,19 @@ func (x *ClientCreateRequest) GetAttribute() *ClientAttribute {
 	return nil
 }
 
+func (x *ClientCreateRequest) GetExtensions() *ClientExtensions {
+	if x != nil {
+		return x.Extensions
+	}
+	return nil
+}
+
 type ClientCreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Identity      *ClientIdentity        `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
 	Meta          *ClientMeta            `protobuf:"bytes,2,opt,name=meta,json=mata,proto3" json:"meta,omitempty"`
 	Attribute     *ClientAttribute       `protobuf:"bytes,3,opt,name=attribute,proto3" json:"attribute,omitempty"`
+	Extensions    *ClientExtensions      `protobuf:"bytes,4,opt,name=extensions,proto3" json:"extensions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -473,6 +482,13 @@ func (x *ClientCreateResponse) GetMeta() *ClientMeta {
 func (x *ClientCreateResponse) GetAttribute() *ClientAttribute {
 	if x != nil {
 		return x.Attribute
+	}
+	return nil
+}
+
+func (x *ClientCreateResponse) GetExtensions() *ClientExtensions {
+	if x != nil {
+		return x.Extensions
 	}
 	return nil
 }
@@ -675,15 +691,21 @@ const file_oppb_v1_rest_service_proto_rawDesc = "" +
 	"\tattribute\x18\x02 \x01(\v2\x18.oppb.v1.IssuerAttributeR\tattribute\"w\n" +
 	"\x14IssuerUpdateResponse\x12'\n" +
 	"\x04meta\x18\x01 \x01(\v2\x13.oppb.v1.IssuerMetaR\x04meta\x126\n" +
-	"\tattribute\x18\x02 \x01(\v2\x18.oppb.v1.IssuerAttributeR\tattribute\"\xab\x01\n" +
+	"\tattribute\x18\x02 \x01(\v2\x18.oppb.v1.IssuerAttributeR\tattribute\"\xe6\x01\n" +
 	"\x13ClientCreateRequest\x123\n" +
 	"\bidentity\x18\x01 \x01(\v2\x17.oppb.v1.ClientIdentityR\bidentity\x12'\n" +
 	"\x04meta\x18\x02 \x01(\v2\x13.oppb.v1.ClientMetaR\x04mata\x126\n" +
-	"\tattribute\x18\x03 \x01(\v2\x18.oppb.v1.ClientAttributeR\tattribute\"\xac\x01\n" +
+	"\tattribute\x18\x03 \x01(\v2\x18.oppb.v1.ClientAttributeR\tattribute\x129\n" +
+	"\n" +
+	"extensions\x18\x04 \x01(\v2\x19.oppb.v1.ClientExtensionsR\n" +
+	"extensions\"\xe7\x01\n" +
 	"\x14ClientCreateResponse\x123\n" +
 	"\bidentity\x18\x01 \x01(\v2\x17.oppb.v1.ClientIdentityR\bidentity\x12'\n" +
 	"\x04meta\x18\x02 \x01(\v2\x13.oppb.v1.ClientMetaR\x04mata\x126\n" +
-	"\tattribute\x18\x03 \x01(\v2\x18.oppb.v1.ClientAttributeR\tattribute\"\x7f\n" +
+	"\tattribute\x18\x03 \x01(\v2\x18.oppb.v1.ClientAttributeR\tattribute\x129\n" +
+	"\n" +
+	"extensions\x18\x04 \x01(\v2\x19.oppb.v1.ClientExtensionsR\n" +
+	"extensions\"\x7f\n" +
 	"\x19SessionGroupCreateRequest\x12$\n" +
 	"\x03key\x18\x01 \x01(\v2\x12.oppb.v1.CommonKeyR\x03key\x12<\n" +
 	"\tattribute\x18\x02 \x01(\v2\x1e.oppb.v1.SessionGroupAttributeR\tattribute\"Z\n" +
@@ -734,7 +756,8 @@ var file_oppb_v1_rest_service_proto_goTypes = []any{
 	(*ClientIdentity)(nil),             // 16: oppb.v1.ClientIdentity
 	(*ClientMeta)(nil),                 // 17: oppb.v1.ClientMeta
 	(*ClientAttribute)(nil),            // 18: oppb.v1.ClientAttribute
-	(*SessionGroupAttribute)(nil),      // 19: oppb.v1.SessionGroupAttribute
+	(*ClientExtensions)(nil),           // 19: oppb.v1.ClientExtensions
+	(*SessionGroupAttribute)(nil),      // 20: oppb.v1.SessionGroupAttribute
 }
 var file_oppb_v1_rest_service_proto_depIdxs = []int32{
 	12, // 0: oppb.v1.IssuerCreateRequest.meta:type_name -> oppb.v1.IssuerMeta
@@ -752,29 +775,31 @@ var file_oppb_v1_rest_service_proto_depIdxs = []int32{
 	16, // 12: oppb.v1.ClientCreateRequest.identity:type_name -> oppb.v1.ClientIdentity
 	17, // 13: oppb.v1.ClientCreateRequest.meta:type_name -> oppb.v1.ClientMeta
 	18, // 14: oppb.v1.ClientCreateRequest.attribute:type_name -> oppb.v1.ClientAttribute
-	16, // 15: oppb.v1.ClientCreateResponse.identity:type_name -> oppb.v1.ClientIdentity
-	17, // 16: oppb.v1.ClientCreateResponse.meta:type_name -> oppb.v1.ClientMeta
-	18, // 17: oppb.v1.ClientCreateResponse.attribute:type_name -> oppb.v1.ClientAttribute
-	14, // 18: oppb.v1.SessionGroupCreateRequest.key:type_name -> oppb.v1.CommonKey
-	19, // 19: oppb.v1.SessionGroupCreateRequest.attribute:type_name -> oppb.v1.SessionGroupAttribute
-	19, // 20: oppb.v1.SessionGroupCreateResponse.attribute:type_name -> oppb.v1.SessionGroupAttribute
-	0,  // 21: oppb.v1.RestService.IssuerCreate:input_type -> oppb.v1.IssuerCreateRequest
-	2,  // 22: oppb.v1.RestService.IssuerGet:input_type -> oppb.v1.IssuerGetRequest
-	4,  // 23: oppb.v1.RestService.IssuerUpdate:input_type -> oppb.v1.IssuerUpdateRequest
-	6,  // 24: oppb.v1.RestService.ClientCreate:input_type -> oppb.v1.ClientCreateRequest
-	8,  // 25: oppb.v1.RestService.SessionGroupCreate:input_type -> oppb.v1.SessionGroupCreateRequest
-	10, // 26: oppb.v1.RestService.KeyRotate:input_type -> oppb.v1.KeyRotateRequest
-	1,  // 27: oppb.v1.RestService.IssuerCreate:output_type -> oppb.v1.IssuerCreateResponse
-	3,  // 28: oppb.v1.RestService.IssuerGet:output_type -> oppb.v1.IssuerGetResponse
-	5,  // 29: oppb.v1.RestService.IssuerUpdate:output_type -> oppb.v1.IssuerUpdateResponse
-	7,  // 30: oppb.v1.RestService.ClientCreate:output_type -> oppb.v1.ClientCreateResponse
-	9,  // 31: oppb.v1.RestService.SessionGroupCreate:output_type -> oppb.v1.SessionGroupCreateResponse
-	11, // 32: oppb.v1.RestService.KeyRotate:output_type -> oppb.v1.KeyRotateResponse
-	27, // [27:33] is the sub-list for method output_type
-	21, // [21:27] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	19, // 15: oppb.v1.ClientCreateRequest.extensions:type_name -> oppb.v1.ClientExtensions
+	16, // 16: oppb.v1.ClientCreateResponse.identity:type_name -> oppb.v1.ClientIdentity
+	17, // 17: oppb.v1.ClientCreateResponse.meta:type_name -> oppb.v1.ClientMeta
+	18, // 18: oppb.v1.ClientCreateResponse.attribute:type_name -> oppb.v1.ClientAttribute
+	19, // 19: oppb.v1.ClientCreateResponse.extensions:type_name -> oppb.v1.ClientExtensions
+	14, // 20: oppb.v1.SessionGroupCreateRequest.key:type_name -> oppb.v1.CommonKey
+	20, // 21: oppb.v1.SessionGroupCreateRequest.attribute:type_name -> oppb.v1.SessionGroupAttribute
+	20, // 22: oppb.v1.SessionGroupCreateResponse.attribute:type_name -> oppb.v1.SessionGroupAttribute
+	0,  // 23: oppb.v1.RestService.IssuerCreate:input_type -> oppb.v1.IssuerCreateRequest
+	2,  // 24: oppb.v1.RestService.IssuerGet:input_type -> oppb.v1.IssuerGetRequest
+	4,  // 25: oppb.v1.RestService.IssuerUpdate:input_type -> oppb.v1.IssuerUpdateRequest
+	6,  // 26: oppb.v1.RestService.ClientCreate:input_type -> oppb.v1.ClientCreateRequest
+	8,  // 27: oppb.v1.RestService.SessionGroupCreate:input_type -> oppb.v1.SessionGroupCreateRequest
+	10, // 28: oppb.v1.RestService.KeyRotate:input_type -> oppb.v1.KeyRotateRequest
+	1,  // 29: oppb.v1.RestService.IssuerCreate:output_type -> oppb.v1.IssuerCreateResponse
+	3,  // 30: oppb.v1.RestService.IssuerGet:output_type -> oppb.v1.IssuerGetResponse
+	5,  // 31: oppb.v1.RestService.IssuerUpdate:output_type -> oppb.v1.IssuerUpdateResponse
+	7,  // 32: oppb.v1.RestService.ClientCreate:output_type -> oppb.v1.ClientCreateResponse
+	9,  // 33: oppb.v1.RestService.SessionGroupCreate:output_type -> oppb.v1.SessionGroupCreateResponse
+	11, // 34: oppb.v1.RestService.KeyRotate:output_type -> oppb.v1.KeyRotateResponse
+	29, // [29:35] is the sub-list for method output_type
+	23, // [23:29] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_oppb_v1_rest_service_proto_init() }

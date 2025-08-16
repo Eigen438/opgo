@@ -30,7 +30,7 @@ import (
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 )
 
-func (i *innerSdk) GetWriteHtmlParam(ctx context.Context, requestId string) (*WriteHtmlParam, error) {
+func (i *innerSdk) GetRequestInfo(ctx context.Context, requestId string) (*RequestInfo, error) {
 	req := connect.NewRequest(&oppb.RequestRequest{
 		RequestId: requestId,
 	})
@@ -39,7 +39,7 @@ func (i *innerSdk) GetWriteHtmlParam(ctx context.Context, requestId string) (*Wr
 	if err != nil {
 		return nil, err
 	}
-	return &WriteHtmlParam{
+	return &RequestInfo{
 		RequestId:  requestId,
 		Client:     res.Msg.Client,
 		AuthParams: res.Msg.AuthParams,

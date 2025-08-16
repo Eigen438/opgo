@@ -24,37 +24,79 @@ package opgo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
-	"github.com/Eigen438/opgo/internal/validate"
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1/oppbconnect"
+	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/Eigen438/opgo/pkg/provider"
 	"github.com/Eigen438/opgo/pkg/rest"
 	"github.com/go-playground/validator/v10"
 )
 
-type WriteHtmlParam struct {
-	RequestId  string
-	Client     *oppb.ClientMeta
+// RequestInfo holds information about a request.
+type RequestInfo struct {
+	// RequestId is the unique identifier for the request.
+	RequestId string
+	// Client contains metadata about the client making the request.
+	Client *oppb.ClientMeta
+	// AuthParams contains the authorization parameters for the request.
 	AuthParams *oppb.AuthorizationParameters
 }
 
+// SdkCallbacks defines the callbacks for the SDK.
+// It includes methods for retrieving user claims and writing login HTML.
 type SdkCallbacks interface {
+	// GetUserClaimsCallback retrieves user claims(json string) for a given subject.
+	// ctx is the context for the request.
+	// subject is the subject for which to retrieve claims.
 	GetUserClaimsCallback(ctx context.Context, subject string) (string, error)
-	WriteLoginHtmlCallback(param *WriteHtmlParam) http.HandlerFunc
+
+	// WriteLoginHtmlCallback writes the login HTML response.
+	// info is the RequestInfo containing request details.
+	// It returns an http.HandlerFunc that serves the HTML response.
+	WriteLoginHtmlCallback(info *RequestInfo) http.HandlerFunc
 }
 
 type Sdk interface {
-	ServeMux(*Paths) *http.ServeMux
-	StartSession(*IssueRequest) http.HandlerFunc
-	AuthorizationIssue(context.Context, *IssueRequest) (*oppb.AuthorizationIssueResponse, error)
-	AuthorizationCancel(context.Context, string) (*oppb.AuthorizationCancelResponse, error)
-	GetWriteHtmlParam(context.Context, string) (*WriteHtmlParam, error)
+	DiscoveryEndpoint(w http.ResponseWriter, r *http.Request)
+	JwksEndpoint(w http.ResponseWriter, r *http.Request)
+	AuthorizationEndpoint(w http.ResponseWriter, r *http.Request)
+	TokenEndpoint(w http.ResponseWriter, r *http.Request)
+	UserinfoEndpoint(w http.ResponseWriter, r *http.Request)
+	RegistrationEndpoint(w http.ResponseWriter, r *http.Request)
+	PushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Request)
+
+	// AuthorizationIssue issues an authorization request.
+	// w is the http.ResponseWriter to write the response to.
+	// r is the http.Request containing the request data.
+	// requestId is the ID of the authorization request.
+	// subject is the subject of the authorization request.
+	AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string)
+
+	// AuthorizationCancel cancels an authorization request.
+	// w is the http.ResponseWriter to write the response to.
+	// r is the http.Request containing the request data.
+	// requestId is the ID of the authorization request to cancel.
+	AuthorizationCancel(w http.ResponseWriter, r *http.Request, requestId string)
+
+	// WriteLoginHtml writes the login HTML response.
+	// w is the http.ResponseWriter to write the HTML to.
+	// r is the http.Request containing the request data.
+	// requestId is the ID of the authorization request.
+	// callbacks is the SdkCallbacks interface to handle callbacks.
+	WriteLoginHtml(w http.ResponseWriter, r *http.Request, requestId string, callbacks SdkCallbacks)
+
+	// GetRequestInfo retrieves information about a request.
+	// ctx is the context for the request.
+	// requestId is the ID of the request to retrieve information for.
+	GetRequestInfo(ctx context.Context, requestId string) (*RequestInfo, error)
+
 	//
 	ClientCreate(context.Context, ClientParam) error
 	SessionGroupCreate(context.Context, *oppb.SessionGroupCreateRequest) error
@@ -118,7 +160,7 @@ func NewHostedSdk(
 	ctx context.Context,
 	issuerMeta *oppb.IssuerMeta,
 	sdkCallbacks SdkCallbacks,
-	providerCallbacks provider.ProviderCallbacks) (Sdk, error) {
+	providerCallbacks model.ProviderCallbacks) (Sdk, error) {
 	if issuerMeta == nil {
 		return nil, fmt.Errorf("parameter issuerMeta is required")
 	}
@@ -127,9 +169,6 @@ func NewHostedSdk(
 	}
 	if providerCallbacks == nil {
 		return nil, fmt.Errorf("parameter providerCallbacks is required")
-	}
-	if err := validate.IssuerMeta(issuerMeta); err != nil {
-		return nil, err
 	}
 
 	localSdkUser := "local_sdk_user" // dummy user
@@ -153,4 +192,32 @@ func NewHostedSdk(
 		rest:     rest.NewRest(res.Key.Id, res.Secret.Password, true),
 	}
 	return i, nil
+}
+
+func (i *innerSdk) WriteLoginHtml(w http.ResponseWriter, r *http.Request, requestId string, callbacks SdkCallbacks) {
+	if callbacks == nil {
+		http.Error(w, "callbacks cannot be nil", http.StatusInternalServerError)
+		return
+	}
+
+	info, err := i.GetRequestInfo(r.Context(), requestId)
+	if err != nil {
+		http.Error(w, "failed to get write HTML param: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	callbacks.WriteLoginHtmlCallback(info).ServeHTTP(w, r)
+}
+
+func writeError(w http.ResponseWriter, err error) {
+	if connect.CodeOf(err) == connect.CodeUnauthenticated {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(errors.Unwrap(err).Error()))
+	} else if connect.CodeOf(err) == connect.CodeInternal {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(errors.Unwrap(err).Error()))
+	} else {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		w.Write([]byte(err.Error()))
+	}
 }

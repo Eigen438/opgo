@@ -82,12 +82,12 @@ func main() {
 		RequestParameterSupported:                  true,
 		RequestUriParameterSupported:               true,
 	}
-	s, err := opgo.NewHostedSdk(ctx, meta, authenticationui.Callbacks{}, firestoreService)
+	sdk, err := opgo.NewHostedSdk(ctx, meta, authenticationui.Callbacks{}, firestoreService)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := s.ClientCreate(ctx, opgo.ClientParam{
+	if err := sdk.ClientCreate(ctx, opgo.ClientParam{
 		ClientId:     "default",
 		ClientSecret: "secret",
 		Meta: &oppb.ClientMeta{
@@ -103,17 +103,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := s.ServeMux(&opgo.Paths{
+	// Create ServeMux
+	setup := opgo.SetupHelper{
 		UseDiscovery:      true,
 		AuthorizationPath: opgo.DEFAULT_AUTHORIZATION_PATH,
 		TokenPath:         opgo.DEFAULT_TOKEN_PATH,
 		UserinfoPath:      opgo.DEFAULT_USERINFO_PATH,
 		JwksPath:          opgo.DEFAULT_JWKS_PATH,
 		RegistrationPath:  opgo.DEFAULT_REGISTRATION_PATH,
-	})
+	}
+	mux := setup.NewServeMux(sdk)
+
 	// Add provider-specific handlers
-	mux.HandleFunc("/api/login", authenticationui.LoginHandler(s))
-	authenticationui.SetupMux(mux)
+	authenticationui.AppendHandlerFunc(mux, sdk)
+
 	log.Printf("start server(port:%s)", port)
 
 	server := http.Server{

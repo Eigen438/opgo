@@ -32,7 +32,6 @@ import (
 	"slices"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/protohelper"
@@ -44,8 +43,8 @@ import (
 
 func (p *Provider) RegistrationCreate(ctx context.Context,
 	req *connect.Request[oppb.RegistrationCreateRequest]) (*connect.Response[oppb.RegistrationCreateResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(RegistrationCreate)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		magicWord, err := randutil.UniqueId()
 		if err != nil {

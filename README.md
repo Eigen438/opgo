@@ -21,7 +21,7 @@ Additionally, opgo can also function as an OP simulator using the provided sampl
 
 ### Prerequisites
 
-* Go 1.23.10 or higher
+* Go 1.23.12 or higher
 
 ### Installation
 
@@ -65,12 +65,12 @@ func main() {
 		RequestParameterSupported:         true,
 		RequestUriParameterSupported:      true,
 	}
-	s, err := opgo.NewHostedSdk(ctx, meta, testui.Callbacks{}, memstore)
+	sdk, err := opgo.NewHostedSdk(ctx, meta, testui.Callbacks{}, memstore)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := s.ClientCreate(ctx, opgo.ClientParam{
+	if err := sdk.ClientCreate(ctx, opgo.ClientParam{
 		ClientId:     "default",
 		ClientSecret: "secret",
 		Meta: &oppb.ClientMeta{
@@ -86,17 +86,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := s.ServeMux(&opgo.Paths{
+	// Create ServeMux
+	setup := opgo.SetupHelper{
 		UseDiscovery:      true,
 		AuthorizationPath: opgo.DEFAULT_AUTHORIZATION_PATH,
 		TokenPath:         opgo.DEFAULT_TOKEN_PATH,
 		UserinfoPath:      opgo.DEFAULT_USERINFO_PATH,
 		JwksPath:          opgo.DEFAULT_JWKS_PATH,
 		RegistrationPath:  opgo.DEFAULT_REGISTRATION_PATH,
-	})
+	}
+	mux := setup.NewServeMux(sdk)
+
 	// Add provider-specific handlers
-	mux.HandleFunc("/login", testui.LoginHandler(s))
-	mux.HandleFunc("/cancel", testui.CancelHandler(s))
+	testui.AppendHandlerFunc(mux, sdk)
 
 	log.Printf("start server(port:%s)", port)
 

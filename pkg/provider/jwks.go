@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"log"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/opgo/internal/convert"
 	"github.com/Eigen438/opgo/internal/keyutil"
@@ -38,8 +37,8 @@ import (
 
 func (p *Provider) Jwks(ctx context.Context,
 	req *connect.Request[oppb.JwksRequest]) (*connect.Response[oppb.JwksResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(Jwks)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		jwkSet := jwkset.NewMemoryStorage()
 		for keyType, kr := range iss.Resources.KeyMap {

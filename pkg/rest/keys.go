@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/keyutil"
@@ -14,8 +13,8 @@ import (
 
 func (rest *Rest) KeyRotate(ctx context.Context,
 	req *connect.Request[oppb.KeyRotateRequest]) (*connect.Response[oppb.KeyRotateResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(ClientCreate)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		key, err := keyutil.GeneratePrivateKey(iss.Key, req.Msg.KeyType, time.Now())
 		if err != nil {

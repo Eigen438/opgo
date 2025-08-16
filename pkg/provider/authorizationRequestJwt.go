@@ -26,9 +26,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -42,24 +40,147 @@ import (
 
 var fapiRejectionAlg = []string{"none", "RS256", "RS384", "RS512"}
 
+// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
+// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts
+// https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter
+// https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
+// https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
 type authorizationRequestParamFromJwt struct {
-	Claims              model.ClaimRules `json:"claims"`
+	Scope               string           `json:"scope"`
+	ResponseType        string           `json:"response_type"`
 	ClientId            string           `json:"client_id"`
-	CodeChallenge       string           `json:"code_challenge"`
-	CodeChallengeMethod string           `json:"code_challenge_method"`
+	RedirectUri         string           `json:"redirect_uri"`
+	State               string           `json:"state"`
+	ResponseMode        string           `json:"response_mode"`
+	Nonce               string           `json:"nonce"`
 	Display             string           `json:"display"`
+	Prompt              string           `json:"prompt"`
+	MaxAge              int32            `json:"max_age"`
+	UiLocales           string           `json:"ui_locales"`
 	IdTokenHint         string           `json:"id_token_hint"`
 	LoginHint           string           `json:"login_hint"`
-	MaxAge              int64            `json:"max_age"`
-	Nonce               string           `json:"nonce"`
-	Prompt              string           `json:"prompt"`
-	RedirectUri         string           `json:"redirect_uri"`
-	ResponseMode        string           `json:"response_mode"`
-	ResponseType        string           `json:"response_type"`
-	Scope               string           `json:"scope"`
-	State               string           `json:"state"`
-	UiLocales           string           `json:"ui_locales"`
+	AcrValues           string           `json:"acr_values"`
+	ClaimsLocales       string           `json:"claims_locales"`
+	Claims              model.ClaimRules `json:"claims"`
+	CodeChallenge       string           `json:"code_challenge"`
+	CodeChallengeMethod string           `json:"code_challenge_method"`
+	Request             string           `json:"request"`
+	RequestUri          string           `json:"request_uri"`
 	jwt.RegisteredClaims
+}
+
+func (a authorizationRequestParamFromJwt) GetScopes() []string {
+	if len(a.Scope) > 0 {
+		return strings.Split(a.Scope, " ")
+	} else {
+		return []string{}
+	}
+}
+
+func (a authorizationRequestParamFromJwt) GetResponseType() string {
+	return a.ResponseType
+}
+
+func (a authorizationRequestParamFromJwt) GetClientId() string {
+	return a.ClientId
+}
+
+func (a authorizationRequestParamFromJwt) GetRedirectUri() string {
+	return a.RedirectUri
+}
+
+func (a authorizationRequestParamFromJwt) GetState() string {
+	return a.State
+}
+
+func (a authorizationRequestParamFromJwt) GetResponseMode() string {
+	return a.ResponseMode
+}
+
+func (a authorizationRequestParamFromJwt) GetNonce() string {
+	return a.Nonce
+}
+
+func (a authorizationRequestParamFromJwt) GetDisplay() string {
+	return a.Display
+}
+
+func (a authorizationRequestParamFromJwt) GetPrompts() []string {
+	if len(a.Prompt) > 0 {
+		return strings.Split(a.Prompt, " ")
+	} else {
+		return []string{}
+	}
+}
+
+func (a authorizationRequestParamFromJwt) GetMaxAge() int32 {
+	return a.MaxAge
+}
+
+func (a authorizationRequestParamFromJwt) GetUiLocales() []string {
+	if len(a.UiLocales) > 0 {
+		return strings.Split(a.UiLocales, " ")
+	} else {
+		return []string{}
+	}
+}
+
+func (a authorizationRequestParamFromJwt) GetIdTokenHint() string {
+	return a.IdTokenHint
+}
+
+func (a authorizationRequestParamFromJwt) GetLoginHint() string {
+	return a.LoginHint
+}
+
+func (a authorizationRequestParamFromJwt) GetAcrValues() []string {
+	if len(a.AcrValues) > 0 {
+		return strings.Split(a.AcrValues, " ")
+	} else {
+		return []string{}
+	}
+}
+
+func (a authorizationRequestParamFromJwt) GetClaimsLocales() []string {
+	if len(a.ClaimsLocales) > 0 {
+		return strings.Split(a.ClaimsLocales, " ")
+	} else {
+		return []string{}
+	}
+}
+
+func (a authorizationRequestParamFromJwt) GetClaims() string {
+	if len(a.Claims.IdToken) > 0 || len(a.Claims.Userinfo) > 0 {
+		b, err := json.Marshal(a.Claims)
+		if err == nil {
+			return string(b)
+		}
+	}
+	return ""
+}
+
+func (a authorizationRequestParamFromJwt) GetCodeChallenge() string {
+	return a.CodeChallenge
+}
+
+func (a authorizationRequestParamFromJwt) GetCodeChallengeMethod() string {
+	return a.CodeChallengeMethod
+}
+
+func (a authorizationRequestParamFromJwt) GetRequest() string {
+	return a.Request
+}
+
+func (a authorizationRequestParamFromJwt) GetRequestUri() string {
+	return a.RequestUri
+}
+
+func (a authorizationRequestParamFromJwt) GetIsPar() bool {
+	return false
+}
+
+func (a authorizationRequestParamFromJwt) GetParKey() string {
+	return ""
 }
 
 func analyzeAuthorizationRequestJwt(
@@ -69,89 +190,18 @@ func analyzeAuthorizationRequestJwt(
 	jwtString string,
 	authParam *oppb.AuthorizationParameters) *oppb.AuthorizationFailResponse {
 
-	arp := &authorizationRequestParamFromJwt{}
+	arp := &authorizationRequestParamFromJwt{MaxAge: -1 /* dummy */}
 	token, err := parseJwt(ctx, client.Meta, jwtString, arp)
 	if err != nil {
 		return failAuthorizationInvalidRequestObject("request object parse error")
 	}
 
-	if client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 {
-		// https://openid.net/specs/openid-financial-api-part-2-1_0-final.html#authorization-server
-		// FAPIの場合はrequest/request_uri指定のパラメータのみを信用するため一旦空にする
-		authParam.AcrValues = []string{}
-		authParam.Claims = ""
-		authParam.ClientId = ""
-		authParam.ClientAssertion = ""
-		authParam.CodeChallenge = ""
-		authParam.CodeChallengeMethod = ""
-		authParam.Display = ""
-		authParam.IdTokenHint = ""
-		authParam.LoginHint = ""
-		authParam.MaxAge = ""
-		authParam.Nonce = ""
-		authParam.Prompts = []string{}
-		authParam.RedirectUri = ""
-		authParam.Request = ""
-		authParam.RequestUri = ""
-		authParam.ResponseMode = ""
-		authParam.ResponseType = ""
-		authParam.Scopes = []string{}
-		authParam.State = ""
-		authParam.UiLocales = []string{}
-	}
-
-	if len(arp.Claims.IdToken) > 0 || len(arp.Claims.Userinfo) > 0 {
-		b, err := json.Marshal(arp.Claims)
-		if err == nil {
-			authParam.Claims = string(b)
-		}
-	}
-	authParam.ClientId = arp.ClientId
-	if len(arp.CodeChallenge) > 0 {
-		authParam.CodeChallenge = arp.CodeChallenge
-	}
-	if len(arp.CodeChallengeMethod) > 0 {
-		authParam.CodeChallengeMethod = arp.CodeChallengeMethod
-	}
-	if len(arp.Display) > 0 {
-		authParam.Display = arp.Display
-	}
-	if len(arp.IdTokenHint) > 0 {
-		authParam.IdTokenHint = arp.IdTokenHint
-	}
-	if len(arp.LoginHint) > 0 {
-		authParam.LoginHint = arp.LoginHint
-	}
-	if arp.MaxAge > 0 {
-		authParam.MaxAge = strconv.Itoa(int(arp.MaxAge))
-	}
-	if len(arp.Nonce) > 0 {
-		authParam.Nonce = arp.Nonce
-	}
-	if len(arp.Prompt) > 0 {
-		authParam.Prompts = strings.Split(arp.Prompt, " ")
-	}
-	if len(arp.RedirectUri) > 0 {
-		authParam.RedirectUri = arp.RedirectUri
-	}
-	if len(arp.ResponseMode) > 0 {
-		authParam.ResponseMode = arp.ResponseMode
-	}
-	authParam.ResponseType = arp.ResponseType
-	if len(arp.Scope) > 0 {
-		authParam.Scopes = strings.Split(arp.Scope, " ")
-	}
-	if len(arp.State) > 0 {
-		authParam.State = arp.State
-	}
-	if len(arp.UiLocales) > 0 {
-		authParam.UiLocales = strings.Split(arp.UiLocales, " ")
-	}
+	model.OverrideAuthorizationParameters(client, authParam, arp)
 
 	// https://openid.net/specs/openid-financial-api-part-2-1_0.html#algorithm-considerations
 	// FAPIではクライアントjwtの署名アルゴリズムは制限がある
-	if client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
-		client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
+	if client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
+		client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
 		if slices.Contains(fapiRejectionAlg, fmt.Sprintf("%v", token.Header["alg"])) {
 			return failAuthorizationInvalidRequestObject("rsigning alg not allow")
 		}
@@ -184,7 +234,6 @@ func analyzeAuthorizationRequestJwt(
 			return failAuthorizationInvalidRequestObject("jwt iss not match")
 		}
 	}
-
 	return nil
 }
 
@@ -194,33 +243,12 @@ func parseJwt(ctx context.Context, client *oppb.ClientMeta, jwtString string, ou
 		if t.Header["alg"] == "none" {
 			return jwt.UnsafeAllowNoneSignatureType, nil
 		} else if len(client.JwksUri) > 0 {
-			u, err := url.Parse(client.JwksUri)
+			kf, err := keyfunc.NewDefault([]string{client.JwksUri})
 			if err != nil {
 				return nil, err
 			}
-			storage, err := jwkset.NewStorageFromHTTP(u.String(), jwkset.HTTPClientStorageOptions{})
-			if err != nil {
-				return nil, err
-			}
-			j, err := storage.JSON(ctx)
-			if err != nil {
-				return nil, err
-			}
-			f, err := keyfunc.NewJWKSetJSON(j)
-			if err != nil {
-				return nil, err
-			}
-			return f.Keyfunc(t)
-		} else if len(client.Jwks.Keys) == 1 {
-			keys := convert.JWKMarchalsFromKeys(client.Jwks.Keys)
-			jwk, err := jwkset.NewJWKFromMarshal(keys[0], jwkset.JWKMarshalOptions{
-				Private: false,
-			}, jwkset.JWKValidateOptions{})
-			if err != nil {
-				return nil, err
-			}
-			return jwk.Key(), nil
-		} else {
+			return kf.Keyfunc(t)
+		} else if client.Jwks != nil {
 			var jwks jwkset.JWKSMarshal
 			jwks.Keys = convert.JWKMarchalsFromKeys(client.Jwks.Keys)
 			storage, err := jwks.ToStorage()
@@ -231,11 +259,13 @@ func parseJwt(ctx context.Context, client *oppb.ClientMeta, jwtString string, ou
 			if err != nil {
 				return nil, err
 			}
-			f, err := keyfunc.NewJWKSetJSON(j)
+			kf, err := keyfunc.NewJWKSetJSON(j)
 			if err != nil {
 				return nil, err
 			}
-			return f.Keyfunc(t)
+			return kf.Keyfunc(t)
+		} else {
+			return nil, fmt.Errorf("no jwks/jwks_uri found for client %s", client.ClientName)
 		}
 	})
 }

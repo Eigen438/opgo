@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"slices"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/pkg/auth"
@@ -37,8 +36,8 @@ import (
 
 func (rest *Rest) ClientCreate(ctx context.Context,
 	req *connect.Request[oppb.ClientCreateRequest]) (*connect.Response[oppb.ClientCreateResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(ClientCreate)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// Check
 		for _, v := range req.Msg.Meta.ResponseTypes {
@@ -83,10 +82,11 @@ func (rest *Rest) ClientCreate(ctx context.Context,
 		}
 
 		client := &model.Client{
-			Identity:  req.Msg.Identity,
-			Issuer:    iss.Key,
-			Meta:      req.Msg.Meta,
-			Attribute: req.Msg.Attribute,
+			Identity:   req.Msg.Identity,
+			Issuer:     iss.Key,
+			Meta:       req.Msg.Meta,
+			Attribute:  req.Msg.Attribute,
+			Extensions: req.Msg.Extensions,
 		}
 
 		if rest.isSingleTenant {
@@ -100,9 +100,10 @@ func (rest *Rest) ClientCreate(ctx context.Context,
 		}
 
 		return connect.NewResponse(&oppb.ClientCreateResponse{
-			Identity:  req.Msg.Identity,
-			Meta:      req.Msg.Meta,
-			Attribute: req.Msg.Attribute,
+			Identity:   req.Msg.Identity,
+			Meta:       req.Msg.Meta,
+			Attribute:  req.Msg.Attribute,
+			Extensions: req.Msg.Extensions,
 		}), nil
 	}
 }

@@ -34,7 +34,6 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/oauth"
@@ -62,8 +61,8 @@ type tokenRequest struct {
 
 func (p *Provider) Token(ctx context.Context,
 	req *connect.Request[oppb.TokenRequest]) (*connect.Response[oppb.TokenResponse], error) {
-	if iss := auth.CheckIssuer(ctx, req); iss == nil {
-		return nil, authn.Errorf("invalid authorization(Token)")
+	if iss, err := auth.GetIssuer(ctx, req); err != nil {
+		return nil, err
 	} else {
 		// ヘッダチェック
 		if ct := req.Msg.ContentType; !strings.HasPrefix(ct, httphelper.MimeTypeWwwFormUnlencoded) {
@@ -140,12 +139,12 @@ func (p *Provider) Token(ctx context.Context,
 				}), nil
 			}
 
-			if params.Client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
-				params.Client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
+			if params.Client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
+				params.Client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
 				// FAPIの場合はさらにClientCertificateをチェックする
 				// checkClientAuthenticationの中では実施しない。
 				// pushedAuthenticationRequestでもcheckClientAuthenticationを使用しているため。
-				if !slices.Contains(authCode.Details.Authorized.Request.Client.Attribute.TlsClientCertificates, req.Msg.TlsClientCertificate) {
+				if !slices.Contains(authCode.Details.Authorized.Request.Client.Extensions.TlsClientCertificates, req.Msg.TlsClientCertificate) {
 					return connect.NewResponse(&oppb.TokenResponse{
 						TokenResponseOneof: &oppb.TokenResponse_Fail{
 							Fail: &oppb.TokenFailResponse{
@@ -417,12 +416,12 @@ func (p *Provider) Token(ctx context.Context,
 				}), nil
 			}
 
-			if params.Client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
-				params.Client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
+			if params.Client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
+				params.Client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
 				// FAPIの場合はさらにClientCertificateをチェックする
 				// checkClientAuthenticationの中では実施しない。
 				// pushedAuthenticationRequestでもcheckClientAuthenticationを使用しているため。
-				if !slices.Contains(refreshToken.Details.Authorized.Request.Client.Attribute.TlsClientCertificates, req.Msg.TlsClientCertificate) {
+				if !slices.Contains(refreshToken.Details.Authorized.Request.Client.Extensions.TlsClientCertificates, req.Msg.TlsClientCertificate) {
 					return connect.NewResponse(&oppb.TokenResponse{
 						TokenResponseOneof: &oppb.TokenResponse_Fail{
 							Fail: &oppb.TokenFailResponse{
@@ -607,11 +606,12 @@ func checkClientAuthentication(ctx context.Context, params *clientAuthentication
 			// another client.
 			token, err := parseJwt(ctx, params.Client.Meta, clientAssertion, rc)
 			if err != nil {
+				log.Printf("parseJwt error: %v", err)
 				return &oppb.TokenFailResponse{
 					StatusCode: http.StatusBadRequest,
 					Error: &oppb.OauthError{
 						Error:            oauth.TokenErrorInvalidGrant,
-						ErrorDescription: "private_jwt parse error:" + err.Error(),
+						ErrorDescription: "private_jwt parse error",
 					},
 				}
 			}
@@ -629,14 +629,14 @@ func checkClientAuthentication(ctx context.Context, params *clientAuthentication
 				return &oppb.TokenFailResponse{
 					StatusCode: http.StatusBadRequest,
 					Error: &oppb.OauthError{
-						Error:            oauth.TokenErrorInvalidGrant,
+						Error:            oauth.TokenErrorInvalidRequest,
 						ErrorDescription: "private_jwt expired",
 					},
 				}
 			}
 
-			if params.Client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
-				params.Client.Attribute.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
+			if params.Client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_1_0 ||
+				params.Client.Extensions.Profile == oppb.EnumClientProfile_ENUM_CLIENT_PROFILE_FAPI_2_0 {
 				// https://openid.net/specs/openid-financial-api-part-2-1_0.html#algorithm-considerations
 				// FAPIではクライアントjwtの署名アルゴリズムは制限がある
 				if slices.Contains(fapiRejectionAlg, fmt.Sprintf("%v", token.Header["alg"])) {

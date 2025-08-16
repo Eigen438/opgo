@@ -30,23 +30,22 @@ import (
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 )
 
-func (i *innerSdk) StartSession(param *IssueRequest) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := connect.NewRequest(&oppb.StartSessionRequest{
-			Subject:   param.Subject,
-			RequestId: param.RequestId,
-		})
-		auth.SetAuth(req, i)
-		res, err := i.provider.StartSession(r.Context(), req)
-		if err != nil {
-			return
-		}
-		http.SetCookie(w, &http.Cookie{
-			Name:     res.Msg.Name,
-			Value:    res.Msg.Value,
-			Secure:   true,
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
-		})
+func (i *innerSdk) startSession(w http.ResponseWriter, r *http.Request, requestId, subject string) (string, error) {
+	req := connect.NewRequest(&oppb.StartSessionRequest{
+		Subject:   subject,
+		RequestId: requestId,
+	})
+	auth.SetAuth(req, i)
+	res, err := i.provider.StartSession(r.Context(), req)
+	if err != nil {
+		return "", err
 	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     res.Msg.Name,
+		Value:    res.Msg.Value,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	return res.Msg.Value, nil
 }
