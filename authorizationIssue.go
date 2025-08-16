@@ -31,12 +31,6 @@ import (
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )
 
-type IssueRequest struct {
-	RequestId string
-	SessionId string
-	Subject   string
-}
-
 func (i *innerSdk) AuthorizationIssue(w http.ResponseWriter, r *http.Request, requestId, subject string) {
 	err := i.authorizationIssue(w, r, requestId, "", subject)
 	if err != nil {
