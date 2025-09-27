@@ -22,87 +22,86 @@
 
 package model
 
-type ClaimObject struct {
-	Essential bool        `json:"essential"`
-	Value     interface{} `json:"value"`
-	Values    []string    `json:"values"`
-}
-
-type ClaimRules struct {
-	Userinfo map[string]*ClaimObject `json:"userinfo"`
-	IdToken  map[string]*ClaimObject `json:"id_token"`
-}
-
 // https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
-var DefaultScopeToClaims = map[string]ClaimRules{
+var defaultScopeToClaims = map[string]ClaimRules{
 	"profile": {
-		Userinfo: map[string]*ClaimObject{
-			"name":               nil,
-			"family_name":        nil,
-			"given_name":         nil,
-			"middle_name":        nil,
-			"nickname":           nil,
-			"preferred_username": nil,
-			"profile":            nil,
-			"picture":            nil,
-			"website":            nil,
-			"gender":             nil,
-			"birthdate":          nil,
-			"zoneinfo":           nil,
-			"locale":             nil,
-			"updated_at":         nil,
+		Userinfo: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"name":               nil,
+					"family_name":        nil,
+					"given_name":         nil,
+					"middle_name":        nil,
+					"nickname":           nil,
+					"preferred_username": nil,
+					"profile":            nil,
+					"picture":            nil,
+					"website":            nil,
+					"gender":             nil,
+					"birthdate":          nil,
+					"zoneinfo":           nil,
+					"locale":             nil,
+					"updated_at":         nil,
+				},
+			},
 		},
 	},
 	"email": {
-		Userinfo: map[string]*ClaimObject{
-			"email":          nil,
-			"email_verified": nil,
+		Userinfo: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"email":          nil,
+					"email_verified": nil,
+				},
+			},
 		},
 	},
 	"address": {
-		Userinfo: map[string]*ClaimObject{
-			"address": nil,
+		Userinfo: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"address": nil,
+				},
+			},
 		},
 	},
 	"phone": {
-		Userinfo: map[string]*ClaimObject{
-			"phone_number":          nil,
-			"phone_number_verified": nil,
+		Userinfo: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"phone_number":          nil,
+					"phone_number_verified": nil,
+				},
+			},
 		},
 	},
 }
 
 func NewAcrClaimRules(acrValues []string) *ClaimRules {
+	vals := []interface{}{}
+	for _, val := range acrValues {
+		vals = append(vals, val)
+	}
 	return &ClaimRules{
-		IdToken: map[string]*ClaimObject{
-			"acr": {
-				Essential: true,
-				Values:    acrValues,
+		IdToken: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"acr": {
+						leaf: &ClaimsLeaf{
+							Essential: NewTrue(),
+							Values:    vals,
+						},
+					},
+				},
 			},
 		},
-	}
-}
-
-func NewClaimRules() *ClaimRules {
-	return &ClaimRules{
-		Userinfo: map[string]*ClaimObject{},
-		IdToken:  map[string]*ClaimObject{},
-	}
-}
-
-func (c *ClaimRules) Append(o *ClaimRules) {
-	for k, v := range o.Userinfo {
-		c.Userinfo[k] = v
-	}
-	for k, v := range o.IdToken {
-		c.IdToken[k] = v
 	}
 }
 
 func MakeClaimRulesFromDefaultScope(scopes []string) *ClaimRules {
 	ret := NewClaimRules()
 	for _, scope := range scopes {
-		target, ok := DefaultScopeToClaims[scope]
+		target, ok := defaultScopeToClaims[scope]
 		if ok {
 			ret.Append(&target)
 		}

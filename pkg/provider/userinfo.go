@@ -102,12 +102,10 @@ func (p *Provider) Userinfo(ctx context.Context,
 
 		// ClaimRulesを復元
 		cr := model.NewClaimRules()
-		_ = json.Unmarshal(access.Details.Authorized.Request.RequestClaims, cr)
-		for key, val := range in {
-			if _, ok := cr.Userinfo[key]; ok {
-				u[key] = val
-			}
+		if err := json.Unmarshal(access.Details.Authorized.Request.RequestClaims, cr); err != nil {
+			return nil, err
 		}
+		cr.MekeUserinfoClaims(in, u)
 
 		if access.Details.Authorized.Request.Client.Meta.UserinfoSignedResponseAlg == "" {
 			return responseJson(u)

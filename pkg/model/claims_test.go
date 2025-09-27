@@ -24,6 +24,7 @@ package model
 
 import (
 	"encoding/json"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,76 +33,96 @@ import (
 func TestMakeClaimRuleFromDefaultScope(t *testing.T) {
 	assert := assert.New(t)
 	claims := MakeClaimRulesFromDefaultScope([]string{"openid", "address", "email"})
-	assert.Contains(claims.Userinfo, "address")
-	assert.Contains(claims.Userinfo, "email")
-	assert.Contains(claims.Userinfo, "email_verified")
-	assert.NotContains(claims.Userinfo, "name")
-	assert.Nil(claims.Userinfo["address"])
-	assert.Nil(claims.Userinfo["email"])
-	assert.Nil(claims.Userinfo["email_verified"])
+	assert.Contains(claims.Userinfo.Claims.branch, "address")
+	assert.Contains(claims.Userinfo.Claims.branch, "email")
+	assert.Contains(claims.Userinfo.Claims.branch, "email_verified")
+	assert.NotContains(claims.Userinfo.Claims.branch, "name")
+	assert.Nil(claims.Userinfo.Claims.branch["address"])
+	assert.Nil(claims.Userinfo.Claims.branch["email"])
+	assert.Nil(claims.Userinfo.Claims.branch["email_verified"])
 
 	jsonString, err := json.Marshal(claims)
+	log.Printf("jsonString: %s", jsonString)
 	assert.Nil(err)
 	revert := NewClaimRules()
 	err = json.Unmarshal(jsonString, revert)
 	assert.Nil(err)
-	assert.Contains(revert.Userinfo, "address")
-	assert.Contains(revert.Userinfo, "email")
-	assert.Contains(revert.Userinfo, "email_verified")
-	assert.NotContains(revert.Userinfo, "name")
-	assert.Nil(revert.Userinfo["address"])
-	assert.Nil(revert.Userinfo["email"])
-	assert.Nil(revert.Userinfo["email_verified"])
+	assert.Contains(revert.Userinfo.Claims.branch, "address")
+	assert.Contains(revert.Userinfo.Claims.branch, "email")
+	assert.Contains(revert.Userinfo.Claims.branch, "email_verified")
+	assert.NotContains(revert.Userinfo.Claims.branch, "name")
+	assert.Nil(revert.Userinfo.Claims.branch["address"])
+	assert.Nil(revert.Userinfo.Claims.branch["email"])
+	assert.Nil(revert.Userinfo.Claims.branch["email_verified"])
 }
 
 func TestClaimRules(t *testing.T) {
 	assert := assert.New(t)
 	target := ClaimRules{
-		Userinfo: map[string]*ClaimObject{
-			"given_name": {
-				Essential: true,
+		Userinfo: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"given_name": {
+						leaf: &ClaimsLeaf{
+							Essential: NewTrue(),
+						},
+					},
+					"nickame": nil,
+					"email": {
+						leaf: &ClaimsLeaf{
+							Essential: NewTrue(),
+						},
+					},
+					"email_verified": {
+						leaf: &ClaimsLeaf{
+							Essential: NewTrue(),
+						},
+					},
+					"picture": nil,
+				},
 			},
-			"nickame": nil,
-			"email": {
-				Essential: true,
-			},
-			"email_verified": {
-				Essential: true,
-			},
-			"picture": nil,
 		},
-		IdToken: map[string]*ClaimObject{
-			"gender": nil,
-			"birthdate": {
-				Essential: true,
-			},
-			"acr": {
-				Values: []string{
-					"urn:mace:incommon:iap:silver",
+		IdToken: &ClaimObjectRoot{
+			Claims: &ClaimsTree{
+				branch: map[string]*ClaimsTree{
+					"gender": nil,
+					"birthdate": {
+						leaf: &ClaimsLeaf{
+							Essential: NewTrue(),
+						},
+					},
+					"acr": {
+						leaf: &ClaimsLeaf{
+							Values: []interface{}{
+								"urn:mace:incommon:iap:silver",
+							},
+						},
+					},
 				},
 			},
 		},
 	}
 
 	jsonString, err := json.Marshal(target)
+	log.Printf("jsonString: %s", jsonString)
 	assert.Nil(err)
 	revert := NewClaimRules()
 	err = json.Unmarshal(jsonString, revert)
 	assert.Nil(err)
-	assert.Contains(revert.Userinfo, "given_name")
-	assert.Contains(revert.Userinfo, "nickame")
-	assert.Contains(revert.Userinfo, "email")
-	assert.Contains(revert.Userinfo, "email_verified")
-	assert.Contains(revert.Userinfo, "picture")
-	assert.True(revert.Userinfo["given_name"].Essential)
-	assert.Nil(revert.Userinfo["nickame"])
-	assert.True(revert.Userinfo["email"].Essential)
-	assert.True(revert.Userinfo["email_verified"].Essential)
-	assert.Nil(revert.Userinfo["picture"])
-	assert.Contains(revert.IdToken, "gender")
-	assert.Contains(revert.IdToken, "birthdate")
-	assert.Contains(revert.IdToken, "acr")
-	assert.Nil(revert.IdToken["gender"])
-	assert.True(revert.IdToken["birthdate"].Essential)
-	assert.Equal(revert.IdToken["acr"].Values[0], "urn:mace:incommon:iap:silver")
+	assert.Contains(revert.Userinfo.Claims.branch, "given_name")
+	assert.Contains(revert.Userinfo.Claims.branch, "nickame")
+	assert.Contains(revert.Userinfo.Claims.branch, "email")
+	assert.Contains(revert.Userinfo.Claims.branch, "email_verified")
+	assert.Contains(revert.Userinfo.Claims.branch, "picture")
+	assert.True(*revert.Userinfo.Claims.branch["given_name"].Leaf().Essential)
+	assert.Nil(revert.Userinfo.Claims.branch["nickame"])
+	assert.True(*revert.Userinfo.Claims.branch["email"].Leaf().Essential)
+	assert.True(*revert.Userinfo.Claims.branch["email_verified"].Leaf().Essential)
+	assert.Nil(revert.Userinfo.Claims.branch["picture"])
+	assert.Contains(revert.IdToken.Claims.branch, "gender")
+	assert.Contains(revert.IdToken.Claims.branch, "birthdate")
+	assert.Contains(revert.IdToken.Claims.branch, "acr")
+	assert.Nil(revert.IdToken.Claims.branch["gender"])
+	assert.True(*revert.IdToken.Claims.branch["birthdate"].Leaf().Essential)
+	assert.Equal(revert.IdToken.Claims.branch["acr"].Leaf().Values[0], "urn:mace:incommon:iap:silver")
 }

@@ -50,20 +50,15 @@ func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now
 
 	// ClaimRulesを復元
 	cr := model.NewClaimRules()
-	_ = json.Unmarshal(identifier.Details.Authorized.Request.RequestClaims, cr)
-	for key, val := range in {
-		if _, ok := cr.IdToken[key]; ok {
-			claims[key] = val
-		}
+	if err := json.Unmarshal(identifier.Details.Authorized.Request.RequestClaims, cr); err != nil {
+		return nil, err
 	}
+	cr.MekeIdTokenClaims(in, claims)
+
 	// https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
 	// response_typeがid_tokenの場合、id_tokenにuserinfoで要求された値を設定する
 	if identifier.Details.Authorized.Request.AuthParams.ResponseType == oauth.ResponseTypeIdToken {
-		for key, val := range in {
-			if _, ok := cr.Userinfo[key]; ok {
-				claims[key] = val
-			}
-		}
+		cr.MekeUserinfoClaims(in, claims)
 	}
 
 	// 動的生成クレーム付与（優先度高）
