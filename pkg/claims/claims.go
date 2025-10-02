@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
 // https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
 var defaultScopeToClaims = map[string]ClaimRules{

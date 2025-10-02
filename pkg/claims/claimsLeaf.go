@@ -20,45 +20,59 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
-import "encoding/json"
+import (
+	"reflect"
+	"slices"
+)
 
-type ClaimObjectRoot struct {
-	VerifiedClaims *VerifiedClaims `json:"verified_claims,omitempty"`
-	Claims         *ClaimsTree     `json:"claims,omitempty"`
+func NewTrue() *bool {
+	b := true
+	return &b
 }
 
-func (c *ClaimObjectRoot) UnmarshalJSON(byteString []byte) error {
-	temp := &ClaimsTree{
-		branch: map[string]*ClaimsTree{},
-	}
-	if err := json.Unmarshal(byteString, temp); err != nil {
-		return err
-	}
-	if v, ok := temp.branch["verified_claims"]; ok {
-		c.VerifiedClaims = NewVerifiedClaims(v)
-	}
-	if v, ok := temp.branch["claims"]; ok {
-		c.Claims = v
-	}
-	return nil
+func NewFalse() *bool {
+	b := false
+	return &b
 }
 
-func (c *ClaimObjectRoot) MakeClaims(in map[string]interface{}, out map[string]interface{}) {
+type ClaimsLeaf struct {
+	Essential *bool         `json:"essential,omitempty"`
+	MaxAge    *int64        `json:"max_age,omitempty"`
+	Purpose   string        `json:"purpose,omitempty"`
+	Value     interface{}   `json:"value,omitempty"`
+	Values    []interface{} `json:"values,omitempty"`
+}
+
+func (c *ClaimsLeaf) Verify(source interface{}) (interface{}, bool) {
 	if c == nil {
-		return
-	}
-	if ret := c.VerifiedClaims.Verify(in); ret != nil {
-		out["verified_claims"] = ret
-	}
-	if c.Claims != nil {
-		if _v := c.Claims.Filter(in); _v != nil {
-			if _out, ok := _v.(map[string]interface{}); ok {
-				for k, v := range _out {
-					out[k] = v
-				}
+		return nil, true
+	} else if c.Essential != nil {
+		if *c.Essential {
+			if source != nil {
+				return source, true
+			}
+			return nil, false
+		} else {
+			return source, true
+		}
+	} else if c.Value != nil {
+		if reflect.TypeOf(c.Value) == reflect.TypeOf(source) {
+			if c.Value == source {
+				return source, true
 			}
 		}
+		return nil, false
+	} else if c.Values != nil {
+		if slices.Contains(c.Values, source) {
+			return source, true
+		}
+		return nil, false
+	} else if c.MaxAge != nil {
+		// TODO: check max_age
+		return source, true
+	} else {
+		return source, true
 	}
 }

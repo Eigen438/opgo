@@ -1,6 +1,6 @@
 // MIT License
 //
-// # Copyright (c) 2025 Eigen
+// Copyright (c) 2025 Eigen
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,66 +20,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
-import (
-	"encoding/json"
-	"log"
-	"testing"
+import "encoding/json"
 
-	"github.com/stretchr/testify/assert"
-)
+type ClaimObjectRoot struct {
+	VerifiedClaims *VerifiedClaims `json:"verified_claims,omitempty"`
+	Claims         *ClaimsTree     `json:"claims,omitempty"`
+}
 
-func TestNewVerifiedClaims(t *testing.T) {
-	assert := assert.New(t)
-	jsonBytes := []byte(`
-		[{
-			"verification": {
-				"trust_framework": {
-					"value": "gold"
-				}
-			},
-			"claims": {
-				"given_name": null
-			}
-		},
-		{
-			"verification": {
-				"trust_framework": {
-					"value": "silver"
-				}
-			},
-			"claims": {
-				"family_name": null
-			}
-		}]
-	`)
-	ct := &ClaimsTree{}
-	err := json.Unmarshal(jsonBytes, ct)
-	assert.Nil(err)
-	vc := NewVerifiedClaims(ct)
-	assert.NotNil(vc)
-	revert, err := json.Marshal(vc)
-	assert.Nil(err)
-	log.Printf("vc %s", revert)
-	{
-		jsonBytes := []byte(`
-			{
-				"verified_claims": {
-					"verification": {
-						"trust_framework": "silver"
-					},
-					"claims": {
-						"given_name": "jane",
-						"family_name": "joe"
-					}
+func (c *ClaimObjectRoot) UnmarshalJSON(byteString []byte) error {
+	temp := &ClaimsTree{
+		branch: map[string]*ClaimsTree{},
+	}
+	if err := json.Unmarshal(byteString, temp); err != nil {
+		return err
+	}
+	if v, ok := temp.branch["verified_claims"]; ok {
+		c.VerifiedClaims = NewVerifiedClaims(v)
+	}
+	if v, ok := temp.branch["claims"]; ok {
+		c.Claims = v
+	}
+	return nil
+}
+
+func (c *ClaimObjectRoot) MakeClaims(in map[string]interface{}, out map[string]interface{}) {
+	if c == nil {
+		return
+	}
+	if ret := c.VerifiedClaims.Verify(in); ret != nil {
+		out["verified_claims"] = ret
+	}
+	if c.Claims != nil {
+		if _v := c.Claims.Filter(in); _v != nil {
+			if _out, ok := _v.(map[string]interface{}); ok {
+				for k, v := range _out {
+					out[k] = v
 				}
 			}
-		`)
-		source := map[string]interface{}{}
-		err := json.Unmarshal(jsonBytes, &source)
-		assert.Nil(err)
-		dest := vc.Verify(source)
-		log.Printf("%+v", dest)
+		}
 	}
 }

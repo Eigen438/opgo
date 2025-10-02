@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Eigen
+// # Copyright (c) 2025 Eigen
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,59 +20,66 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
 import (
-	"reflect"
-	"slices"
+	"encoding/json"
+	"log"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func NewTrue() *bool {
-	b := true
-	return &b
-}
-
-func NewFalse() *bool {
-	b := false
-	return &b
-}
-
-type ClaimsLeaf struct {
-	Essential *bool         `json:"essential,omitempty"`
-	MaxAge    *int64        `json:"max_age,omitempty"`
-	Purpose   string        `json:"purpose,omitempty"`
-	Value     interface{}   `json:"value,omitempty"`
-	Values    []interface{} `json:"values,omitempty"`
-}
-
-func (c *ClaimsLeaf) Verify(source interface{}) (interface{}, bool) {
-	if c == nil {
-		return nil, true
-	} else if c.Essential != nil {
-		if *c.Essential {
-			if source != nil {
-				return source, true
+func TestNewVerifiedClaims(t *testing.T) {
+	assert := assert.New(t)
+	jsonBytes := []byte(`
+		[{
+			"verification": {
+				"trust_framework": {
+					"value": "gold"
+				}
+			},
+			"claims": {
+				"given_name": null
 			}
-			return nil, false
-		} else {
-			return source, true
-		}
-	} else if c.Value != nil {
-		if reflect.TypeOf(c.Value) == reflect.TypeOf(source) {
-			if c.Value == source {
-				return source, true
+		},
+		{
+			"verification": {
+				"trust_framework": {
+					"value": "silver"
+				}
+			},
+			"claims": {
+				"family_name": null
 			}
-		}
-		return nil, false
-	} else if c.Values != nil {
-		if slices.Contains(c.Values, source) {
-			return source, true
-		}
-		return nil, false
-	} else if c.MaxAge != nil {
-		// TODO: check max_age
-		return source, true
-	} else {
-		return source, true
+		}]
+	`)
+	ct := &ClaimsTree{}
+	err := json.Unmarshal(jsonBytes, ct)
+	assert.Nil(err)
+	vc := NewVerifiedClaims(ct)
+	assert.NotNil(vc)
+	revert, err := json.Marshal(vc)
+	assert.Nil(err)
+	log.Printf("vc %s", revert)
+	{
+		jsonBytes := []byte(`
+			{
+				"verified_claims": {
+					"verification": {
+						"trust_framework": "silver"
+					},
+					"claims": {
+						"given_name": "jane",
+						"family_name": "joe"
+					}
+				}
+			}
+		`)
+		source := map[string]interface{}{}
+		err := json.Unmarshal(jsonBytes, &source)
+		assert.Nil(err)
+		dest := vc.Verify(source)
+		log.Printf("%+v", dest)
 	}
 }

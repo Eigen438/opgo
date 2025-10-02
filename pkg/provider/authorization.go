@@ -24,6 +24,7 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -42,6 +43,7 @@ import (
 	"github.com/Eigen438/opgo/internal/retryhelper"
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"github.com/Eigen438/opgo/pkg/claims"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 	"github.com/Eigen438/opgo/pkg/model"
 	"google.golang.org/grpc/codes"
@@ -528,6 +530,18 @@ func authorization(ctx context.Context,
 		}
 	}
 
+	// IDToken,Userinfoでどのようなクレームを期待されているかの情報をここで作成している
+	cr := claims.MakeClaimRulesFromDefaultScope(params.Scopes)
+	if len(params.AcrValues) > 0 {
+		cr.Append(claims.NewAcrClaimRules(params.AcrValues))
+	}
+	if len(params.Claims) > 0 {
+		cp := claims.NewClaimRules()
+		_ = json.Unmarshal([]byte(params.Claims), cp)
+		cr.Append(cp)
+	}
+	crJson, _ := json.Marshal(cr)
+
 	var r *model.Request
 	if err := retryhelper.RetryIfError(ctx, retryCount, func(ctx context.Context) error {
 		// リクエスト情報を生成する
@@ -535,7 +549,7 @@ func authorization(ctx context.Context,
 		if err != nil {
 			return err
 		}
-		r = model.NewRequest(requestId, iss.Meta.Issuer, client, params, time.Now())
+		r = model.NewRequest(requestId, iss.Meta.Issuer, client, params, crJson, time.Now())
 		return dataprovider.Create(ctx, r)
 	}); err != nil {
 		log.Printf("[BACKEND_ERROR] request Set retry over:%v", err)

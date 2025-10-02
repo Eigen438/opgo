@@ -34,6 +34,7 @@ import (
 	"github.com/Eigen438/opgo/internal/query"
 	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"github.com/Eigen438/opgo/pkg/claims"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/golang-jwt/jwt/v5"
@@ -101,7 +102,7 @@ func (p *Provider) Userinfo(ctx context.Context,
 		u["sub"] = access.Details.Authorized.Subject
 
 		// ClaimRulesを復元
-		cr := model.NewClaimRules()
+		cr := claims.NewClaimRules()
 		if err := json.Unmarshal(access.Details.Authorized.Request.RequestClaims, cr); err != nil {
 			return nil, err
 		}

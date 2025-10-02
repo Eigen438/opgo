@@ -24,7 +24,6 @@ package model
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -62,18 +61,8 @@ func NewRequest(
 	issuer string,
 	client *Client,
 	authParam *oppb.AuthorizationParameters,
+	requestClaims []byte,
 	now time.Time) *Request {
-	// IDToken,Userinfoでどのようなクレームを期待されているかの情報をここで作成している
-	cr := MakeClaimRulesFromDefaultScope(authParam.Scopes)
-	if len(authParam.AcrValues) > 0 {
-		cr.Append(NewAcrClaimRules(authParam.AcrValues))
-	}
-	if len(authParam.Claims) > 0 {
-		cp := NewClaimRules()
-		_ = json.Unmarshal([]byte(authParam.Claims), cp)
-		cr.Append(cp)
-	}
-	crJson, _ := json.Marshal(cr)
 	return &Request{
 		Details: RequestDetails{
 			Key: &oppb.CommonKey{
@@ -82,7 +71,7 @@ func NewRequest(
 			Client:        client,
 			AuthParams:    authParam,
 			Issuer:        issuer,
-			RequestClaims: crJson,
+			RequestClaims: requestClaims,
 		},
 		CreateAt: now,
 		ExpireAt: now.Add(time.Duration(client.Attribute.RequestLifetimeSeconds) * time.Second),
