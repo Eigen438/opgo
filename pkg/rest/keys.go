@@ -6,8 +6,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
+	"github.com/Eigen438/opgo/internal/auth"
 	"github.com/Eigen438/opgo/internal/keyutil"
-	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 )
 

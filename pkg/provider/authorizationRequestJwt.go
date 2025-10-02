@@ -30,9 +30,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Eigen438/opgo/internal/claims"
 	"github.com/Eigen438/opgo/internal/convert"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
-	"github.com/Eigen438/opgo/pkg/claims"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/MicahParks/jwkset"
 	"github.com/MicahParks/keyfunc/v3"

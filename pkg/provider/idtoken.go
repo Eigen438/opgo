@@ -31,10 +31,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Eigen438/opgo/internal/claims"
 	"github.com/Eigen438/opgo/internal/keyutil"
 	"github.com/Eigen438/opgo/internal/oauth"
 	"github.com/Eigen438/opgo/internal/randutil"
-	"github.com/Eigen438/opgo/pkg/claims"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/golang-jwt/jwt/v5"
 )
