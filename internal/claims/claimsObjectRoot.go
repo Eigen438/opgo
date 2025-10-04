@@ -39,15 +39,19 @@ func (c *claimObjectRoot) UnmarshalJSON(byteString []byte) error {
 	if v, ok := temp.branch["verified_claims"]; ok {
 		c.VerifiedClaims = newVerifiedClaims(v)
 	}
-	if v, ok := temp.branch["claims"]; ok {
-		c.Claims = v
-	}
+	delete(temp.branch, "verified_claims")
+	c.Claims = temp
 	return nil
 }
 
-func (c *claimObjectRoot) MakeClaims(in map[string]interface{}, out map[string]interface{}) {
+func (c *claimObjectRoot) MakeClaims(claims string, out map[string]interface{}) error {
+	in := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(claims), &in); err != nil {
+		return err
+	}
+
 	if c == nil {
-		return
+		return nil
 	}
 	if ret := c.VerifiedClaims.Verify(in); ret != nil {
 		out["verified_claims"] = ret
@@ -61,4 +65,5 @@ func (c *claimObjectRoot) MakeClaims(in map[string]interface{}, out map[string]i
 			}
 		}
 	}
+	return nil
 }

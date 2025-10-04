@@ -71,15 +71,3 @@ func (c *ClaimRules) Append(o *ClaimRules) {
 		}
 	}
 }
-
-func (c *ClaimRules) MekeIdTokenClaims(in map[string]interface{}, out map[string]interface{}) {
-	if c.IdToken != nil {
-		c.IdToken.MakeClaims(in, out)
-	}
-}
-
-func (c *ClaimRules) MekeUserinfoClaims(in map[string]interface{}, out map[string]interface{}) {
-	if c.Userinfo != nil {
-		c.Userinfo.MakeClaims(in, out)
-	}
-}

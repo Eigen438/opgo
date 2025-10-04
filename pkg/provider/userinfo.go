@@ -89,12 +89,6 @@ func (p *Provider) Userinfo(ctx context.Context,
 			}
 		}
 
-		in := map[string]interface{}{}
-		err := json.Unmarshal([]byte(access.Details.Authorized.Claims), &in)
-		if err != nil {
-			return nil, err
-		}
-
 		cr, err := makeClaimsRule(access.Details.Authorized.Request.AuthParams)
 		if err != nil {
 			return nil, err
@@ -102,7 +96,9 @@ func (p *Provider) Userinfo(ctx context.Context,
 
 		// クレーム情報からユーザ情報の応答を作成する
 		u := jwt.MapClaims{}
-		cr.MekeUserinfoClaims(in, u)
+		if err := cr.Userinfo.MakeClaims(access.Details.Authorized.Claims, u); err != nil {
+			return nil, err
+		}
 
 		// 必須クレーム設定
 		u["sub"] = access.Details.Authorized.Subject

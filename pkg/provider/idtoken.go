@@ -60,16 +60,16 @@ func makeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now
 
 	//マップのコピー
 	c := jwt.MapClaims{}
-	in := map[string]interface{}{}
-	if err := json.Unmarshal([]byte(identifier.Details.Authorized.Claims), &in); err != nil {
+	if err := cr.IdToken.MakeClaims(identifier.Details.Authorized.Claims, c); err != nil {
 		return nil, err
 	}
-	cr.MekeIdTokenClaims(in, c)
 
 	// https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
 	// response_typeがid_tokenの場合、id_tokenにuserinfoで要求された値を設定する
 	if identifier.Details.Authorized.Request.AuthParams.ResponseType == oauth.ResponseTypeIdToken {
-		cr.MekeUserinfoClaims(in, c)
+		if err := cr.Userinfo.MakeClaims(identifier.Details.Authorized.Claims, c); err != nil {
+			return nil, err
+		}
 	}
 
 	// 動的生成クレーム付与（優先度高）
