@@ -102,9 +102,10 @@ func (p *Provider) Userinfo(ctx context.Context,
 
 		// クレーム情報からユーザ情報の応答を作成する
 		u := jwt.MapClaims{}
+		cr.MekeUserinfoClaims(in, u)
+
 		// 必須クレーム設定
 		u["sub"] = access.Details.Authorized.Subject
-		cr.MekeUserinfoClaims(in, u)
 
 		if access.Details.Authorized.Request.Client.Meta.UserinfoSignedResponseAlg == "" {
 			return responseJson(u)
