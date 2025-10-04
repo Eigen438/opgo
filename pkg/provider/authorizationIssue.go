@@ -151,8 +151,9 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 
 		if slices.Contains(strings.Split(r.Details.AuthParams.ResponseType, " "), oauth.ResponseTypeToken) {
 			if err := retryhelper.RetryIfError(ctx, retryCount, func(ctx context.Context) error {
-				access, err := MakeAccessTokenIdentifier(authorized, time.Now(), "")
+				access, err := makeAccessTokenIdentifier(authorized, time.Now(), "")
 				if err != nil {
+					log.Printf("makeAccessTokenIdentifier error:%s", err.Error())
 					return err
 				}
 				if err := dataprovider.Create(ctx, access); err != nil {
@@ -170,15 +171,16 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 
 		if slices.Contains(strings.Split(r.Details.AuthParams.ResponseType, " "), oauth.ResponseTypeIdToken) {
 			if err := retryhelper.RetryIfError(ctx, retryCount, func(ctx context.Context) error {
-				id, err := MakeIdTokenIdentifier(authorized, time.Now())
+				id, err := makeIdTokenIdentifier(authorized, time.Now())
 				if err != nil {
+					log.Printf("makeIdTokenIdentifier error:%s", err.Error())
 					return err
 				}
 				if err := dataprovider.Create(ctx, id); err != nil {
 					return err
 				}
 
-				claims, err := MakeIdTokenClaims(iss, id, time.Now(), success.Code, success.AccessToken, success.State)
+				claims, err := makeIdTokenClaims(iss, id, time.Now(), success.Code, success.AccessToken, success.State)
 				if err != nil {
 					return err
 				}
@@ -201,7 +203,7 @@ func (p *Provider) AuthorizationIssue(ctx context.Context,
 		vals["session_state"] = getSessionState(r.Details.Client.Issuer.Id, r.Details.Client.Identity.ClientId, req.Msg.SessionId)
 		vals["state"] = success.State
 
-		builder, err := NewRedirectBuilder(iss, r.Details.Client, r.Details.AuthParams, vals)
+		builder, err := newRedirectBuilder(iss, r.Details.Client, r.Details.AuthParams, vals)
 		if err != nil {
 			log.Printf("[BACKEND_ERROR] redirect build error")
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("NewRedirectBuilder error: %v", err))

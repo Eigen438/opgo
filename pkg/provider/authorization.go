@@ -37,6 +37,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/auth"
+	"github.com/Eigen438/opgo/internal/keyutil"
 	"github.com/Eigen438/opgo/internal/oauth"
 	"github.com/Eigen438/opgo/internal/query"
 	"github.com/Eigen438/opgo/internal/randutil"
@@ -44,6 +45,7 @@ import (
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 	"github.com/Eigen438/opgo/pkg/model"
+	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -177,7 +179,7 @@ func makeFailResponse(
 		vals["iss"] = iss.Meta.Issuer
 	}
 
-	builder, err := NewRedirectBuilder(iss, client, params, vals)
+	builder, err := newRedirectBuilder(iss, client, params, vals)
 	if err != nil {
 		return nil, err
 	}
@@ -593,9 +595,9 @@ func authorization(ctx context.Context,
 
 	if slices.Contains(params.Prompts, "none") {
 		if params.IdTokenHint != "" {
-			hintClaims, err := VerifyIdToken(ctx, iss, params.IdTokenHint)
+			hintClaims, err := verifyIdToken(ctx, iss, params.IdTokenHint)
 			if err != nil {
-				log.Printf("VerifyIdToken error:%v", err)
+				log.Printf("verifyIdToken error:%v", err)
 				return connect.NewResponse(&oppb.AuthorizationResponse{
 					AuthorizationResponseOneof: &oppb.AuthorizationResponse_Fail{
 						Fail: failAuthorizationLoginRequired(),
@@ -674,4 +676,16 @@ func authorization(ctx context.Context,
 			},
 		}), nil
 	}
+}
+
+func verifyIdToken(ctx context.Context, iss *model.Issuer, idTokenString string) (*jwt.RegisteredClaims, error) {
+	out := &jwt.RegisteredClaims{}
+	_, err := jwt.NewParser(jwt.WithLeeway(24*time.Hour)).ParseWithClaims(idTokenString, out, keyutil.GetKeyfunc(ctx, iss.Key))
+	if err != nil {
+		return nil, err
+	}
+	if out.Issuer != iss.Meta.Issuer {
+		return nil, fmt.Errorf("unknown issuer")
+	}
+	return out, nil
 }

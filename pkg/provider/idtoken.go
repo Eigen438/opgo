@@ -23,16 +23,13 @@
 package provider
 
 import (
-	"context"
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/Eigen438/opgo/internal/claims"
-	"github.com/Eigen438/opgo/internal/keyutil"
 	"github.com/Eigen438/opgo/internal/oauth"
 	"github.com/Eigen438/opgo/internal/randutil"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
@@ -55,7 +52,7 @@ func makeClaimsRule(params *oppb.AuthorizationParameters) (*claims.ClaimRules, e
 	return cr, nil
 }
 
-func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now time.Time, code, accessToken, state string) (jwt.MapClaims, error) {
+func makeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now time.Time, code, accessToken, state string) (jwt.MapClaims, error) {
 	cr, err := makeClaimsRule(identifier.Details.Authorized.Request.AuthParams)
 	if err != nil {
 		return nil, err
@@ -130,7 +127,7 @@ func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now
 	return c, nil
 }
 
-func MakeIdTokenIdentifier(authorized model.Authorized, now time.Time) (*model.TokenIdentifier, error) {
+func makeIdTokenIdentifier(authorized model.Authorized, now time.Time) (*model.TokenIdentifier, error) {
 	identifier, err := randutil.UuidV4()
 	if err != nil {
 		return nil, err
@@ -148,7 +145,7 @@ func MakeIdTokenIdentifier(authorized model.Authorized, now time.Time) (*model.T
 	}, nil
 }
 
-func MakeAccessTokenIdentifier(authorized model.Authorized, now time.Time, tlsClientCertificate string) (*model.TokenIdentifier, error) {
+func makeAccessTokenIdentifier(authorized model.Authorized, now time.Time, tlsClientCertificate string) (*model.TokenIdentifier, error) {
 	identifier, err := randutil.UuidV4()
 	if err != nil {
 		return nil, err
@@ -167,7 +164,7 @@ func MakeAccessTokenIdentifier(authorized model.Authorized, now time.Time, tlsCl
 	}, nil
 }
 
-func MakeRefreshTokenIdentifier(authorized model.Authorized, now time.Time) (*model.TokenIdentifier, error) {
+func makeRefreshTokenIdentifier(authorized model.Authorized, now time.Time) (*model.TokenIdentifier, error) {
 	identifier, err := randutil.UuidV4()
 	if err != nil {
 		return nil, err
@@ -183,18 +180,6 @@ func MakeRefreshTokenIdentifier(authorized model.Authorized, now time.Time) (*mo
 		RequestId: authorized.Request.Key.Id,
 		SessionId: authorized.SessionId,
 	}, nil
-}
-
-func VerifyIdToken(ctx context.Context, iss *model.Issuer, idTokenString string) (*jwt.RegisteredClaims, error) {
-	out := &jwt.RegisteredClaims{}
-	_, err := jwt.NewParser(jwt.WithLeeway(24*time.Hour)).ParseWithClaims(idTokenString, out, keyutil.GetKeyfunc(ctx, iss.Key))
-	if err != nil {
-		return nil, err
-	}
-	if out.Issuer != iss.Meta.Issuer {
-		return nil, fmt.Errorf("unknown issuer")
-	}
-	return out, nil
 }
 
 func createHash(signedAlg, target string) []byte {
