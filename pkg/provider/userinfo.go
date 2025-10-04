@@ -32,7 +32,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
 	"github.com/Eigen438/opgo/internal/auth"
-	"github.com/Eigen438/opgo/internal/claims"
 	"github.com/Eigen438/opgo/internal/query"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
@@ -96,16 +95,15 @@ func (p *Provider) Userinfo(ctx context.Context,
 			return nil, err
 		}
 
+		cr, err := makeClaimsRule(access.Details.Authorized.Request.AuthParams)
+		if err != nil {
+			return nil, err
+		}
+
 		// クレーム情報からユーザ情報の応答を作成する
 		u := jwt.MapClaims{}
 		// 必須クレーム設定
 		u["sub"] = access.Details.Authorized.Subject
-
-		// ClaimRulesを復元
-		cr := claims.NewClaimRules()
-		if err := json.Unmarshal(access.Details.Authorized.Request.RequestClaims, cr); err != nil {
-			return nil, err
-		}
 		cr.MekeUserinfoClaims(in, u)
 
 		if access.Details.Authorized.Request.Client.Meta.UserinfoSignedResponseAlg == "" {

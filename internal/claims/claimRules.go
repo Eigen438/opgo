@@ -23,8 +23,8 @@
 package claims
 
 type ClaimRules struct {
-	Userinfo *ClaimObjectRoot `json:"userinfo,omitempty"`
-	IdToken  *ClaimObjectRoot `json:"id_token,omitempty"`
+	Userinfo *claimObjectRoot `json:"userinfo,omitempty"`
+	IdToken  *claimObjectRoot `json:"id_token,omitempty"`
 }
 
 func NewClaimRules() *ClaimRules {
@@ -34,7 +34,7 @@ func NewClaimRules() *ClaimRules {
 func (c *ClaimRules) Append(o *ClaimRules) {
 	if o.Userinfo != nil {
 		if c.Userinfo == nil {
-			c.Userinfo = &ClaimObjectRoot{}
+			c.Userinfo = &claimObjectRoot{}
 		}
 		if o.Userinfo.VerifiedClaims != nil {
 			if c.Userinfo.VerifiedClaims == nil {
@@ -53,7 +53,7 @@ func (c *ClaimRules) Append(o *ClaimRules) {
 	}
 	if o.IdToken != nil {
 		if c.IdToken == nil {
-			c.IdToken = &ClaimObjectRoot{}
+			c.IdToken = &claimObjectRoot{}
 		}
 		if o.IdToken.VerifiedClaims != nil {
 			if c.IdToken.VerifiedClaims == nil {

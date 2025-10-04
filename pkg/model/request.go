@@ -31,11 +31,10 @@ import (
 )
 
 type RequestDetails struct {
-	Key           *oppb.CommonKey
-	Client        *Client
-	AuthParams    *oppb.AuthorizationParameters
-	Issuer        string
-	RequestClaims []byte
+	Key        *oppb.CommonKey
+	Client     *Client
+	AuthParams *oppb.AuthorizationParameters
+	Issuer     string
 }
 
 type Request struct {
@@ -61,17 +60,15 @@ func NewRequest(
 	issuer string,
 	client *Client,
 	authParam *oppb.AuthorizationParameters,
-	requestClaims []byte,
 	now time.Time) *Request {
 	return &Request{
 		Details: RequestDetails{
 			Key: &oppb.CommonKey{
 				Id: id,
 			},
-			Client:        client,
-			AuthParams:    authParam,
-			Issuer:        issuer,
-			RequestClaims: requestClaims,
+			Client:     client,
+			AuthParams: authParam,
+			Issuer:     issuer,
 		},
 		CreateAt: now,
 		ExpireAt: now.Add(time.Duration(client.Attribute.RequestLifetimeSeconds) * time.Second),

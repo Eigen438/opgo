@@ -35,23 +35,36 @@ import (
 	"github.com/Eigen438/opgo/internal/keyutil"
 	"github.com/Eigen438/opgo/internal/oauth"
 	"github.com/Eigen438/opgo/internal/randutil"
+	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now time.Time, code, accessToken, state string) (jwt.MapClaims, error) {
-	//マップのコピー
-	c := jwt.MapClaims{}
+func makeClaimsRule(params *oppb.AuthorizationParameters) (*claims.ClaimRules, error) {
+	cr := claims.MakeClaimRulesFromDefaultScope(params.Scopes)
+	if len(params.AcrValues) > 0 {
+		cr.Append(claims.NewAcrClaimRules(params.AcrValues))
+	}
+	if len(params.Claims) > 0 {
+		cp := claims.NewClaimRules()
+		if err := json.Unmarshal([]byte(params.Claims), cp); err != nil {
+			return nil, err
+		}
+		cr.Append(cp)
+	}
+	return cr, nil
+}
 
-	in := map[string]interface{}{}
-	err := json.Unmarshal([]byte(identifier.Details.Authorized.Claims), &in)
+func MakeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now time.Time, code, accessToken, state string) (jwt.MapClaims, error) {
+	cr, err := makeClaimsRule(identifier.Details.Authorized.Request.AuthParams)
 	if err != nil {
 		return nil, err
 	}
 
-	// ClaimRulesを復元
-	cr := claims.NewClaimRules()
-	if err := json.Unmarshal(identifier.Details.Authorized.Request.RequestClaims, cr); err != nil {
+	//マップのコピー
+	c := jwt.MapClaims{}
+	in := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(identifier.Details.Authorized.Claims), &in); err != nil {
 		return nil, err
 	}
 	cr.MekeIdTokenClaims(in, c)

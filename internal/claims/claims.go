@@ -25,9 +25,9 @@ package claims
 // https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
 var defaultScopeToClaims = map[string]ClaimRules{
 	"profile": {
-		Userinfo: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		Userinfo: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"name":               nil,
 					"family_name":        nil,
 					"given_name":         nil,
@@ -47,9 +47,9 @@ var defaultScopeToClaims = map[string]ClaimRules{
 		},
 	},
 	"email": {
-		Userinfo: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		Userinfo: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"email":          nil,
 					"email_verified": nil,
 				},
@@ -57,18 +57,18 @@ var defaultScopeToClaims = map[string]ClaimRules{
 		},
 	},
 	"address": {
-		Userinfo: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		Userinfo: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"address": nil,
 				},
 			},
 		},
 	},
 	"phone": {
-		Userinfo: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		Userinfo: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"phone_number":          nil,
 					"phone_number_verified": nil,
 				},
@@ -83,12 +83,12 @@ func NewAcrClaimRules(acrValues []string) *ClaimRules {
 		vals = append(vals, val)
 	}
 	return &ClaimRules{
-		IdToken: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		IdToken: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"acr": {
-						leaf: &ClaimsLeaf{
-							Essential: NewTrue(),
+						leaf: &claimsLeaf{
+							Essential: newTrue(),
 							Values:    vals,
 						},
 					},

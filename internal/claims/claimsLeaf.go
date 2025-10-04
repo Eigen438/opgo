@@ -27,17 +27,17 @@ import (
 	"slices"
 )
 
-func NewTrue() *bool {
+func newTrue() *bool {
 	b := true
 	return &b
 }
 
-func NewFalse() *bool {
+func newFalse() *bool {
 	b := false
 	return &b
 }
 
-type ClaimsLeaf struct {
+type claimsLeaf struct {
 	Essential *bool         `json:"essential,omitempty"`
 	MaxAge    *int64        `json:"max_age,omitempty"`
 	Purpose   string        `json:"purpose,omitempty"`
@@ -45,7 +45,7 @@ type ClaimsLeaf struct {
 	Values    []interface{} `json:"values,omitempty"`
 }
 
-func (c *ClaimsLeaf) Verify(source interface{}) (interface{}, bool) {
+func (c *claimsLeaf) Verify(source interface{}) (interface{}, bool) {
 	if c == nil {
 		return nil, true
 	} else if c.Essential != nil {

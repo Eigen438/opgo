@@ -24,24 +24,24 @@ package claims
 
 import "encoding/json"
 
-type VerifiedClaims ClaimsTree
+type verifiedClaims claimsTree
 
-type verifiedClaims struct {
+type temporaryClaims struct {
 	Verification interface{} `json:"verification,omitempty"`
 	Claims       interface{} `json:"claims,omitempty"`
 }
 
-func NewVerifiedClaims(ct *ClaimsTree) *VerifiedClaims {
+func newVerifiedClaims(ct *claimsTree) *verifiedClaims {
 	if ct == nil {
 		return nil
 	}
-	return &VerifiedClaims{
+	return &verifiedClaims{
 		array:  ct.array,
 		branch: ct.branch,
 	}
 }
 
-func (c *VerifiedClaims) Verify(source map[string]interface{}) interface{} {
+func (c *verifiedClaims) Verify(source map[string]interface{}) interface{} {
 	if c == nil {
 		return nil
 	}
@@ -51,12 +51,12 @@ func (c *VerifiedClaims) Verify(source map[string]interface{}) interface{} {
 			csource, ok2 := vc["claims"]
 			if ok1 && ok2 {
 				if c.array != nil {
-					ret := []verifiedClaims{}
+					ret := []temporaryClaims{}
 					for _, item := range c.array {
 						vout, ok1 := item.branch["verification"].Verify(vsource)
 						cout := item.branch["claims"].Filter(csource)
 						if vout != nil && ok1 && cout != nil {
-							ret = append(ret, verifiedClaims{
+							ret = append(ret, temporaryClaims{
 								Verification: vout,
 								Claims:       cout,
 							})
@@ -70,7 +70,7 @@ func (c *VerifiedClaims) Verify(source map[string]interface{}) interface{} {
 					vout, ok1 := c.branch["verification"].Verify(vsource)
 					cout := c.branch["claims"].Filter(csource)
 					if vout != nil && ok1 && cout != nil {
-						return verifiedClaims{
+						return temporaryClaims{
 							Verification: vout,
 							Claims:       cout,
 						}
@@ -83,8 +83,8 @@ func (c *VerifiedClaims) Verify(source map[string]interface{}) interface{} {
 	return nil
 }
 
-func (c *VerifiedClaims) UnmarshalJSON(byteString []byte) error {
-	ct := &ClaimsTree{}
+func (c *verifiedClaims) UnmarshalJSON(byteString []byte) error {
+	ct := &claimsTree{}
 	err := json.Unmarshal(byteString, ct)
 	if err != nil {
 		return err
@@ -94,11 +94,11 @@ func (c *VerifiedClaims) UnmarshalJSON(byteString []byte) error {
 	return nil
 }
 
-func (c *VerifiedClaims) MarshalJSON() ([]byte, error) {
+func (c *verifiedClaims) MarshalJSON() ([]byte, error) {
 	if c == nil {
 		return []byte("null"), nil
 	}
-	ct := &ClaimsTree{
+	ct := &claimsTree{
 		array:  c.array,
 		branch: c.branch,
 	}

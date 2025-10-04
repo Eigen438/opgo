@@ -59,40 +59,40 @@ func TestMakeClaimRuleFromDefaultScope(t *testing.T) {
 func TestClaimRules(t *testing.T) {
 	assert := assert.New(t)
 	target := ClaimRules{
-		Userinfo: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		Userinfo: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"given_name": {
-						leaf: &ClaimsLeaf{
-							Essential: NewTrue(),
+						leaf: &claimsLeaf{
+							Essential: newTrue(),
 						},
 					},
 					"nickame": nil,
 					"email": {
-						leaf: &ClaimsLeaf{
-							Essential: NewTrue(),
+						leaf: &claimsLeaf{
+							Essential: newTrue(),
 						},
 					},
 					"email_verified": {
-						leaf: &ClaimsLeaf{
-							Essential: NewTrue(),
+						leaf: &claimsLeaf{
+							Essential: newTrue(),
 						},
 					},
 					"picture": nil,
 				},
 			},
 		},
-		IdToken: &ClaimObjectRoot{
-			Claims: &ClaimsTree{
-				branch: map[string]*ClaimsTree{
+		IdToken: &claimObjectRoot{
+			Claims: &claimsTree{
+				branch: map[string]*claimsTree{
 					"gender": nil,
 					"birthdate": {
-						leaf: &ClaimsLeaf{
-							Essential: NewTrue(),
+						leaf: &claimsLeaf{
+							Essential: newTrue(),
 						},
 					},
 					"acr": {
-						leaf: &ClaimsLeaf{
+						leaf: &claimsLeaf{
 							Values: []interface{}{
 								"urn:mace:incommon:iap:silver",
 							},

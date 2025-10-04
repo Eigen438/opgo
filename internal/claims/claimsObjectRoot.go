@@ -24,20 +24,20 @@ package claims
 
 import "encoding/json"
 
-type ClaimObjectRoot struct {
-	VerifiedClaims *VerifiedClaims `json:"verified_claims,omitempty"`
-	Claims         *ClaimsTree     `json:"claims,omitempty"`
+type claimObjectRoot struct {
+	VerifiedClaims *verifiedClaims `json:"verified_claims,omitempty"`
+	Claims         *claimsTree     `json:"claims,omitempty"`
 }
 
-func (c *ClaimObjectRoot) UnmarshalJSON(byteString []byte) error {
-	temp := &ClaimsTree{
-		branch: map[string]*ClaimsTree{},
+func (c *claimObjectRoot) UnmarshalJSON(byteString []byte) error {
+	temp := &claimsTree{
+		branch: map[string]*claimsTree{},
 	}
 	if err := json.Unmarshal(byteString, temp); err != nil {
 		return err
 	}
 	if v, ok := temp.branch["verified_claims"]; ok {
-		c.VerifiedClaims = NewVerifiedClaims(v)
+		c.VerifiedClaims = newVerifiedClaims(v)
 	}
 	if v, ok := temp.branch["claims"]; ok {
 		c.Claims = v
@@ -45,7 +45,7 @@ func (c *ClaimObjectRoot) UnmarshalJSON(byteString []byte) error {
 	return nil
 }
 
-func (c *ClaimObjectRoot) MakeClaims(in map[string]interface{}, out map[string]interface{}) {
+func (c *claimObjectRoot) MakeClaims(in map[string]interface{}, out map[string]interface{}) {
 	if c == nil {
 		return
 	}

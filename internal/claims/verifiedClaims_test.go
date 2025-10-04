@@ -54,10 +54,10 @@ func TestNewVerifiedClaims(t *testing.T) {
 			}
 		}]
 	`)
-	ct := &ClaimsTree{}
+	ct := &claimsTree{}
 	err := json.Unmarshal(jsonBytes, ct)
 	assert.Nil(err)
-	vc := NewVerifiedClaims(ct)
+	vc := newVerifiedClaims(ct)
 	assert.NotNil(vc)
 	revert, err := json.Marshal(vc)
 	assert.Nil(err)

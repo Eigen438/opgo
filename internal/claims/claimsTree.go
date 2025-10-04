@@ -28,25 +28,25 @@ import (
 	"strings"
 )
 
-type ClaimsTree struct {
-	leaf   *ClaimsLeaf
-	branch map[string]*ClaimsTree
-	array  []ClaimsTree
+type claimsTree struct {
+	leaf   *claimsLeaf
+	branch map[string]*claimsTree
+	array  []claimsTree
 }
 
-func (c ClaimsTree) Leaf() *ClaimsLeaf {
+func (c claimsTree) Leaf() *claimsLeaf {
 	return c.leaf
 }
 
-func (c ClaimsTree) Branch() map[string]*ClaimsTree {
+func (c claimsTree) Branch() map[string]*claimsTree {
 	return c.branch
 }
 
-func (c ClaimsTree) Array() []ClaimsTree {
+func (c claimsTree) Array() []claimsTree {
 	return c.array
 }
 
-func (c *ClaimsTree) Verify(source interface{}) (interface{}, bool) {
+func (c *claimsTree) Verify(source interface{}) (interface{}, bool) {
 	if c == nil {
 		return source, true
 	} else if source == nil {
@@ -99,7 +99,7 @@ func (c *ClaimsTree) Verify(source interface{}) (interface{}, bool) {
 	}
 }
 
-func (c *ClaimsTree) Filter(source interface{}) interface{} {
+func (c *claimsTree) Filter(source interface{}) interface{} {
 	if c == nil {
 		return source
 	} else if source == nil {
@@ -148,7 +148,7 @@ func (c *ClaimsTree) Filter(source interface{}) interface{} {
 	}
 }
 
-func (c *ClaimsTree) Append(target *ClaimsTree) {
+func (c *claimsTree) Append(target *claimsTree) {
 	if c.array != nil && target.array != nil {
 		c.array = append(c.array, target.array...)
 	} else if c.branch != nil && target.branch != nil {
@@ -158,16 +158,16 @@ func (c *ClaimsTree) Append(target *ClaimsTree) {
 	}
 }
 
-func (c *ClaimsTree) UnmarshalJSON(byteString []byte) error {
+func (c *claimsTree) UnmarshalJSON(byteString []byte) error {
 	if strings.HasPrefix(string(byteString), "[") {
-		var i = []ClaimsTree{}
+		var i = []claimsTree{}
 		err := json.Unmarshal(byteString, &i)
 		if err != nil {
 			return err
 		}
 		c.array = i
 	} else if strings.HasPrefix(string(byteString), "{") {
-		var i = map[string]*ClaimsTree{}
+		var i = map[string]*claimsTree{}
 		err := json.Unmarshal(byteString, &i)
 		if err != nil {
 			return err
@@ -178,7 +178,7 @@ func (c *ClaimsTree) UnmarshalJSON(byteString []byte) error {
 		_, ok4 := i["purpose"]
 		_, ok5 := i["max_age"]
 		if ok1 || ok2 || ok3 || ok4 || ok5 {
-			var i = &ClaimsLeaf{}
+			var i = &claimsLeaf{}
 			err := json.Unmarshal(byteString, &i)
 			if err != nil {
 				return err
@@ -195,7 +195,7 @@ func (c *ClaimsTree) UnmarshalJSON(byteString []byte) error {
 	return nil
 }
 
-func (c *ClaimsTree) MarshalJSON() ([]byte, error) {
+func (c *claimsTree) MarshalJSON() ([]byte, error) {
 	if c == nil {
 		return []byte("null"), nil
 	}

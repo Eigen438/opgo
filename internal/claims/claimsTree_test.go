@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func targetClaimsTree(assert *assert.Assertions) *ClaimsTree {
+func targetClaimsTree(assert *assert.Assertions) *claimsTree {
 	jsonString := `{
 		"abc":{"essential":false},
 		"def":null,
@@ -39,7 +39,7 @@ func targetClaimsTree(assert *assert.Assertions) *ClaimsTree {
 			"mno":null
 		}]
 	}`
-	ct := &ClaimsTree{}
+	ct := &claimsTree{}
 	err := json.Unmarshal([]byte(jsonString), ct)
 	assert.Nil(err)
 	return ct
@@ -48,8 +48,8 @@ func targetClaimsTree(assert *assert.Assertions) *ClaimsTree {
 func TestClaimsTree(t *testing.T) {
 	assert := assert.New(t)
 	{
-		ct := &ClaimsTree{
-			branch: map[string]*ClaimsTree{
+		ct := &claimsTree{
+			branch: map[string]*claimsTree{
 				"test": {},
 			},
 		}
@@ -58,23 +58,23 @@ func TestClaimsTree(t *testing.T) {
 		assert.Equal([]byte(`{"test":null}`), v)
 	}
 	{
-		ct := &ClaimsTree{
-			branch: map[string]*ClaimsTree{},
+		ct := &claimsTree{
+			branch: map[string]*claimsTree{},
 		}
 		v, err := json.Marshal(ct)
 		assert.Nil(err)
 		assert.Equal([]byte(`null`), v)
 	}
 	{
-		ct := &ClaimsTree{
-			branch: map[string]*ClaimsTree{
+		ct := &claimsTree{
+			branch: map[string]*claimsTree{
 				"abc": {
-					leaf: &ClaimsLeaf{
-						Essential: NewFalse(),
+					leaf: &claimsLeaf{
+						Essential: newFalse(),
 					},
 				},
 				"def": {
-					branch: map[string]*ClaimsTree{},
+					branch: map[string]*claimsTree{},
 				},
 			},
 		}

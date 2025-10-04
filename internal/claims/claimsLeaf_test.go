@@ -32,7 +32,7 @@ func TestClaimsLeaf(t *testing.T) {
 	assert := assert.New(t)
 	{
 		// value
-		l := &ClaimsLeaf{
+		l := &claimsLeaf{
 			Value: "123",
 		}
 		{
@@ -48,7 +48,7 @@ func TestClaimsLeaf(t *testing.T) {
 	}
 	{
 		// values
-		l := &ClaimsLeaf{
+		l := &claimsLeaf{
 			Values: []interface{}{"123", "456"},
 		}
 		{
@@ -69,7 +69,7 @@ func TestClaimsLeaf(t *testing.T) {
 	}
 	{
 		// 無指定
-		l := &ClaimsLeaf{}
+		l := &claimsLeaf{}
 		{
 			r, b := l.Verify("123")
 			assert.True(b)
@@ -83,7 +83,7 @@ func TestClaimsLeaf(t *testing.T) {
 	}
 	{
 		// nil
-		var l *ClaimsLeaf
+		var l *claimsLeaf
 		{
 			r, b := l.Verify("123")
 			assert.True(b)
@@ -97,8 +97,8 @@ func TestClaimsLeaf(t *testing.T) {
 	}
 	{
 		// essential: true
-		l := &ClaimsLeaf{
-			Essential: NewTrue(),
+		l := &claimsLeaf{
+			Essential: newTrue(),
 		}
 		{
 			r, b := l.Verify("123")
@@ -113,8 +113,8 @@ func TestClaimsLeaf(t *testing.T) {
 	}
 	{
 		// essential: true
-		l := &ClaimsLeaf{
-			Essential: NewFalse(),
+		l := &claimsLeaf{
+			Essential: newFalse(),
 		}
 		{
 			r, b := l.Verify("123")
