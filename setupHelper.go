@@ -87,24 +87,26 @@ func (helper SetupHelper) pushedAuthorizationPath() string {
 	return helper.PushedAuthorizationPath
 }
 
-func (p *SetupHelper) NewServeMux(sdk Sdk) *http.ServeMux {
+func (helper *SetupHelper) NewServeMux(sdk Sdk) *http.ServeMux {
 	mux := http.NewServeMux()
-	if p.useDiscovery() {
+	if helper.useDiscovery() {
 		mux.HandleFunc(DEFAULT_DISCOVERY_PATH, sdk.DiscoveryEndpoint)
 	}
-	mux.HandleFunc(p.authorizationPath(), sdk.AuthorizationEndpoint)
-	mux.HandleFunc(p.tokenPath(), sdk.TokenEndpoint)
-	if p.jwksPath() != "" {
-		mux.HandleFunc(p.jwksPath(), sdk.JwksEndpoint)
+
+	mux.HandleFunc(helper.authorizationPath(), sdk.AuthorizationEndpoint)
+	mux.HandleFunc(helper.tokenPath(), sdk.TokenEndpoint)
+
+	if helper.jwksPath() != "" {
+		mux.HandleFunc(helper.jwksPath(), sdk.JwksEndpoint)
 	}
-	if p.userinfoPath() != "" {
-		mux.HandleFunc(p.userinfoPath(), sdk.UserinfoEndpoint)
+	if helper.userinfoPath() != "" {
+		mux.HandleFunc(helper.userinfoPath(), sdk.UserinfoEndpoint)
 	}
-	if p.registrationPath() != "" {
-		mux.HandleFunc(p.registrationPath(), sdk.RegistrationEndpoint)
+	if helper.registrationPath() != "" {
+		mux.HandleFunc(helper.registrationPath(), sdk.RegistrationEndpoint)
 	}
-	if p.pushedAuthorizationPath() != "" {
-		mux.HandleFunc(p.pushedAuthorizationPath(), sdk.PushedAuthorizationEndpoint)
+	if helper.pushedAuthorizationPath() != "" {
+		mux.HandleFunc(helper.pushedAuthorizationPath(), sdk.PushedAuthorizationEndpoint)
 	}
 	return mux
 }
