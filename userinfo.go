@@ -40,7 +40,7 @@ func (i *innerSdk) UserinfoEndpoint(w http.ResponseWriter, r *http.Request) {
 			Method:               r.Method,
 			TlsClientCertificate: r.Header.Get("X-Client-Cert-Hash"),
 		})
-		// Formデータ取得
+		// Get form
 		defer r.Body.Close()
 		if r.Body != nil {
 			if b, err := io.ReadAll(r.Body); err == nil {

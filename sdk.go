@@ -63,13 +63,24 @@ type SdkCallbacks interface {
 	WriteLoginHtmlCallback(info *RequestInfo) http.HandlerFunc
 }
 
+// Sdk defines the interface for the OPGo SDK.
+// It provides methods for handling OpenID Connect endpoints, as well as other
+// management tasks.
 type Sdk interface {
+	// DiscoveryEndpoint handles the OpenID Connect discovery endpoint,
+	// which provides OpenID Provider configuration information to clients.
 	DiscoveryEndpoint(w http.ResponseWriter, r *http.Request)
+	// JwksEndpoint handles the JWKS endpoint.
 	JwksEndpoint(w http.ResponseWriter, r *http.Request)
+	// AuthorizationEndpoint handles the OpenID Connect authorization endpoint.
 	AuthorizationEndpoint(w http.ResponseWriter, r *http.Request)
+	// TokenEndpoint handles the OpenID Connect token endpoint.
 	TokenEndpoint(w http.ResponseWriter, r *http.Request)
+	// UserinfoEndpoint handles the OpenID Connect userinfo endpoint.
 	UserinfoEndpoint(w http.ResponseWriter, r *http.Request)
+	// RegistrationEndpoint handles the OpenID Connect client registration endpoint.
 	RegistrationEndpoint(w http.ResponseWriter, r *http.Request)
+	// PushedAuthorizationEndpoint handles the OpenID Connect pushed authorization endpoint.
 	PushedAuthorizationEndpoint(w http.ResponseWriter, r *http.Request)
 
 	// AuthorizationIssue issues an authorization request.
@@ -97,14 +108,16 @@ type Sdk interface {
 	// requestId is the ID of the request to retrieve information for.
 	GetRequestInfo(ctx context.Context, requestId string) (*RequestInfo, error)
 
-	//
+	// ClientCreate creates a new client.
 	ClientCreate(context.Context, ClientParam) error
+	// SessionGroupCreate creates a new session group.
 	SessionGroupCreate(context.Context, *oppb.SessionGroupCreateRequest) error
+	// KeyRotate rotates the key for a session group.
 	KeyRotate(context.Context, string) error
 }
 
 type innerSdk struct {
-	config   *Config
+	config   *SdkConfig
 	provider oppbconnect.ProviderServiceClient
 	rest     oppbconnect.RestServiceClient
 }
@@ -117,14 +130,21 @@ func (i *innerSdk) Password() string {
 	return i.config.IssuerPassword
 }
 
-type Config struct {
-	ServerHostPort string       `validate:"required"`
-	IssuerId       string       `validate:"required"`
-	IssuerPassword string       `validate:"required"`
-	Callbacks      SdkCallbacks `validate:"required"`
+// SdkConfig holds the configuration for the SDK.
+type SdkConfig struct {
+	// ServerHostPort is the host and port of the semi-hosted gRPC server.
+	ServerHostPort string `validate:"required"`
+	// IssuerId is the ID of the issuer.
+	IssuerId string `validate:"required"`
+	// IssuerPassword is the password for the issuer.
+	IssuerPassword string `validate:"required"`
+	// Callbacks is the SdkCallbacks interface to handle callbacks.
+	Callbacks SdkCallbacks `validate:"required"`
 }
 
-func NewSemiHostedSdk(config *Config) (Sdk, error) {
+// NewSemiHostedSdk creates a new SDK for connect semi-hosted gRPC server.
+// It takes a config object and returns an Sdk interface and an error.
+func NewSemiHostedSdk(config *SdkConfig) (Sdk, error) {
 	v := validator.New()
 	if err := v.Struct(config); err != nil {
 		return nil, err
@@ -156,6 +176,9 @@ func NewSemiHostedSdk(config *Config) (Sdk, error) {
 	return i, nil
 }
 
+// NewHostedSdk creates a new hosted SDK.
+// It takes a context, issuer metadata, SDK callbacks, and provider callbacks,
+// and returns an Sdk interface and an error.
 func NewHostedSdk(
 	ctx context.Context,
 	issuerMeta *oppb.IssuerMeta,
@@ -183,7 +206,7 @@ func NewHostedSdk(
 	}
 
 	i := &innerSdk{
-		config: &Config{
+		config: &SdkConfig{
 			IssuerId:       res.Key.Id,
 			IssuerPassword: res.Secret.Password,
 			Callbacks:      sdkCallbacks,
