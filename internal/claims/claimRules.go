@@ -20,41 +20,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package rest
+package claims
 
-import (
-	"context"
+type ClaimRules struct {
+	Userinfo *claimObjectRoot `json:"userinfo,omitempty"`
+	IdToken  *claimObjectRoot `json:"id_token,omitempty"`
+}
 
-	"connectrpc.com/connect"
-	"github.com/Eigen438/dataprovider"
-	"github.com/Eigen438/opgo/internal/auth"
-	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
-	"github.com/Eigen438/opgo/pkg/model"
-)
+func NewClaimRules() *ClaimRules {
+	return &ClaimRules{}
+}
 
-func (rest *Rest) SessionGroupCreate(ctx context.Context,
-	req *connect.Request[oppb.SessionGroupCreateRequest]) (*connect.Response[oppb.SessionGroupCreateResponse], error) {
-	if iss, err := auth.GetIssuer(ctx, req); err != nil {
-		return nil, err
-	} else {
-		sg := &model.SessionGroup{
-			Key:       req.Msg.Key,
-			Issuer:    iss.Key,
-			Attribute: req.Msg.Attribute,
+func (c *ClaimRules) Append(o *ClaimRules) {
+	if o.Userinfo != nil {
+		if c.Userinfo == nil {
+			c.Userinfo = &claimObjectRoot{}
 		}
-
-		if rest.isSingleTenant {
-			if err := dataprovider.Set(ctx, sg); err != nil {
-				return nil, err
-			}
-		} else {
-			if err := dataprovider.Create(ctx, sg); err != nil {
-				return nil, err
+		if o.Userinfo.VerifiedClaims != nil {
+			if c.Userinfo.VerifiedClaims == nil {
+				c.Userinfo.VerifiedClaims = o.Userinfo.VerifiedClaims
 			}
 		}
-
-		return connect.NewResponse(&oppb.SessionGroupCreateResponse{
-			Attribute: req.Msg.Attribute,
-		}), nil
+		if o.Userinfo.Claims != nil {
+			if c.Userinfo.Claims == nil {
+				c.Userinfo.Claims = o.Userinfo.Claims
+			} else {
+				for k, v := range o.Userinfo.Claims.branch {
+					c.Userinfo.Claims.branch[k] = v
+				}
+			}
+		}
+	}
+	if o.IdToken != nil {
+		if c.IdToken == nil {
+			c.IdToken = &claimObjectRoot{}
+		}
+		if o.IdToken.VerifiedClaims != nil {
+			if c.IdToken.VerifiedClaims == nil {
+				c.IdToken.VerifiedClaims = o.IdToken.VerifiedClaims
+			}
+		}
+		if o.IdToken.Claims != nil {
+			if c.IdToken.Claims == nil {
+				c.IdToken.Claims = o.IdToken.Claims
+			} else {
+				for k, v := range o.IdToken.Claims.branch {
+					c.IdToken.Claims.branch[k] = v
+				}
+			}
+		}
 	}
 }

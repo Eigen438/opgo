@@ -20,57 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
-import (
-	"context"
-	"fmt"
-	"time"
+import "encoding/json"
 
-	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
-)
-
-type RequestDetails struct {
-	Key        *oppb.CommonKey
-	Client     *Client
-	AuthParams *oppb.AuthorizationParameters
-	Issuer     string
+type claimObjectRoot struct {
+	VerifiedClaims *verifiedClaims `json:"verified_claims,omitempty"`
+	Claims         *claimsTree     `json:"claims,omitempty"`
 }
 
-type Request struct {
-	CreateAt time.Time
-	Details  RequestDetails
-	ExpireAt time.Time
-}
-
-func GetRequestCollectionName(issuerId string) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/requests", version, issuerId)
-}
-
-func (r Request) Path(_ context.Context) string {
-	return GetRequestCollectionName(r.Details.Client.Issuer.Id) + "/" + r.Details.Key.Id
-}
-
-func (r Request) ExpireAtUnix(_ context.Context) int64 {
-	return r.ExpireAt.Unix()
-}
-
-func NewRequest(
-	id string,
-	issuer string,
-	client *Client,
-	authParam *oppb.AuthorizationParameters,
-	now time.Time) *Request {
-	return &Request{
-		Details: RequestDetails{
-			Key: &oppb.CommonKey{
-				Id: id,
-			},
-			Client:     client,
-			AuthParams: authParam,
-			Issuer:     issuer,
-		},
-		CreateAt: now,
-		ExpireAt: now.Add(time.Duration(client.Attribute.RequestLifetimeSeconds) * time.Second),
+func (c *claimObjectRoot) UnmarshalJSON(byteString []byte) error {
+	temp := &claimsTree{
+		branch: map[string]*claimsTree{},
 	}
+	if err := json.Unmarshal(byteString, temp); err != nil {
+		return err
+	}
+	if v, ok := temp.branch["verified_claims"]; ok {
+		c.VerifiedClaims = newVerifiedClaims(v)
+	}
+	delete(temp.branch, "verified_claims")
+	c.Claims = temp
+	return nil
+}
+
+func (c *claimObjectRoot) MakeClaims(claims string, out map[string]interface{}) error {
+	in := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(claims), &in); err != nil {
+		return err
+	}
+
+	if c == nil {
+		return nil
+	}
+	if ret := c.VerifiedClaims.Verify(in); ret != nil {
+		out["verified_claims"] = ret
+	}
+	if c.Claims != nil {
+		if _v := c.Claims.Filter(in); _v != nil {
+			if _out, ok := _v.(map[string]interface{}); ok {
+				for k, v := range _out {
+					out[k] = v
+				}
+			}
+		}
+	}
+	return nil
 }

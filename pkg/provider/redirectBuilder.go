@@ -58,7 +58,7 @@ type RedirectBuilder struct {
 	Values       map[string]string
 }
 
-func NewRedirectBuilder(iss *model.Issuer, client *model.Client, params *oppb.AuthorizationParameters, vals map[string]string) (*RedirectBuilder, error) {
+func newRedirectBuilder(iss *model.Issuer, client *model.Client, params *oppb.AuthorizationParameters, vals map[string]string) (*RedirectBuilder, error) {
 	u, err := url.Parse(params.RedirectUri)
 	if err != nil {
 		return nil, err

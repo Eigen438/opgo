@@ -26,7 +26,7 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
-	"github.com/Eigen438/opgo/pkg/auth"
+	"github.com/Eigen438/opgo/internal/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 )

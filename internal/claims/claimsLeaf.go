@@ -20,57 +20,59 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
 import (
-	"context"
-	"fmt"
-	"time"
-
-	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"reflect"
+	"slices"
 )
 
-type RequestDetails struct {
-	Key        *oppb.CommonKey
-	Client     *Client
-	AuthParams *oppb.AuthorizationParameters
-	Issuer     string
+func newTrue() *bool {
+	b := true
+	return &b
 }
 
-type Request struct {
-	CreateAt time.Time
-	Details  RequestDetails
-	ExpireAt time.Time
+func newFalse() *bool {
+	b := false
+	return &b
 }
 
-func GetRequestCollectionName(issuerId string) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/requests", version, issuerId)
+type claimsLeaf struct {
+	Essential *bool         `json:"essential,omitempty"`
+	MaxAge    *int64        `json:"max_age,omitempty"`
+	Purpose   string        `json:"purpose,omitempty"`
+	Value     interface{}   `json:"value,omitempty"`
+	Values    []interface{} `json:"values,omitempty"`
 }
 
-func (r Request) Path(_ context.Context) string {
-	return GetRequestCollectionName(r.Details.Client.Issuer.Id) + "/" + r.Details.Key.Id
-}
-
-func (r Request) ExpireAtUnix(_ context.Context) int64 {
-	return r.ExpireAt.Unix()
-}
-
-func NewRequest(
-	id string,
-	issuer string,
-	client *Client,
-	authParam *oppb.AuthorizationParameters,
-	now time.Time) *Request {
-	return &Request{
-		Details: RequestDetails{
-			Key: &oppb.CommonKey{
-				Id: id,
-			},
-			Client:     client,
-			AuthParams: authParam,
-			Issuer:     issuer,
-		},
-		CreateAt: now,
-		ExpireAt: now.Add(time.Duration(client.Attribute.RequestLifetimeSeconds) * time.Second),
+func (c *claimsLeaf) Verify(source interface{}) (interface{}, bool) {
+	if c == nil {
+		return nil, true
+	} else if c.Essential != nil {
+		if *c.Essential {
+			if source != nil {
+				return source, true
+			}
+			return nil, false
+		} else {
+			return source, true
+		}
+	} else if c.Value != nil {
+		if reflect.TypeOf(c.Value) == reflect.TypeOf(source) {
+			if c.Value == source {
+				return source, true
+			}
+		}
+		return nil, false
+	} else if c.Values != nil {
+		if slices.Contains(c.Values, source) {
+			return source, true
+		}
+		return nil, false
+	} else if c.MaxAge != nil {
+		// TODO: check max_age
+		return source, true
+	} else {
+		return source, true
 	}
 }

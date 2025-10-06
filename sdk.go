@@ -30,7 +30,7 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
-	"github.com/Eigen438/opgo/pkg/auth"
+	"github.com/Eigen438/opgo/internal/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1/oppbconnect"
 	"github.com/Eigen438/opgo/pkg/model"

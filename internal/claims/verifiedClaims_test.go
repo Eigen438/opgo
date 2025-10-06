@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Eigen
+// # Copyright (c) 2025 Eigen
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,57 +20,66 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package claims
 
 import (
-	"context"
-	"fmt"
-	"time"
+	"encoding/json"
+	"log"
+	"testing"
 
-	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
+	"github.com/stretchr/testify/assert"
 )
 
-type RequestDetails struct {
-	Key        *oppb.CommonKey
-	Client     *Client
-	AuthParams *oppb.AuthorizationParameters
-	Issuer     string
-}
-
-type Request struct {
-	CreateAt time.Time
-	Details  RequestDetails
-	ExpireAt time.Time
-}
-
-func GetRequestCollectionName(issuerId string) string {
-	return fmt.Sprintf("opgo/%s/issuers/%s/requests", version, issuerId)
-}
-
-func (r Request) Path(_ context.Context) string {
-	return GetRequestCollectionName(r.Details.Client.Issuer.Id) + "/" + r.Details.Key.Id
-}
-
-func (r Request) ExpireAtUnix(_ context.Context) int64 {
-	return r.ExpireAt.Unix()
-}
-
-func NewRequest(
-	id string,
-	issuer string,
-	client *Client,
-	authParam *oppb.AuthorizationParameters,
-	now time.Time) *Request {
-	return &Request{
-		Details: RequestDetails{
-			Key: &oppb.CommonKey{
-				Id: id,
+func TestNewVerifiedClaims(t *testing.T) {
+	assert := assert.New(t)
+	jsonBytes := []byte(`
+		[{
+			"verification": {
+				"trust_framework": {
+					"value": "gold"
+				}
 			},
-			Client:     client,
-			AuthParams: authParam,
-			Issuer:     issuer,
+			"claims": {
+				"given_name": null
+			}
 		},
-		CreateAt: now,
-		ExpireAt: now.Add(time.Duration(client.Attribute.RequestLifetimeSeconds) * time.Second),
+		{
+			"verification": {
+				"trust_framework": {
+					"value": "silver"
+				}
+			},
+			"claims": {
+				"family_name": null
+			}
+		}]
+	`)
+	ct := &claimsTree{}
+	err := json.Unmarshal(jsonBytes, ct)
+	assert.Nil(err)
+	vc := newVerifiedClaims(ct)
+	assert.NotNil(vc)
+	revert, err := json.Marshal(vc)
+	assert.Nil(err)
+	log.Printf("vc %s", revert)
+	{
+		jsonBytes := []byte(`
+			{
+				"verified_claims": {
+					"verification": {
+						"trust_framework": "silver"
+					},
+					"claims": {
+						"given_name": "jane",
+						"family_name": "joe"
+					}
+				}
+			}
+		`)
+		source := map[string]interface{}{}
+		err := json.Unmarshal(jsonBytes, &source)
+		assert.Nil(err)
+		dest := vc.Verify(source)
+		log.Printf("%+v", dest)
 	}
 }

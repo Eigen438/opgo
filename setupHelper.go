@@ -92,8 +92,10 @@ func (p *SetupHelper) NewServeMux(sdk Sdk) *http.ServeMux {
 	if p.useDiscovery() {
 		mux.HandleFunc(DEFAULT_DISCOVERY_PATH, sdk.DiscoveryEndpoint)
 	}
+
 	mux.HandleFunc(p.authorizationPath(), sdk.AuthorizationEndpoint)
 	mux.HandleFunc(p.tokenPath(), sdk.TokenEndpoint)
+
 	if p.jwksPath() != "" {
 		mux.HandleFunc(p.jwksPath(), sdk.JwksEndpoint)
 	}

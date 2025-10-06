@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Eigen438/opgo/internal/claims"
 	"github.com/Eigen438/opgo/internal/convert"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/model"
@@ -46,26 +47,26 @@ var fapiRejectionAlg = []string{"none", "RS256", "RS384", "RS512"}
 // https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
 // https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
 type authorizationRequestParamFromJwt struct {
-	Scope               string           `json:"scope"`
-	ResponseType        string           `json:"response_type"`
-	ClientId            string           `json:"client_id"`
-	RedirectUri         string           `json:"redirect_uri"`
-	State               string           `json:"state"`
-	ResponseMode        string           `json:"response_mode"`
-	Nonce               string           `json:"nonce"`
-	Display             string           `json:"display"`
-	Prompt              string           `json:"prompt"`
-	MaxAge              int32            `json:"max_age"`
-	UiLocales           string           `json:"ui_locales"`
-	IdTokenHint         string           `json:"id_token_hint"`
-	LoginHint           string           `json:"login_hint"`
-	AcrValues           string           `json:"acr_values"`
-	ClaimsLocales       string           `json:"claims_locales"`
-	Claims              model.ClaimRules `json:"claims"`
-	CodeChallenge       string           `json:"code_challenge"`
-	CodeChallengeMethod string           `json:"code_challenge_method"`
-	Request             string           `json:"request"`
-	RequestUri          string           `json:"request_uri"`
+	Scope               string            `json:"scope"`
+	ResponseType        string            `json:"response_type"`
+	ClientId            string            `json:"client_id"`
+	RedirectUri         string            `json:"redirect_uri"`
+	State               string            `json:"state"`
+	ResponseMode        string            `json:"response_mode"`
+	Nonce               string            `json:"nonce"`
+	Display             string            `json:"display"`
+	Prompt              string            `json:"prompt"`
+	MaxAge              int32             `json:"max_age"`
+	UiLocales           string            `json:"ui_locales"`
+	IdTokenHint         string            `json:"id_token_hint"`
+	LoginHint           string            `json:"login_hint"`
+	AcrValues           string            `json:"acr_values"`
+	ClaimsLocales       string            `json:"claims_locales"`
+	Claims              claims.ClaimRules `json:"claims"`
+	CodeChallenge       string            `json:"code_challenge"`
+	CodeChallengeMethod string            `json:"code_challenge_method"`
+	Request             string            `json:"request"`
+	RequestUri          string            `json:"request_uri"`
 	jwt.RegisteredClaims
 }
 
@@ -150,7 +151,7 @@ func (a authorizationRequestParamFromJwt) GetClaimsLocales() []string {
 }
 
 func (a authorizationRequestParamFromJwt) GetClaims() string {
-	if len(a.Claims.IdToken) > 0 || len(a.Claims.Userinfo) > 0 {
+	if !claims.IsClaimRulesEmpty(&a.Claims) {
 		b, err := json.Marshal(a.Claims)
 		if err == nil {
 			return string(b)

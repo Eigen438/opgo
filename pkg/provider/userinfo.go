@@ -31,8 +31,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
+	"github.com/Eigen438/opgo/internal/auth"
 	"github.com/Eigen438/opgo/internal/query"
-	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 	"github.com/Eigen438/opgo/pkg/model"
@@ -89,25 +89,19 @@ func (p *Provider) Userinfo(ctx context.Context,
 			}
 		}
 
-		in := map[string]interface{}{}
-		err := json.Unmarshal([]byte(access.Details.Authorized.Claims), &in)
+		cr, err := makeClaimsRules(access.Details.Authorized.Request.AuthParams)
 		if err != nil {
 			return nil, err
 		}
 
 		// クレーム情報からユーザ情報の応答を作成する
 		u := jwt.MapClaims{}
+		if err := cr.Userinfo.MakeClaims(access.Details.Authorized.Claims, u); err != nil {
+			return nil, err
+		}
+
 		// 必須クレーム設定
 		u["sub"] = access.Details.Authorized.Subject
-
-		// ClaimRulesを復元
-		cr := model.NewClaimRules()
-		_ = json.Unmarshal(access.Details.Authorized.Request.RequestClaims, cr)
-		for key, val := range in {
-			if _, ok := cr.Userinfo[key]; ok {
-				u[key] = val
-			}
-		}
 
 		if access.Details.Authorized.Request.Client.Meta.UserinfoSignedResponseAlg == "" {
 			return responseJson(u)

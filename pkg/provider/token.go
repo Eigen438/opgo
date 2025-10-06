@@ -36,10 +36,10 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/Eigen438/dataprovider"
+	"github.com/Eigen438/opgo/internal/auth"
 	"github.com/Eigen438/opgo/internal/oauth"
 	"github.com/Eigen438/opgo/internal/query"
 	"github.com/Eigen438/opgo/internal/retryhelper"
-	"github.com/Eigen438/opgo/pkg/auth"
 	"github.com/Eigen438/opgo/pkg/auto-generated/oppb/v1"
 	"github.com/Eigen438/opgo/pkg/httphelper"
 	"github.com/Eigen438/opgo/pkg/model"
@@ -265,9 +265,9 @@ func (p *Provider) Token(ctx context.Context,
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					access, err := MakeAccessTokenIdentifier(authCode.Details.Authorized, time.Now(), req.Msg.TlsClientCertificate)
+					access, err := makeAccessTokenIdentifier(authCode.Details.Authorized, time.Now(), req.Msg.TlsClientCertificate)
 					if err != nil {
-						log.Printf("data.MakeAccessTokenIdentifier error:%s", err.Error())
+						log.Printf("makeAccessTokenIdentifier error:%s", err.Error())
 						goError = err
 						return
 					}
@@ -286,9 +286,9 @@ func (p *Provider) Token(ctx context.Context,
 				go func() {
 					defer wg.Done()
 					if slices.Contains(authCode.Details.Authorized.Request.AuthParams.Scopes, "offline_access") {
-						refresh, err := MakeRefreshTokenIdentifier(authCode.Details.Authorized, time.Now())
+						refresh, err := makeRefreshTokenIdentifier(authCode.Details.Authorized, time.Now())
 						if err != nil {
-							log.Printf("data.MakeRefreshTokenIdentifier error:%s", err.Error())
+							log.Printf("makeRefreshTokenIdentifier error:%s", err.Error())
 							goError = err
 							return
 						}
@@ -306,9 +306,9 @@ func (p *Provider) Token(ctx context.Context,
 				go func() {
 					defer wg.Done()
 					if slices.Contains(authCode.Details.Authorized.Request.AuthParams.Scopes, "openid") {
-						id, err := MakeIdTokenIdentifier(authCode.Details.Authorized, time.Now())
+						id, err := makeIdTokenIdentifier(authCode.Details.Authorized, time.Now())
 						if err != nil {
-							log.Printf("data.MakeIdTokenIdentifier error:%s", err.Error())
+							log.Printf("makeIdTokenIdentifier error:%s", err.Error())
 							goError = err
 							return
 						}
@@ -317,7 +317,7 @@ func (p *Provider) Token(ctx context.Context,
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
-							claims, err := MakeIdTokenClaims(iss, id, time.Now(), "", "", "")
+							claims, err := makeIdTokenClaims(iss, id, time.Now(), "", "", "")
 							if err != nil {
 								goError = err
 								return
@@ -460,8 +460,9 @@ func (p *Provider) Token(ctx context.Context,
 				}
 
 				tlsClientCertificate := req.Msg.TlsClientCertificate
-				access, err := MakeAccessTokenIdentifier(refreshToken.Details.Authorized, time.Now(), tlsClientCertificate)
+				access, err := makeAccessTokenIdentifier(refreshToken.Details.Authorized, time.Now(), tlsClientCertificate)
 				if err != nil {
+					log.Printf("makeAccessTokenIdentifier error:%s", err.Error())
 					return err
 				}
 				if err := dataprovider.Create(ctx, access); err != nil {
@@ -473,9 +474,9 @@ func (p *Provider) Token(ctx context.Context,
 				success.TokenType = "Bearer"
 
 				if slices.Contains(refreshToken.Details.Authorized.Request.AuthParams.Scopes, "offline_access") {
-					refresh, err := MakeRefreshTokenIdentifier(refreshToken.Details.Authorized, time.Now())
+					refresh, err := makeRefreshTokenIdentifier(refreshToken.Details.Authorized, time.Now())
 					if err != nil {
-						log.Printf("data.MakeRefreshTokenIdentifier error:%s", err.Error())
+						log.Printf("makeRefreshTokenIdentifier error:%s", err.Error())
 						return err
 					}
 					if err := dataprovider.Create(ctx, refresh); err != nil {
@@ -486,16 +487,16 @@ func (p *Provider) Token(ctx context.Context,
 				}
 
 				if slices.Contains(refreshToken.Details.Authorized.Request.AuthParams.Scopes, "openid") {
-					id, err := MakeIdTokenIdentifier(refreshToken.Details.Authorized, time.Now())
+					id, err := makeIdTokenIdentifier(refreshToken.Details.Authorized, time.Now())
 					if err != nil {
-						log.Printf("data.MakeIdTokenIdentifier error:%s", err.Error())
+						log.Printf("makeIdTokenIdentifier error:%s", err.Error())
 						return err
 					}
 					if err := dataprovider.Create(ctx, id); err != nil {
 						return err
 					}
 
-					claims, err := MakeIdTokenClaims(iss, id, time.Now(), "", "", "")
+					claims, err := makeIdTokenClaims(iss, id, time.Now(), "", "", "")
 					if err != nil {
 						return err
 					}
