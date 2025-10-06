@@ -89,7 +89,7 @@ func (p *Provider) Userinfo(ctx context.Context,
 			}
 		}
 
-		cr, err := makeClaimsRule(access.Details.Authorized.Request.AuthParams)
+		cr, err := makeClaimsRules(access.Details.Authorized.Request.AuthParams)
 		if err != nil {
 			return nil, err
 		}

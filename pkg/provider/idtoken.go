@@ -37,7 +37,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func makeClaimsRule(params *oppb.AuthorizationParameters) (*claims.ClaimRules, error) {
+func makeClaimsRules(params *oppb.AuthorizationParameters) (*claims.ClaimRules, error) {
 	cr := claims.MakeClaimRulesFromDefaultScope(params.Scopes)
 	if len(params.AcrValues) > 0 {
 		cr.Append(claims.NewAcrClaimRules(params.AcrValues))
@@ -53,7 +53,7 @@ func makeClaimsRule(params *oppb.AuthorizationParameters) (*claims.ClaimRules, e
 }
 
 func makeIdTokenClaims(iss *model.Issuer, identifier *model.TokenIdentifier, now time.Time, code, accessToken, state string) (jwt.MapClaims, error) {
-	cr, err := makeClaimsRule(identifier.Details.Authorized.Request.AuthParams)
+	cr, err := makeClaimsRules(identifier.Details.Authorized.Request.AuthParams)
 	if err != nil {
 		return nil, err
 	}

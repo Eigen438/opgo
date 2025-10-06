@@ -151,7 +151,7 @@ func (a authorizationRequestParamFromJwt) GetClaimsLocales() []string {
 }
 
 func (a authorizationRequestParamFromJwt) GetClaims() string {
-	if a.Claims.IdToken != nil || a.Claims.Userinfo != nil {
+	if !claims.IsClaimRulesEmpty(&a.Claims) {
 		b, err := json.Marshal(a.Claims)
 		if err == nil {
 			return string(b)

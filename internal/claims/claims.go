@@ -108,3 +108,16 @@ func MakeClaimRulesFromDefaultScope(scopes []string) *ClaimRules {
 	}
 	return ret
 }
+
+func IsClaimRulesEmpty(rules *ClaimRules) bool {
+	if rules == nil {
+		return true
+	}
+	if rules.IdToken != nil {
+		return false
+	}
+	if rules.Userinfo != nil {
+		return false
+	}
+	return true
+}
